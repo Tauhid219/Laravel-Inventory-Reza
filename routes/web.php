@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserRolePermissionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
@@ -100,11 +103,21 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/purchases/{purchase}/edit', [PurchaseController::class, 'edit'])->name('purchases.edit');
     Route::put('/purchases/{purchase}/edit', [PurchaseController::class, 'update'])->name('purchases.update');
     Route::delete('/purchases/{purchase}', [PurchaseController::class, 'destroy'])->name('purchases.delete');
+
+    // Route Role and Permission
+    Route::resource('/permission', PermissionController::class)->names('pr');
+    Route::resource('/role', RoleController::class)->names('rl');
+    Route::get('/role/{id}/add-permissions', [RoleController::class, 'addPermissionToRole'])->name('addPermissionToRole');
+    Route::put('/role/{id}/give-permissions', [RoleController::class, 'givePermissionToRole'])->name('givePermissionToRole');
+    Route::resource('/user', UserRolePermissionController::class)->names('user');
+    Route::get('welcome-page', function () {
+        return view('role-permission.welcome-page');
+    })->name('welcome-page');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
-Route::get('test/', function (){
-//    return view('test');
+Route::get('test/', function () {
+    //    return view('test');
     return view('orders.create');
 });
