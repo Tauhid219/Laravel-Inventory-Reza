@@ -22,7 +22,11 @@ class DatabaseSeeder extends Seeder
                 //UserSeeder::class,
             CategorySeeder::class,
             UnitSeeder::class,
-            ProductSeeder::class
+            ProductSeeder::class,
+            RoleSeeder::class,
+            PermissionSeeder::class,
+            UserSeederForRolePermission::class,
+            RolePermissionSeeder::class
         ]);
 
         $orders = Order::factory(50)->create();
