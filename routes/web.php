@@ -46,9 +46,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // User Management
-    Route::resource('/users', UserController::class); //->except(['show']);
+    Route::resource('/users', UserController::class)->middleware(['auth', 'role:super-admin']); //->except(['show']);
     // Route::put('/user/change-password/{username}', [UserController::class, 'updatePassword'])->name('users.updatePassword');
-    Route::put('/user/change-password/{user}', [UserController::class, 'updatePassword'])->name('users.updatePassword');
+    Route::put('/user/change-password/{user}', [UserController::class, 'updatePassword'])->middleware(['auth', 'role:super-admin'])->name('users.updatePassword');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/profile/settings', [ProfileController::class, 'settings'])->name('profile.settings');
@@ -79,7 +79,7 @@ Route::middleware(['auth'])->group(function () {
 
     // SHOW ORDER
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::put('/orders/update/{order}', [OrderController::class, 'update'])->name('orders.update');
+    Route::put('/orders/update/{order}', [OrderController::class, 'update'])->middleware(['auth', 'role:super-admin'])->name('orders.update');
 
     // DUES
     Route::get('/due/orders/', [DueOrderController::class, 'index'])->name('due.index');
@@ -102,18 +102,20 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
     Route::get('/purchases/{purchase}/edit', [PurchaseController::class, 'edit'])->name('purchases.edit');
-    Route::put('/purchases/{purchase}/edit', [PurchaseController::class, 'update'])->name('purchases.update');
+    Route::put('/purchases/{purchase}/edit', [PurchaseController::class, 'update'])->middleware(['auth', 'role:super-admin'])->name('purchases.update');
     Route::delete('/purchases/{purchase}', [PurchaseController::class, 'destroy'])->name('purchases.delete');
 
     // Route Role and Permission
-    Route::resource('/permission', PermissionController::class)->names('pr');
-    Route::resource('/role', RoleController::class)->names('rl');
-    Route::get('/role/{id}/add-permissions', [RoleController::class, 'addPermissionToRole'])->name('addPermissionToRole');
-    Route::put('/role/{id}/give-permissions', [RoleController::class, 'givePermissionToRole'])->name('givePermissionToRole');
-    Route::resource('/user', UserRolePermissionController::class)->names('user');
-    Route::get('welcome-page', function () {
-        return view('role-permission.welcome-page');
-    })->name('welcome-page');
+    Route::middleware(['role:super-admin'])->group(function () {
+        Route::resource('/permission', PermissionController::class)->names('pr');
+        Route::resource('/role', RoleController::class)->names('rl');
+        Route::get('/role/{id}/add-permissions', [RoleController::class, 'addPermissionToRole'])->name('addPermissionToRole');
+        Route::put('/role/{id}/give-permissions', [RoleController::class, 'givePermissionToRole'])->name('givePermissionToRole');
+        Route::resource('/user', UserRolePermissionController::class)->names('user');
+        Route::get('welcome-page', function () {
+            return view('role-permission.welcome-page');
+        })->name('welcome-page');
+    });
 });
 
 require __DIR__ . '/auth.php';
