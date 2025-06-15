@@ -64,7 +64,7 @@
 
                                             <x-input name="username" :value="old('username', $user->username)" required="true"/>
 
-                                            <x-input name="email" :value="old('name', $user->email)" label="Email address" required="true"/>
+                                            <x-input name="email" :value="old('email', $user->email)" label="Email address" required="true"/>
                                         </div>
                                     </div>
                                 </div>

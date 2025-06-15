@@ -47,7 +47,8 @@ Route::middleware(['auth'])->group(function () {
 
     // User Management
     Route::resource('/users', UserController::class); //->except(['show']);
-    Route::put('/user/change-password/{username}', [UserController::class, 'updatePassword'])->name('users.updatePassword');
+    // Route::put('/user/change-password/{username}', [UserController::class, 'updatePassword'])->name('users.updatePassword');
+    Route::put('/user/change-password/{user}', [UserController::class, 'updatePassword'])->name('users.updatePassword');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/profile/settings', [ProfileController::class, 'settings'])->name('profile.settings');
