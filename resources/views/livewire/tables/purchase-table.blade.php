@@ -28,13 +28,14 @@
             <div class="ms-auto text-secondary">
                 Search:
                 <div class="ms-2 d-inline-block">
-                    <input type="text" wire:model.live="search" class="form-control form-control-sm" aria-label="Search invoice">
+                    <input type="text" wire:model.live="search" class="form-control form-control-sm"
+                        aria-label="Search invoice">
                 </div>
             </div>
         </div>
     </div>
 
-    <x-spinner.loading-spinner/>
+    <x-spinner.loading-spinner />
 
     <div class="table-responsive">
         <table wire:loading.remove class="table table-bordered card-table table-vcenter text-nowrap datatable">
@@ -79,55 +80,55 @@
                 </tr>
             </thead>
             <tbody>
-            @forelse ($purchases as $purchase)
-                <tr>
-                    <td class="align-middle text-center">
-                        {{ $loop->iteration }}
-                    </td>
-                    <td class="align-middle text-center">
-                        {{ $purchase->purchase_no }}
-                    </td>
-                    <td class="align-middle">
-                        {{ $purchase->supplier->name }}
-                    </td>
-                    <td class="align-middle text-center">
-                        {{ $purchase->date->format('d-m-Y') }}
-                    </td>
-                    <td class="align-middle text-center">
-                        {{ Number::currency($purchase->total_amount, 'EUR') }}
-                    </td>
+                @forelse ($purchases as $purchase)
+                    <tr>
+                        <td class="align-middle text-center">
+                            {{ $loop->iteration }}
+                        </td>
+                        <td class="align-middle text-center">
+                            {{ $purchase->purchase_no }}
+                        </td>
+                        <td class="align-middle">
+                            {{ $purchase->supplier->name }}
+                        </td>
+                        <td class="align-middle text-center">
+                            {{ $purchase->date->format('d-m-Y') }}
+                        </td>
+                        <td class="align-middle text-center">
+                            {{ Number::currency($purchase->total_amount, 'EUR') }}
+                        </td>
 
-                    @if ($purchase->status === \App\Enums\PurchaseStatus::APPROVED)
-                        <td class="align-middle text-center">
-                            <span class="badge bg-green text-white text-uppercase">
-                                {{ __('APPROVED') }}
-                            </span>
-                        </td>
-                        <td class="align-middle text-center">
-                            <x-button.show class="btn-icon" route="{{ route('purchases.show', $purchase) }}"/>
+                        @if ($purchase->status === \App\Enums\PurchaseStatus::APPROVED)
+                            <td class="align-middle text-center">
+                                <span class="badge bg-green text-white text-uppercase">
+                                    {{ __('APPROVED') }}
+                                </span>
+                            </td>
+                            <td class="align-middle text-center">
+                                <x-button.show class="btn-icon" route="{{ route('purchases.show', $purchase) }}" />
 
-                            <x-button.edit class="btn-icon" route="{{ route('purchases.edit', $purchase) }}"/>
-                        </td>
-                    @else
-                        <td class="align-middle text-center">
-                            <span class="badge bg-orange text-white text-uppercase">
-                                {{ __('PENDING') }}
-                            </span>
-                        </td>
-                        <td class="align-middle text-center" style="width: 5%">
-                            <x-button.show class="btn-icon" route="{{ route('purchases.show', $purchase) }}"/>
-                            <x-button.edit class="btn-icon" route="{{ route('purchases.edit', $purchase) }}"/>
-                            <x-button.delete class="btn-icon" route="{{ route('purchases.delete', $purchase) }}"/>
-                        </td>
-                    @endif
-                </tr>
+                                {{-- <x-button.edit class="btn-icon" route="{{ route('purchases.edit', $purchase) }}" /> --}}
+                            </td>
+                        @else
+                            <td class="align-middle text-center">
+                                <span class="badge bg-orange text-white text-uppercase">
+                                    {{ __('PENDING') }}
+                                </span>
+                            </td>
+                            <td class="align-middle text-center" style="width: 5%">
+                                <x-button.show class="btn-icon" route="{{ route('purchases.show', $purchase) }}" />
+                                {{-- <x-button.edit class="btn-icon" route="{{ route('purchases.edit', $purchase) }}" /> --}}
+                                <x-button.delete class="btn-icon" route="{{ route('purchases.delete', $purchase) }}" />
+                            </td>
+                        @endif
+                    </tr>
                 @empty
-                <tr>
-                    <td class="align-middle text-center" colspan="7">
-                        No results found
-                    </td>
-                </tr>
-            @endforelse
+                    <tr>
+                        <td class="align-middle text-center" colspan="7">
+                            No results found
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -139,7 +140,7 @@
         </p>
 
         <ul class="pagination m-0 ms-auto">
-        {{ $purchases->links() }}
+            {{ $purchases->links() }}
         </ul>
     </div>
 </div>

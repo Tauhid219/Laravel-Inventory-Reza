@@ -86,7 +86,8 @@
                         </div>
 
                         @role('super-admin')
-                            @if ($purchase->purchase_status == 0)
+                            {{-- @if ($purchase->purchase_status == 0) --}}
+                            @if ($purchase->status == \App\Enums\PurchaseStatus::PENDING)
                                 <form action="{{ route('purchases.update', $purchase) }}" method="POST">
                                     @csrf
                                     @method('put')
