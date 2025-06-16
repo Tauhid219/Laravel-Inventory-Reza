@@ -36,6 +36,17 @@ class PurchaseController extends Controller
         ]);
     }
 
+    public function pendingPurchases()
+    {
+        $purchases = Purchase::with(['supplier'])
+            ->where('status', PurchaseStatus::PENDING) // Assuming 0 = pending
+            ->get();
+
+        return view('purchases.pending-purchases', [
+            'purchases' => $purchases,
+        ]);
+    }
+
     public function show(Purchase $purchase)
     {
         $purchase->loadMissing(['supplier', 'details', 'createdBy', 'updatedBy'])->get();
@@ -73,7 +84,7 @@ class PurchaseController extends Controller
         /*
          * TODO: Must validate that
          */
-        if (! $request->invoiceProducts == null) {
+        if (!$request->invoiceProducts == null) {
             $pDetails = [];
 
             foreach ($request->invoiceProducts as $product) {
@@ -100,7 +111,7 @@ class PurchaseController extends Controller
 
         foreach ($products as $product) {
             Product::where('id', $product->product_id)
-                ->update(['quantity' => DB::raw('quantity+'.$product->quantity)]);
+                ->update(['quantity' => DB::raw('quantity+' . $product->quantity)]);
         }
 
         Purchase::findOrFail($purchase->id)

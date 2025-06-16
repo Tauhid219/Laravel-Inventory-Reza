@@ -118,6 +118,9 @@
                                     <a class="dropdown-item" href="{{ route('purchases.approvedPurchases') }}">
                                         {{ __('Approval') }}
                                     </a>
+                                    <a class="dropdown-item" href="{{ route('purchases.pendingPurchases') }}">
+                                        {{ __('Pending') }}
+                                    </a>
                                     <a class="dropdown-item" href="{{ route('purchases.dailyPurchaseReport') }}">
                                         {{ __('Daily Purchase Report') }}
                                     </a>
