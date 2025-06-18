@@ -87,8 +87,8 @@ Follow these steps to set up the project locally:
 
 11. **Login using the default admin credentials:**
 
-    - **Email:** `admin@admin.com`
-    - **Password:** `password`
+    - **Email:** `ahmad@gmail.com`
+    - **Password:** `12345678`
 
 ## 📄 License
 
