@@ -9,28 +9,13 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Unit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Picqer\Barcode\BarcodeGeneratorHTML;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        // $products = Product::select('id', 'name')
-        //     ->limit(1)
-        //     ->get();
-
-        // return view('products.index', [
-        //     'products' => $products,
-        // ]);
-
-        // $products = Product::with(['category', 'unit']) // eager loading
-        //     ->latest()                                  // order by created_at desc
-        //     ->paginate(25);                             // pagination
-
-        // return view('products.index', [
-        //     'products' => $products,
-        // ]);
-
         return view('products.index');
     }
 
@@ -55,30 +40,42 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
+        // Check for duplicate product code
         $existingProduct = Product::where('code', $request->get('code'))->first();
 
         if ($existingProduct) {
             $newCode = $this->generateUniqueCode();
-
             $request->merge(['code' => $newCode]);
         }
 
         try {
-            $product = Product::create($request->all());
+            // Create product with validated fields and generated slug
+            $product = Product::create(array_merge(
+                $request->only([
+                    'code',
+                    'name',
+                    'category_id',
+                    'unit_id',
+                    'buying_price',
+                    'selling_price',
+                    'quantity_alert',
+                    'tax',
+                    'tax_type',
+                    'notes',
+                ]),
+                [
+                    'slug' => Str::slug($request->get('name')),
+                ]
+            ));
 
-            /**
-             * Handle image upload
-             */
+            // Handle image upload if present
             if ($request->hasFile('product_image')) {
                 $file = $request->file('product_image');
                 $filename = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
 
-                // Validate file before uploading
                 if ($file->isValid()) {
                     $file->storeAs('products/', $filename, 'public');
-                    $product->update([
-                        'product_image' => $filename
-                    ]);
+                    $product->update(['product_image' => $filename]);
                 } else {
                     return back()->withErrors(['product_image' => 'Invalid image file']);
                 }
@@ -90,7 +87,9 @@ class ProductController extends Controller
 
         } catch (\Exception $e) {
             // Handle any unexpected errors
-            return back()->withErrors(['error' => 'Something went wrong while creating the product']);
+            return back()->withErrors([
+                'error' => 'Something went wrong: ' . $e->getMessage()
+            ]);
         }
     }
 

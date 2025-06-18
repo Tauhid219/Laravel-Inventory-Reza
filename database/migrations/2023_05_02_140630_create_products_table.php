@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -18,7 +17,7 @@ return new class extends Migration
             $table->string('slug');
             $table->string('code')->unique()->nullable();
             //$table->string('product_barcode_symbology')->nullable();
-            $table->integer('quantity');
+            $table->integer('quantity')->default(0);
             $table->integer('buying_price')->comment('Buying Price');
             $table->integer('selling_price')->comment('Selling Price');
             $table->integer('quantity_alert');
@@ -31,7 +30,7 @@ return new class extends Migration
             $table->foreignIdFor(\App\Models\Category::class)
                 ->nullable()
                 ->constrained()
-//                ->restrictOnDelete();
+                //                ->restrictOnDelete();
 //                ->cascadeOnDelete();
                 ->nullOnDelete();
 
