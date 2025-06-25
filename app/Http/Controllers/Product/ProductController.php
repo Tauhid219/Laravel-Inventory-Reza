@@ -125,35 +125,6 @@ class ProductController extends Controller
         ]);
     }
 
-    // public function update(UpdateProductRequest $request, Product $product)
-    // {
-    //     $product->update($request->except('product_image'));
-
-    //     if ($request->hasFile('product_image')) {
-
-    //         // Delete old image if exists
-    //         if ($product->product_image) {
-    //             \Storage::disk('public')->delete('products/' . $product->product_image);
-    //         }
-
-    //         // Prepare new image
-    //         $file = $request->file('product_image');
-    //         $fileName = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
-
-    //         // Store new image to public storage
-    //         $file->storeAs('products/', $fileName, 'public');
-
-    //         // Save new image name to database
-    //         $product->update([
-    //             'product_image' => $fileName
-    //         ]);
-    //     }
-
-    //     return redirect()
-    //         ->route('products.index')
-    //         ->with('success', 'Product has been updated!');
-    // }
-
     public function update(UpdateProductRequest $request, Product $product)
     {
         try {
