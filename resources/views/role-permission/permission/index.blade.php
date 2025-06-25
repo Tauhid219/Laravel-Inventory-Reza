@@ -17,10 +17,10 @@
 
                         <div class="card mt-3">
                             <div class="card-header">
-                                <h4>Permissions
+                                <h4 class="mb-0">
+                                    Permissions
                                     @can('create permission')
-                                        <a href="{{ url('permission/create') }}" class="btn btn-primary float-end">Add
-                                            Permission</a>
+                                        <a href="{{ url('permission/create') }}" class="btn btn-primary ms-3">Add Permission</a>
                                     @endcan
                                 </h4>
                             </div>

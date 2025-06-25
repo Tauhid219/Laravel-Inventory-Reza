@@ -12,7 +12,7 @@
                             <div class="card-header">
                             </div>
                             <div class="card-body">
-                                <h1>Welcome to Role and Permission Management using Spatie</h1>
+                                <h1>Welcome to Role and Permission Management</h1>
                             </div>
                         </div>
                     </div>

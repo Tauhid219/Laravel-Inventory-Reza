@@ -10,8 +10,8 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Create User
-                                    <a href="{{ route('user.index') }}" class="btn btn-danger float-end">Back</a>
+                                <h4 class="mb-0">Create User
+                                    <a href="{{ route('user.index') }}" class="btn btn-danger ms-3">Back</a>
                                 </h4>
                             </div>
                             <div class="card-body">

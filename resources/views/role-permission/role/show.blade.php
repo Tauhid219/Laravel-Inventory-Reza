@@ -17,8 +17,8 @@
 
                         <div class="card mt-3">
                             <div class="card-header">
-                                <h4>Role List
-                                    <a href="{{ url('role') }}" class="btn btn-danger float-end">Back</a>
+                                <h4 class="mb-0">Role List
+                                    <a href="{{ url('role') }}" class="btn btn-danger ms-3">Back</a>
                                 </h4>
                             </div>
                             <div class="container">
