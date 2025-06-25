@@ -196,7 +196,7 @@
                                                 <span class="text-danger">*</span>
                                             </label>
 
-                                            <input type="number"
+                                            <input disabled type="number"
                                                    id="quantity"
                                                    name="quantity"
                                                    class="form-control @error('quantity') is-invalid @enderror"
@@ -285,7 +285,7 @@
                                     </div>
 
                                     <div class="col-md-12">
-                                        <div class="mb-3 mb-0">
+                                        <div class="mb-3">
                                             <label for="notes" class="form-label">
                                                 {{ __('Notes') }}
                                             </label>

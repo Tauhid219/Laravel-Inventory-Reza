@@ -125,33 +125,85 @@ class ProductController extends Controller
         ]);
     }
 
+    // public function update(UpdateProductRequest $request, Product $product)
+    // {
+    //     $product->update($request->except('product_image'));
+
+    //     if ($request->hasFile('product_image')) {
+
+    //         // Delete old image if exists
+    //         if ($product->product_image) {
+    //             \Storage::disk('public')->delete('products/' . $product->product_image);
+    //         }
+
+    //         // Prepare new image
+    //         $file = $request->file('product_image');
+    //         $fileName = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
+
+    //         // Store new image to public storage
+    //         $file->storeAs('products/', $fileName, 'public');
+
+    //         // Save new image name to database
+    //         $product->update([
+    //             'product_image' => $fileName
+    //         ]);
+    //     }
+
+    //     return redirect()
+    //         ->route('products.index')
+    //         ->with('success', 'Product has been updated!');
+    // }
+
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $product->update($request->except('product_image'));
+        try {
+            // Update basic info, excluding quantity and image
+            $product->update(array_merge(
+                $request->only([
+                    'code',
+                    'name',
+                    'category_id',
+                    'unit_id',
+                    'buying_price',
+                    'selling_price',
+                    'quantity_alert',
+                    'tax',
+                    'tax_type',
+                    'notes',
+                ]),
+                [
+                    'slug' => Str::slug($request->get('name')),
+                ]
+            ));
 
-        if ($request->hasFile('product_image')) {
+            // If image is updated
+            if ($request->hasFile('product_image')) {
+                // Delete old image if exists
+                if ($product->product_image) {
+                    \Storage::disk('public')->delete('products/' . $product->product_image);
+                }
 
-            // Delete old image if exists
-            if ($product->product_image) {
-                \Storage::disk('public')->delete('products/' . $product->product_image);
+                // Store new image
+                $file = $request->file('product_image');
+                $fileName = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
+
+                if ($file->isValid()) {
+                    $file->storeAs('products/', $fileName, 'public');
+                    $product->update(['product_image' => $fileName]);
+                } else {
+                    return back()->withErrors(['product_image' => 'Invalid image file']);
+                }
             }
 
-            // Prepare new image
-            $file = $request->file('product_image');
-            $fileName = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
+            return redirect()
+                ->route('products.index')
+                ->with('success', 'Product has been updated!');
 
-            // Store new image to public storage
-            $file->storeAs('products/', $fileName, 'public');
-
-            // Save new image name to database
-            $product->update([
-                'product_image' => $fileName
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'error' => 'Something went wrong: ' . $e->getMessage()
             ]);
         }
-
-        return redirect()
-            ->route('products.index')
-            ->with('success', 'Product has been updated!');
     }
 
     public function destroy(Product $product)

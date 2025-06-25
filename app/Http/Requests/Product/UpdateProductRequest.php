@@ -31,7 +31,7 @@ class UpdateProductRequest extends FormRequest
             ],
             'category_id'       => 'required|integer',
             'unit_id'           => 'required|integer',
-            'quantity'          => 'required|integer',
+            // 'quantity'          => 'required|integer',
             'buying_price'      => 'required|integer',
             'selling_price'     => 'required|integer',
             'quantity_alert'    => 'required|integer',
