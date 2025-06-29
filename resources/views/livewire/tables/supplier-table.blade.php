@@ -28,13 +28,14 @@
             <div class="ms-auto text-secondary">
                 Search:
                 <div class="ms-2 d-inline-block">
-                    <input type="text" wire:model.live="search" class="form-control form-control-sm" aria-label="Search invoice">
+                    <input type="text" wire:model.live="search" class="form-control form-control-sm"
+                        aria-label="Search invoice">
                 </div>
             </div>
         </div>
     </div>
 
-    <x-spinner.loading-spinner/>
+    <x-spinner.loading-spinner />
 
     <div class="table-responsive">
         <table wire:loading.remove class="table table-bordered card-table table-vcenter text-nowrap datatable">
@@ -73,45 +74,48 @@
                 </tr>
             </thead>
             <tbody>
-            @forelse ($suppliers as $supplier)
-                <tr>
-                    <td class="align-middle text-center">
-                        {{ ($suppliers->currentPage() - 1) * $suppliers->perPage() + $loop->iteration }}
-                    </td>
-                    <td class="align-middle">
-                        {{ $supplier->name }}
-                    </td>
-                    <td class="align-middle">
-                        {{ $supplier->email }}
-                    </td>
-                    <td class="align-middle">
-                        {{ $supplier->shopname }}
-                    </td>
-                    <td class="align-middle text-center">
-                        <span class="badge bg-primary text-white text-uppercase">
-                            {{ $supplier->type }}
-                        </span>
-                    </td>
-                    <td class="align-middle text-center" style="width: 10%">
-                        <x-button.show class="btn-icon" route="{{ route('suppliers.show', $supplier) }}"/>
-                        <x-button.edit class="btn-icon" route="{{ route('suppliers.edit', $supplier) }}"/>
-                        <x-button.delete class="btn-icon" route="{{ route('suppliers.destroy', $supplier) }}"/>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td class="align-middle text-center" colspan="5">
-                        No results found
-                    </td>
-                </tr>
-            @endforelse
+                @forelse ($suppliers as $supplier)
+                    <tr>
+                        <td class="align-middle text-center">
+                            {{ ($suppliers->currentPage() - 1) * $suppliers->perPage() + $loop->iteration }}
+                        </td>
+                        <td class="align-middle">
+                            {{ $supplier->name }}
+                        </td>
+                        <td class="align-middle">
+                            {{ $supplier->email }}
+                        </td>
+                        <td class="align-middle">
+                            {{ $supplier->shopname }}
+                        </td>
+                        <td class="align-middle text-center">
+                            <span class="badge bg-primary text-white text-uppercase">
+                                {{ $supplier->type }}
+                            </span>
+                        </td>
+                        <td class="align-middle text-center" style="width: 10%">
+                            <x-button.show class="btn-icon" route="{{ route('suppliers.show', $supplier) }}" />
+                            <x-button.edit class="btn-icon" route="{{ route('suppliers.edit', $supplier) }}" />
+                            @role('super-admin')
+                                <x-button.delete class="btn-icon" route="{{ route('suppliers.destroy', $supplier) }}" />
+                            @endrole
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td class="align-middle text-center" colspan="5">
+                            No results found
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 
     <div class="card-footer d-flex align-items-center">
         <p class="m-0 text-secondary">
-            Showing <span>{{ $suppliers->firstItem() }}</span> to <span>{{ $suppliers->lastItem() }}</span> of <span>{{ $suppliers->total() }}</span> entries
+            Showing <span>{{ $suppliers->firstItem() }}</span> to <span>{{ $suppliers->lastItem() }}</span> of
+            <span>{{ $suppliers->total() }}</span> entries
         </p>
 
         <ul class="pagination m-0 ms-auto">

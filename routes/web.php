@@ -62,6 +62,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/quotations', QuotationController::class);
     Route::resource('/customers', CustomerController::class);
     Route::resource('/suppliers', SupplierController::class);
+    Route::delete('suppliers/{supplier}', [SupplierController::class, 'destroy'])
+        ->name('suppliers.destroy')
+        ->middleware(['auth', 'role:super-admin']);
     Route::resource('/categories', CategoryController::class);
     Route::resource('/units', UnitController::class);
 
