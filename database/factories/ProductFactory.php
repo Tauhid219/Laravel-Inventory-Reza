@@ -2,8 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Enums\TaxType;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
@@ -17,16 +19,23 @@ class ProductFactory extends Factory
      */
     public function definition(): array
     {
+        $name = $this->faker->unique()->words(2, true);
+
         return [
-            'name' => fake()->word(),
-            'category_id' => fake()->randomElement([1, 2, 3, 4, 5]),
-            'unit_id' => fake()->randomElement([1, 2, 3]),
-            'quantity' => fake()->randomNumber(2),
-            'buying_price' => fake()->randomNumber(2),
-            'selling_price' => fake()->randomNumber(2),
-            'quantity_alert' => fake()->randomElement([5,10,15]),
-            'tax' => fake()->randomElement([5,10,15,20,25]),
-            'tax_type' => fake()->randomElement([1,2]),
+            'name' => $name,
+            'slug' => Str::slug($name), // ✅ slug তৈরি name থেকে
+            'code' => 'PC' . strtoupper(Str::random(6)), // ✅ কোড ইউনিক
+            'category_id' => \App\Models\Category::factory(),
+            'unit_id' => \App\Models\Unit::factory(),
+            'quantity' => $this->faker->numberBetween(1, 100),
+            'buying_price' => $this->faker->numberBetween(100, 1000),
+            'selling_price' => $this->faker->numberBetween(1000, 2000),
+            'quantity_alert' => $this->faker->randomElement([5, 10, 15]),
+            'tax' => $this->faker->randomElement([5, 10, 15, 20, 25]),
+            'tax_type' => $this->faker->randomElement([
+                TaxType::EXCLUSIVE->value,
+                TaxType::INCLUSIVE->value,
+            ]),
         ];
     }
 }
