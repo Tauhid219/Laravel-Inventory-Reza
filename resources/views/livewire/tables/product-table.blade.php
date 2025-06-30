@@ -138,9 +138,7 @@
                         <td class="align-middle text-center" style="width: 10%">
                             <x-button.show class="btn-icon" route="{{ route('products.show', $product) }}" />
                             <x-button.edit class="btn-icon" route="{{ route('products.edit', $product) }}" />
-                            @role('super-admin')
-                                <x-button.delete class="btn-icon" route="{{ route('products.destroy', $product) }}" />
-                            @endrole
+                            <x-button.delete class="btn-icon" route="{{ route('products.destroy', $product) }}" />
                         </td>
                     </tr>
                 @empty

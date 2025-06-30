@@ -73,9 +73,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/products/import', [ProductImportController::class, 'store'])->name('products.import.store');
     Route::get('/products/export', [ProductExportController::class, 'create'])->name('products.export.store');
     Route::resource('/products', ProductController::class);
-    Route::delete('products/{product}', [ProductController::class, 'destroy'])
-        ->name('products.destroy')
-        ->middleware(['auth', 'role:super-admin']);
 
     // Route Orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
