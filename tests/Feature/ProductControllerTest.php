@@ -48,18 +48,18 @@ class ProductControllerTest extends TestCase
 
     public function test_product_store(): void
     {
-        // 🔒 Acting as authenticated user
+        // Acting as authenticated user
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        // 🧪 Fake storage for image test
+        // Fake storage for image test
         Storage::fake('public');
 
-        // 🧱 Create necessary foreign keys
+        // Create necessary foreign keys
         $category = Category::factory()->create();
         $unit = Unit::factory()->create();
 
-        // 🧾 Prepare request payload
+        // Prepare request payload
         $data = [
             'code' => 'PC123',
             'name' => 'Test Product',
@@ -74,14 +74,14 @@ class ProductControllerTest extends TestCase
             'product_image' => UploadedFile::fake()->image('product.jpg'),
         ];
 
-        // 🚀 POST request to store product
+        // POST request to store product
         $response = $this->post('/products', $data);
 
-        // ✅ Assert redirect back with success message
+        // Assert redirect back with success message
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        // ✅ Assert product exists in database
+        // Assert product exists in database
         $this->assertDatabaseHas('products', [
             'name' => 'Test Product',
             // 'code' => 'PC123', // or auto-generated
@@ -89,13 +89,13 @@ class ProductControllerTest extends TestCase
             'unit_id' => $unit->id,
         ]);
 
-        // ✅ Assert image stored
+        // Assert image stored
         Storage::disk('public')->assertExists('products/' . Product::first()->product_image);
     }
 
     public function test_product_show(): void
     {
-        // Arrange: লগইন এবং প্রোডাক্ট বানানো
+        // Arrange:
         $user = User::factory()->create();
         $this->actingAs($user);
 
@@ -104,10 +104,10 @@ class ProductControllerTest extends TestCase
             ->for(Unit::factory())
             ->create();
 
-        // Act: show রাউট হিট করো
+        // Act: show
         $response = $this->get(route('products.show', $product->slug));
 
-        // Assert: সব ঠিকমতো কাজ করছে কি না
+        // Assert:
         $response->assertStatus(200);
         $response->assertViewIs('products.show');
         $response->assertViewHas('barcode');
@@ -118,7 +118,7 @@ class ProductControllerTest extends TestCase
 
     public function test_product_edit(): void
     {
-        // Arrange: লগইন এবং প্রোডাক্ট বানানো
+        // Arrange:
         $user = User::factory()->create();
         $this->actingAs($user);
 
@@ -127,10 +127,10 @@ class ProductControllerTest extends TestCase
             ->for(Unit::factory())
             ->create();
 
-        // Act: edit রাউট হিট করো
+        // Act: edit
         $response = $this->get(route('products.edit', $product->slug));
 
-        // Assert: সব ঠিকমতো কাজ করছে কি না
+        // Assert:
         $response->assertStatus(200);
         $response->assertViewIs('products.edit');
         $response->assertViewHas('product', function ($viewProduct) use ($product) {
@@ -151,10 +151,10 @@ class ProductControllerTest extends TestCase
             ->for(Unit::factory())
             ->create();
 
-        // 🧪 Fake storage for image test
+        // Fake storage for image test
         Storage::fake('public');
 
-        // 🧾 Prepare request payload
+        // Prepare request payload
         $data = [
             'code' => 'PC123',
             'name' => 'Updated Product',
@@ -183,7 +183,6 @@ class ProductControllerTest extends TestCase
             'selling_price' => 80000,  // 800 * 100
         ]);
 
-        // রিফ্রেশ করা প্রোডাক্ট
         $updatedProduct = Product::find($product->id);
 
         // Assert: Old image deleted and new image stored
@@ -194,7 +193,7 @@ class ProductControllerTest extends TestCase
 
     public function test_product_destroy(): void
     {
-        // Arrange: লগইন এবং প্রোডাক্ট বানানো
+        // Arrange:
         $user = User::factory()->create();
         $this->actingAs($user);
 
@@ -203,14 +202,14 @@ class ProductControllerTest extends TestCase
             ->for(Unit::factory())
             ->create();
 
-        // Act: DELETE রাউট হিট করো
+        // Act: DELETE
         $response = $this->delete(route('products.destroy', $product->slug));
 
-        // Assert: সব ঠিকমতো কাজ করছে কি না
+        // Assert:
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        // Assert: প্রোডাক্ট ডিলিট হয়েছে কি না
+        // Assert:
         $this->assertDatabaseMissing('products', [
             'id' => $product->id,
         ]);
