@@ -1,0 +1,60 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+
+class RolePermissionSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $superAdminRole = Role::where('name', 'super-admin')->first();
+        $permissions = Permission::all();
+
+        // Assign all permissions to super-admin role
+        $superAdminRole->syncPermissions($permissions);
+
+        // Get the 'admin' role from the roles table.
+        $adminRole = Role::where('name', 'admin')->first();
+
+        // Get specific permissions for the 'admin' role (change these to your desired permissions)
+        $adminPermissions = Permission::whereIn('name', [
+            'view role',
+            'update role',
+            'view permission',
+            'create user',
+            'view user',
+            'update user',
+            'delete user',
+            'create product',
+            'view product',
+            'update product',
+            'delete product',
+            'create purchase',
+            'view purchase',
+            'update purchase',
+            'delete purchase',
+            'create order',
+            'view order',
+            'update order',
+            'delete order',
+            'create category',
+            'view category',
+            'update category',
+            'delete category',
+            'create subcategory',
+            'view subcategory',
+            'update subcategory',
+            'delete subcategory'
+        ])->get();
+
+        // Assign only the specific permissions to the 'admin' role.
+        $adminRole->syncPermissions($adminPermissions);
+    }
+}
