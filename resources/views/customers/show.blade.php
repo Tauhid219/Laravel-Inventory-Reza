@@ -20,7 +20,7 @@
             <div class="row row-cards">
 
                 <div class="row">
-                    <div class="col-lg-4">
+                    {{-- <div class="col-lg-4">
                         <div class="card">
                             <div class="card-body">
                                 <h3 class="card-title">
@@ -34,9 +34,9 @@
                                 >
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
-                    <div class="col-lg-8">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
@@ -62,7 +62,7 @@
                                         <td>Address</td>
                                         <td>{{ $customer->address }}</td>
                                     </tr>
-                                    <tr>
+                                    {{-- <tr>
                                         <td>Account holder</td>
                                         <td>{{ $customer->account_holder }}</td>
                                     </tr>
@@ -73,7 +73,7 @@
                                     <tr>
                                         <td>Bank name</td>
                                         <td>{{ $customer->bank_name }}</td>
-                                    </tr>
+                                    </tr> --}}
                                     </tbody>
                                 </table>
                             </div>

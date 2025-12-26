@@ -2,12 +2,12 @@
 
 namespace App\Livewire\Tables;
 
-use App\Models\Category;
-use App\Models\Purchase;
 use Livewire\Component;
+use App\Models\Category;
+use App\Models\Order;
 use Livewire\WithPagination;
 
-class PurchaseTable extends Component
+class OrderV2Table extends Component
 {
     use WithPagination;
 
@@ -15,7 +15,7 @@ class PurchaseTable extends Component
 
     public $search = '';
 
-    public $sortField = 'purchase_no';
+    public $sortField = 'id';
 
     public $sortAsc = false;
 
@@ -25,7 +25,6 @@ class PurchaseTable extends Component
     {
         if ($this->sortField === $field) {
             $this->sortAsc = !$this->sortAsc;
-
         } else {
             $this->sortAsc = true;
         }
@@ -38,8 +37,8 @@ class PurchaseTable extends Component
         $user = auth()->user();
 
         // Start the query for orders
-        $query = Purchase::query()->with([
-            'supplier',
+        $query = Order::query()->with([
+            'customer',
             'details.product.category',
             'details.product.subCategory'
         ]);
@@ -63,7 +62,7 @@ class PurchaseTable extends Component
 
         // 3. Apply filters based on user roles
         if ($user->hasRole('super-admin|admin')) {
-            // Super Admin or Admin sees all purchases
+            // Super Admin or Admin sees all orders
             $this->selectedCategory = null;
         } else {
             $hasMatchingRole = false;
@@ -85,12 +84,12 @@ class PurchaseTable extends Component
         }
 
         // 4. Execute the query with search, sorting, and pagination
-        $purchases = $query->search($this->search)
+        $orders = $query->search($this->search)
             ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
             ->paginate($this->perPage);
 
-        return view('livewire.tables.purchase-table', [
-            'purchases' => $purchases,
+        return view('livewire.tables.order-v2-table', [
+            'orders' => $orders,
         ]);
     }
 }

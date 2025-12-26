@@ -74,7 +74,8 @@
                         <td class="align-middle text-center" style="width: 10%">
                             <x-button.show class="btn-icon" route="{{ route('categories.show', $category) }}" />
                             <x-button.edit class="btn-icon" route="{{ route('categories.edit', $category) }}" />
-                            <x-button.delete class="btn-icon" route="{{ route('categories.destroy', $category) }}" />
+                            <x-button.delete class="btn-icon" route="{{ route('categories.destroy', $category) }}"
+                                onclick="return confirm('Are you sure you want to delete this category?')" />
                         </td>
                     </tr>
                 @empty

@@ -28,7 +28,22 @@
                         <thead class="thead-light">
                             <tr>
                                 <th scope="col" class="align-middle text-center w-1">No.</th>
-                                <th scope="col" class="align-middle text-center">Purchase</th>
+                                {{-- <th scope="col" class="align-middle text-center">Purchase</th> --}}
+                                <th scope="col" class="align-middle text-center">
+                                    <a href="#" role="button">
+                                        {{ __('Product') }}
+                                    </a>
+                                </th>
+                                <th scope="col" class="align-middle text-center">
+                                    <a href="#" role="button">
+                                        {{ __('Category') }}
+                                    </a>
+                                </th>
+                                <th scope="col" class="align-middle text-center">
+                                    <a href="#" role="button">
+                                        {{ __('Sub Category') }}
+                                    </a>
+                                </th>
                                 <th scope="col" class="align-middle text-center">Supplier</th>
                                 <th scope="col" class="align-middle text-center">Date</th>
                                 <th scope="col" class="align-middle text-center">Total</th>
@@ -42,17 +57,48 @@
                                     <td class="align-middle text-center">
                                         {{ $loop->iteration }}
                                     </td>
-                                    <td class="align-middle text-center">
+                                    {{-- <td class="align-middle text-center">
                                         {{ $purchase->purchase_no }}
+                                    </td> --}}
+
+                                    {{-- Product Names --}}
+                                    <td class="align-middle text-center">
+                                        @foreach ($purchase->details as $detail)
+                                            <span class="badge bg-blue-lt">{{ $detail->product->name }}</span><br>
+                                        @endforeach
+                                    </td>
+
+                                    {{-- Category Names --}}
+                                    <td class="align-middle text-center">
+                                        @php
+                                            $categories = $purchase->details
+                                                ->map(fn($d) => $d->product->category->name)
+                                                ->unique();
+                                        @endphp
+                                        @foreach ($categories as $catName)
+                                            <span class="badge bg-purple-lt">{{ $catName }}</span><br>
+                                        @endforeach
+                                    </td>
+
+                                    {{-- Sub-Category Names --}}
+                                    <td class="align-middle text-center">
+                                        @php
+                                            $subCategories = $purchase->details
+                                                ->map(fn($d) => $d->product->subCategory->name ?? 'N/A')
+                                                ->unique();
+                                        @endphp
+                                        @foreach ($subCategories as $subCatName)
+                                            <span class="badge bg-gray-lt">{{ $subCatName }}</span><br>
+                                        @endforeach
                                     </td>
                                     <td class="align-middle">
                                         {{ $purchase->supplier->name }}
                                     </td>
                                     <td class="align-middle text-center">
-                                        {{ $purchase->purchase_date ? $purchase->purchase_date->format('d-m-Y') : 'N/A' }}
+                                        {{ $purchase->date ? $purchase->date->format('d-m-Y') : 'N/A' }}
                                     </td>
                                     <td class="align-middle text-center">
-                                        {{ Number::currency($purchase->total_amount, 'EUR') }}
+                                        {{ Number::currency($purchase->total_amount, 'BDT') }}
                                     </td>
                                     <td class="align-middle text-center">
                                         {{-- <span

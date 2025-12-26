@@ -28,7 +28,7 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="">Email</label>
-                                        <input type="text" name="email" readonly value="{{ $user->email }}"
+                                        <input type="text" name="email" value="{{ $user->email }}"
                                             class="form-control" />
                                     </div>
                                     <div class="mb-3">
@@ -40,7 +40,7 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="">Role</label>
-                                        <select name="role[]" class="form-control" multiple>
+                                        <select name="role[]" class="form-control">
                                             <option value="">Select Role</option>
                                             @foreach ($role as $roles)
                                                 @if ($roles->name != 'super-admin' || $user->hasRole('super-admin'))

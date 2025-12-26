@@ -20,6 +20,8 @@ use App\Http\Controllers\Order\OrderPendingController;
 use App\Http\Controllers\Order\OrderCompleteController;
 use App\Http\Controllers\Quotation\QuotationController;
 use App\Http\Controllers\Dashboards\DashboardController;
+use App\Http\Controllers\OrderV2\OrderV2CompleteController;
+use App\Http\Controllers\OrderV2\OrderV2Controller;
 use App\Http\Controllers\Product\ProductExportController;
 use App\Http\Controllers\Product\ProductImportController;
 
@@ -84,6 +86,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
     Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
+    Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.delete');
 
     Route::post('/invoice/create', [InvoiceController::class, 'create'])->name('invoice.create');
 
@@ -99,6 +102,16 @@ Route::middleware(['auth'])->group(function () {
 
     // TODO: Remove from OrderController
     Route::get('/orders/details/{order_id}/download', [OrderController::class, 'downloadInvoice'])->name('order.downloadInvoice');
+
+    // Route Orders V2
+    Route::get('/orders-v2', [OrderV2Controller::class, 'index'])->name('ordersV2.index');
+    Route::get('/orders-v2/completed', [OrderV2Controller::class, 'completedOrders'])->name('ordersV2.completedOrders');
+    Route::get('/orders-v2/pending', [OrderV2Controller::class, 'pendingOrders'])->name('ordersV2.pendingOrders');
+    Route::get('/orders-v2/create', [OrderV2Controller::class, 'create'])->name('ordersV2.create');
+    Route::post('/orders-v2/store', [OrderV2Controller::class, 'store'])->name('ordersV2.store');
+    Route::get('/orders-v2/{order}', [OrderV2Controller::class, 'show'])->name('ordersV2.show');
+    Route::put('/orders-v2/update/{order}', [OrderV2Controller::class, 'update'])->middleware(['auth', 'role:super-admin|admin'])->name('ordersV2.update');
+    Route::delete('/orders-v2/{order}', [OrderV2Controller::class, 'destroy'])->name('ordersV2.delete');
 
     // Route Purchases
     Route::get('/purchases/approved', [PurchaseController::class, 'approvedPurchases'])->name('purchases.approvedPurchases');

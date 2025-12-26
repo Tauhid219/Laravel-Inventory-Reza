@@ -18,7 +18,7 @@
 <div class="page-body">
     <div class="container-xl">
         <div class="row row-cards">
-            <div class="col-lg-4">
+            {{-- <div class="col-lg-4">
                 <div class="card">
                     <div class="card-body">
                         <h3 class="card-title">
@@ -32,9 +32,9 @@
                         />
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
-            <div class="col-lg-8">
+            <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header">
                         <div>
@@ -74,7 +74,7 @@
                                     <td>Type</td>
                                     <td>{{ $supplier->type->label() }}</td>
                                 </tr>
-                                <tr>
+                                {{-- <tr>
                                     <td>Account holder</td>
                                     <td>{{ $supplier->account_holder }}</td>
                                 </tr>
@@ -85,7 +85,7 @@
                                 <tr>
                                     <td>Bank name</td>
                                     <td>{{ $supplier->bank_name }}</td>
-                                </tr>
+                                </tr> --}}
                             </tbody>
                         </table>
                     </div>

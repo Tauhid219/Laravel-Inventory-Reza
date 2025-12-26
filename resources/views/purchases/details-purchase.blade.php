@@ -51,9 +51,9 @@
                             </div>
                             <!-- Form Group (order date) -->
                             <div class="col-md-6">
-                                <label class="small mb-1">Order Date</label>
+                                <label class="small mb-1">Purchase Date</label>
                                 <div class="form-control form-control-solid">
-                                    {{ $purchase->purchase_date ? $purchase->purchase_date->format('d-m-Y') : 'N/A' }}</div>
+                                    {{ $purchase->date ? $purchase->date->format('d-m-Y') : 'N/A' }}</div>
                             </div>
                         </div>
                         <div class="row gx-3 mb-3">
@@ -119,7 +119,7 @@
                                     <thead class="thead-light">
                                         <tr>
                                             <th scope="col">No.</th>
-                                            <th scope="col">Photo</th>
+                                            {{-- <th scope="col">Photo</th> --}}
                                             <th scope="col">Product Name</th>
                                             <th scope="col">Product Code</th>
                                             {{-- <th scope="col">Current Stock</th> --}}
@@ -132,12 +132,12 @@
                                         @foreach ($products as $product)
                                             <tr>
                                                 <td scope="row">{{ $loop->iteration }}</td>
-                                                <td scope="row">
+                                                {{-- <td scope="row">
                                                     <div style="max-height: 80px; max-width: 80px;">
                                                         <img class="img-fluid"
                                                             src="{{ $product->product->product_image ? asset('storage/products/' . $product->product->product_image) : asset('assets/img/products/default.webp') }}">
                                                     </div>
-                                                </td>
+                                                </td> --}}
                                                 <td scope="row">{{ $product->product->name }}</td>
                                                 <td scope="row">{{ $product->product->code }}</td>
                                                 {{-- <td scope="row"><span

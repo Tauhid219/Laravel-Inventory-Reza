@@ -24,7 +24,7 @@
                     @csrf
 
                     <div class="row">
-                        <div class="col-lg-4">
+                        {{-- <div class="col-lg-4">
                             <div class="card">
                                 <div class="card-body">
                                     <h3 class="card-title">
@@ -49,9 +49,9 @@
                                     @enderror
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-lg-8">
+                        <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-header">
                                     <div>
@@ -87,31 +87,19 @@
                                                     <span class="text-danger">*</span>
                                                 </label>
 
-                                                @if ($categories->count() === 1)
-                                                    <select name="category_id" id="category_id"
-                                                        class="form-select @error('category_id') is-invalid @enderror"
-                                                        readonly>
-                                                        @foreach ($categories as $category)
-                                                            <option value="{{ $category->id }}" selected>
-                                                                {{ $category->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                @else
-                                                    <select name="category_id" id="category_id"
-                                                        class="form-select @error('category_id') is-invalid @enderror">
-                                                        <option selected="" disabled="">
-                                                            Select a category:
-                                                        </option>
+                                                <select name="category_id" id="category_id"
+                                                    class="form-select @error('category_id') is-invalid @enderror">
+                                                    <option selected="" disabled="">
+                                                        Select a category:
+                                                    </option>
 
-                                                        @foreach ($categories as $category)
-                                                            <option value="{{ $category->id }}"
-                                                                @if (old('category_id') == $category->id) selected="selected" @endif>
-                                                                {{ $category->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                @endif
+                                                    @foreach ($categories as $category)
+                                                        <option value="{{ $category->id }}"
+                                                            @if (old('category_id') == $category->id) selected="selected" @endif>
+                                                            {{ $category->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
 
                                                 @error('category_id')
                                                     <div class="invalid-feedback">
@@ -205,14 +193,14 @@
                                         </div>
 
                                         <div class="col-sm-6 col-md-6">
-                                            <x-input type="number" label="Buying Price" name="buying_price"
-                                                id="buying_price" placeholder="0" value="{{ old('buying_price') }}" />
+                                            <x-input type="number" label="Price" name="buying_price" id="buying_price"
+                                                placeholder="0" value="{{ old('buying_price') }}" />
                                         </div>
 
-                                        <div class="col-sm-6 col-md-6">
+                                        {{-- <div class="col-sm-6 col-md-6">
                                             <x-input type="number" label="Selling Price" name="selling_price"
                                                 id="selling_price" placeholder="0" value="{{ old('selling_price') }}" />
-                                        </div>
+                                        </div> --}}
 
                                         <div class="col-sm-6 col-md-6">
                                             <x-input disabled type="number" label="Quantity" name="quantity"
@@ -225,7 +213,7 @@
                                                 value="{{ old('quantity_alert') }}" />
                                         </div>
 
-                                        <div class="col-sm-6 col-md-6">
+                                        {{-- <div class="col-sm-6 col-md-6">
                                             <x-input type="number" label="Tax" name="tax" id="tax"
                                                 placeholder="0" value="{{ old('tax') }}" />
                                         </div>
@@ -252,7 +240,7 @@
                                                     </div>
                                                 @enderror
                                             </div>
-                                        </div>
+                                        </div> --}}
 
                                         <div class="col-md-12">
                                             <div class="mb-3">

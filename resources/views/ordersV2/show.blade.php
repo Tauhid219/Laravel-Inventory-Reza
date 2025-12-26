@@ -48,7 +48,7 @@
                             </div>
                         </div>
 
-                        <x-action.close route="{{ route('orders.index') }}" />
+                        <x-action.close route="{{ route('ordersV2.index') }}" />
                     </div>
                 </div>
 
@@ -93,9 +93,11 @@
                             <thead class="thead-light">
                                 <tr>
                                     <th scope="col" class="align-middle text-center">No.</th>
-                                    <th scope="col" class="align-middle text-center">Photo</th>
+                                    {{-- <th scope="col" class="align-middle text-center">Photo</th> --}}
                                     <th scope="col" class="align-middle text-center">Product Name</th>
-                                    <th scope="col" class="align-middle text-center">Product Code</th>
+                                    {{-- <th scope="col" class="align-middle text-center">Product Code</th> --}}
+                                    <th scope="col" class="align-middle text-center">Category</th>
+                                    <th scope="col" class="align-middle text-center">Sub Category</th>
                                     <th scope="col" class="align-middle text-center">Quantity</th>
                                     <th scope="col" class="align-middle text-center">Price</th>
                                     <th scope="col" class="align-middle text-center">Total</th>
@@ -107,17 +109,25 @@
                                         <td class="align-middle text-center">
                                             {{ $loop->iteration }}
                                         </td>
-                                        <td class="align-middle text-center">
+                                        {{-- <td class="align-middle text-center">
                                             <div style="max-height: 80px; max-width: 80px;">
                                                 <img class="img-fluid"
                                                     src="{{ $item->product->product_image ? asset('storage/products/' . $item->product->product_image) : asset('assets/img/products/default.webp') }}">
                                             </div>
-                                        </td>
+                                        </td> --}}
                                         <td class="align-middle text-center">
-                                            {{ $item->product->name }}
+                                            <span class="badge bg-blue-lt">{{ $item->product->name }}</span>
                                         </td>
-                                        <td class="align-middle text-center">
+                                        {{-- <td class="align-middle text-center">
                                             {{ $item->product->code }}
+                                        </td> --}}
+                                        <td class="align-middle text-center">
+                                            <span
+                                                class="badge bg-purple-lt">{{ $item->product->category->name ?? 'N/A' }}</span>
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            <span
+                                                class="badge bg-gray-lt">{{ $item->product->subCategory->name ?? 'N/A' }}</span>
                                         </td>
                                         <td class="align-middle text-center">
                                             {{ $item->quantity }}
@@ -131,15 +141,13 @@
                                     </tr>
                                 @endforeach
                                 <tr>
-                                    <td colspan="6" class="text-end">
-                                        Payed amount
-                                    </td>
+                                    <td colspan="6" class="text-end">Payed amount</td>
                                     <td class="text-center">{{ number_format($order->pay, 2) }}</td>
                                 </tr>
-                                <tr>
+                                {{-- <tr>
                                     <td colspan="6" class="text-end">Due</td>
                                     <td class="text-center">{{ number_format($order->due, 2) }}</td>
-                                </tr>
+                                </tr> --}}
                                 {{-- <tr>
                                     <td colspan="6" class="text-end">VAT</td>
                                     <td class="text-center">{{ number_format($order->vat, 2) }}</td>
@@ -152,22 +160,28 @@
                         </table>
                     </div>
 
-                    <!-- Display Note -->
-                    <div class="row gx-3 mb-3">
-                        <div class="col-md-12">
-                            <label for="note" class="form-label">
-                                {{ __('Note') }}
-                            </label>
-                            <textarea class="form-control" rows="4" disabled>{{ $note }}</textarea>
+                    @if ($order->note)
+                        <div class="row mt-5">
+                            <div class="col-md-12">
+                                <div class="hr-text text-start text-secondary mb-3">
+                                    <span>{{ __('Order Note') }}</span>
+                                </div>
+                                <div class="card bg-light-lt border-0 shadow-none">
+                                    <div class="card-body p-3 text-secondary"
+                                        style="white-space: pre-wrap; background-color: #f8f9fa; border-left: 4px solid #206bc4;">
+                                        {{ $order->note }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    @endif
 
                 </div>
 
                 @role('super-admin|admin')
                     <div class="card-footer text-end">
                         @if ($order->order_status === \App\Enums\OrderStatus::PENDING)
-                            <form action="{{ route('orders.update', $order) }}" method="POST">
+                            <form action="{{ route('ordersV2.update', $order) }}" method="POST">
                                 @method('put')
                                 @csrf
 

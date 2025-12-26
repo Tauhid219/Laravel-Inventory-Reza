@@ -23,7 +23,7 @@
                 @csrf
                 @method('put')
                 <div class="row">
-                    <div class="col-lg-4">
+                    {{-- <div class="col-lg-4">
                         <div class="card">
                             <div class="card-body">
                                 <h3 class="card-title">
@@ -47,9 +47,9 @@
                                 @enderror
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
-                    <div class="col-lg-8">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
                                 <h3 class="card-title">
@@ -67,7 +67,7 @@
                                         <x-input label="Phone number" name="phone" :value="old('phone', $customer->phone)" :required="true" />
                                     </div>
 
-                                    <div class="col-sm-6 col-md-6">
+                                    {{-- <div class="col-sm-6 col-md-6">
                                         <label for="bank_name" class="form-label">
                                             {{ __('Bank Name') }}
                                         </label>
@@ -102,7 +102,7 @@
                                                  :value="old('account_number', $customer->account_number)"
                                                  :required="true"
                                         />
-                                    </div>
+                                    </div> --}}
 
                                     <div class="col-md-12">
                                         <div class="mb-3">

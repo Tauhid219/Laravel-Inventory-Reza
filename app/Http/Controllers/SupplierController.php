@@ -29,9 +29,9 @@ class SupplierController extends Controller
         /**
          * Handle upload an image
          */
-        if($request->hasFile('photo')){
+        if ($request->hasFile('photo')) {
             $file = $request->file('photo');
-            $filename = hexdec(uniqid()).'.'.$file->getClientOriginalExtension();
+            $filename = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
 
             $file->storeAs('suppliers/', $filename, 'public');
             $supplier->update([
@@ -68,16 +68,16 @@ class SupplierController extends Controller
         /**
          * Handle upload image with Storage.
          */
-        if($request->hasFile('photo')){
+        if ($request->hasFile('photo')) {
 
             // Delete Old Photo
-            if($supplier->photo){
+            if ($supplier->photo) {
                 unlink(public_path('storage/suppliers/') . $supplier->photo);
             }
 
             // Prepare New Photo
             $file = $request->file('photo');
-            $fileName = hexdec(uniqid()).'.'.$file->getClientOriginalExtension();
+            $fileName = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
 
             // Store an image to Storage
             $file->storeAs('suppliers/', $fileName, 'public');
@@ -95,10 +95,18 @@ class SupplierController extends Controller
 
     public function destroy(Supplier $supplier)
     {
+        // Check if supplier has related purchases
+        if ($supplier->purchases()->count() > 0) {
+            // If there are related purchases, return an error message
+            return redirect()
+                ->route('suppliers.index')
+                ->with('error', 'This supplier has related purchases. Deletion is not allowed.');
+        }
+
         /**
          * Delete photo if exists.
          */
-        if($supplier->photo){
+        if ($supplier->photo) {
             unlink(public_path('storage/suppliers/') . $supplier->photo);
         }
 

@@ -29,10 +29,9 @@ class CustomerController extends Controller
         /**
          * Handle upload an image
          */
-        if($request->hasFile('photo'))
-        {
+        if ($request->hasFile('photo')) {
             $file = $request->file('photo');
-            $filename = hexdec(uniqid()).'.'.$file->getClientOriginalExtension();
+            $filename = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
 
             $file->storeAs('customers/', $filename, 'public');
             $customer->update([
@@ -66,16 +65,16 @@ class CustomerController extends Controller
         //
         $customer->update($request->except('photo'));
 
-        if($request->hasFile('photo')){
+        if ($request->hasFile('photo')) {
 
             // Delete Old Photo
-            if($customer->photo){
+            if ($customer->photo) {
                 unlink(public_path('storage/customers/') . $customer->photo);
             }
 
             // Prepare New Photo
             $file = $request->file('photo');
-            $fileName = hexdec(uniqid()).'.'.$file->getClientOriginalExtension();
+            $fileName = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
 
             // Store an image to Storage
             $file->storeAs('customers/', $fileName, 'public');
@@ -93,8 +92,15 @@ class CustomerController extends Controller
 
     public function destroy(Customer $customer)
     {
-        if($customer->photo)
-        {
+        // Check if customer has related orders
+        if ($customer->orders()->count() > 0) {
+            // If there are related orders, return an error message
+            return redirect()
+                ->route('customers.index')
+                ->with('error', 'This customer has related orders. Deletion is not allowed.');
+        }
+
+        if ($customer->photo) {
             unlink(public_path('storage/customers/') . $customer->photo);
         }
 

@@ -22,7 +22,7 @@
             <form action="{{ route('suppliers.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
-                    <div class="col-lg-4">
+                    {{-- <div class="col-lg-4">
                         <div class="card">
                             <div class="card-body">
                                 <h3 class="card-title">
@@ -46,9 +46,9 @@
                                 @enderror
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
-                    <div class="col-lg-8">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
                                 <h3 class="card-title">
@@ -89,7 +89,7 @@
                                         @enderror
                                     </div>
 
-                                    <div class="col-sm-6 col-md-6">
+                                    {{-- <div class="col-sm-6 col-md-6">
                                         <label for="bank_name" class="form-label required">
                                             Bank Name
                                         </label>
@@ -115,7 +115,7 @@
 
                                     <div class="col-sm-6 col-md-6">
                                         <x-input name="account_number" label="Account number"/>
-                                    </div>
+                                    </div> --}}
 
                                     <div class="col-md-12">
                                         <div class="mb-3">

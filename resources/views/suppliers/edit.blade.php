@@ -23,7 +23,7 @@
                 @csrf
                 @method('put')
                 <div class="row">
-                    <div class="col-lg-4">
+                    {{-- <div class="col-lg-4">
                         <div class="card">
                             <div class="card-body">
                                 <h3 class="card-title">
@@ -47,9 +47,9 @@
                                 @enderror
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
-                    <div class="col-lg-8">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
                                 <div>
@@ -91,7 +91,7 @@
                                         @enderror
                                     </div>
 
-                                    <div class="col-sm-6 col-md-6">
+                                    {{-- <div class="col-sm-6 col-md-6">
                                         <label for="bank_name" class="form-label required">
                                             Bank Name
                                         </label>
@@ -124,7 +124,7 @@
                                                  label="Account number"
                                                  :value="old('account_number', $supplier->account_number)"
                                         />
-                                    </div>
+                                    </div> --}}
 
                                     <div class="col-md-12">
                                         <div class="mb-3">

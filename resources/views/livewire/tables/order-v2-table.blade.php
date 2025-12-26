@@ -2,12 +2,12 @@
     <div class="card-header">
         <div>
             <h3 class="card-title">
-                {{ __('Purchases') }}
+                {{ __('Orders') }}
             </h3>
         </div>
 
         <div class="card-actions">
-            <x-action.create route="{{ route('purchases.create') }}" />
+            <x-action.create route="{{ route('ordersV2.create') }}" />
         </div>
     </div>
 
@@ -45,9 +45,9 @@
                         {{ __('No.') }}
                     </th>
                     {{-- <th scope="col" class="align-middle text-center">
-                        <a wire:click.prevent="sortBy('purchase_no')" href="#" role="button">
-                            {{ __('Purchase No.') }}
-                            @include('inclues._sort-icon', ['field' => 'purchase_no'])
+                        <a wire:click.prevent="sortBy('invoice_no')" href="#" role="button">
+                            {{ __('Invoice No.') }}
+                            @include('inclues._sort-icon', ['field' => 'invoice_no'])
                         </a>
                     </th> --}}
                     <th scope="col" class="align-middle text-center">
@@ -66,27 +66,33 @@
                         </a>
                     </th>
                     <th scope="col" class="align-middle text-center">
-                        <a wire:click.prevent="sortBy('supplier_id')" href="#" role="button">
-                            {{ __('Supplier') }}
-                            @include('inclues._sort-icon', ['field' => 'supplier_id'])
+                        <a wire:click.prevent="sortBy('customer_id')" href="#" role="button">
+                            {{ __('Customer') }}
+                            @include('inclues._sort-icon', ['field' => 'customer_id'])
                         </a>
                     </th>
                     <th scope="col" class="align-middle text-center">
-                        <a wire:click.prevent="sortBy('date')" href="#" role="button">
+                        <a wire:click.prevent="sortBy('order_date')" href="#" role="button">
                             {{ __('Date') }}
-                            @include('inclues._sort-icon', ['field' => 'date'])
+                            @include('inclues._sort-icon', ['field' => 'order_date'])
                         </a>
                     </th>
+                    {{-- <th scope="col" class="align-middle text-center">
+                        <a wire:click.prevent="sortBy('payment_type')" href="#" role="button">
+                            {{ __('Paymet') }}
+                            @include('inclues._sort-icon', ['field' => 'payment_type'])
+                        </a>
+                    </th> --}}
                     <th scope="col" class="align-middle text-center">
-                        <a wire:click.prevent="sortBy('total_amount')" href="#" role="button">
+                        <a wire:click.prevent="sortBy('total')" href="#" role="button">
                             {{ __('Total') }}
-                            @include('inclues._sort-icon', ['field' => 'total_amount'])
+                            @include('inclues._sort-icon', ['field' => 'total'])
                         </a>
                     </th>
                     <th scope="col" class="align-middle text-center">
-                        <a wire:click.prevent="sortBy('status')" href="#" role="button">
+                        <a wire:click.prevent="sortBy('order_status')" href="#" role="button">
                             {{ __('Status') }}
-                            @include('inclues._sort-icon', ['field' => 'status'])
+                            @include('inclues._sort-icon', ['field' => 'order_status'])
                         </a>
                     </th>
                     <th scope="col" class="align-middle text-center">
@@ -95,18 +101,18 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($purchases as $purchase)
+                @forelse ($orders as $order)
                     <tr>
                         <td class="align-middle text-center">
                             {{ $loop->iteration }}
                         </td>
                         {{-- <td class="align-middle text-center">
-                            {{ $purchase->purchase_no }}
+                            {{ $order->invoice_no }}
                         </td> --}}
-
+                        
                         {{-- Product Names --}}
                         <td class="align-middle text-center">
-                            @foreach ($purchase->details as $detail)
+                            @foreach ($order->details as $detail)
                                 <span class="badge bg-blue-lt">{{ $detail->product->name }}</span><br>
                             @endforeach
                         </td>
@@ -114,7 +120,7 @@
                         {{-- Category Names --}}
                         <td class="align-middle text-center">
                             @php
-                                $categories = $purchase->details->map(fn($d) => $d->product->category->name)->unique();
+                                $categories = $order->details->map(fn($d) => $d->product->category->name)->unique();
                             @endphp
                             @foreach ($categories as $catName)
                                 <span class="badge bg-purple-lt">{{ $catName }}</span><br>
@@ -124,7 +130,7 @@
                         {{-- Sub-Category Names --}}
                         <td class="align-middle text-center">
                             @php
-                                $subCategories = $purchase->details
+                                $subCategories = $order->details
                                     ->map(fn($d) => $d->product->subCategory->name ?? 'N/A')
                                     ->unique();
                             @endphp
@@ -133,45 +139,34 @@
                             @endforeach
                         </td>
                         <td class="align-middle">
-                            {{ $purchase->supplier->name }}
+                            {{ $order->customer->name }}
                         </td>
                         <td class="align-middle text-center">
-                            {{ $purchase->date->format('d-m-Y') }}
+                            {{ $order->order_date->format('d-m-Y') }}
+                        </td>
+                        {{-- <td class="align-middle text-center">
+                            {{ $order->payment_type }}
+                        </td> --}}
+                        <td class="align-middle text-center">
+                            {{ Number::currency($order->total, 'BDT') }}
                         </td>
                         <td class="align-middle text-center">
-                            {{ Number::currency($purchase->total_amount, 'BDT') }}
+                            <x-status dot
+                                color="{{ $order->order_status === \App\Enums\OrderStatus::COMPLETE ? 'green' : 'orange' }}"
+                                class="text-uppercase">
+                                {{ $order->order_status->label() }}
+                            </x-status>
                         </td>
-
-                        @if ($purchase->status === \App\Enums\PurchaseStatus::APPROVED)
-                            <td class="align-middle text-center">
-                                <span class="badge bg-green text-white text-uppercase">
-                                    {{ __('APPROVED') }}
-                                </span>
-                            </td>
-                            <td class="align-middle text-center">
-                                <x-button.show class="btn-icon" route="{{ route('purchases.show', $purchase) }}" />
-
-                                {{-- <x-button.edit class="btn-icon" route="{{ route('purchases.edit', $purchase) }}" /> --}}
-                                <x-button.delete class="btn-icon" route="{{ route('purchases.delete', $purchase) }}"
-                                    onclick="return confirm('Are you sure you want to delete this purchase?')" />
-                            </td>
-                        @else
-                            <td class="align-middle text-center">
-                                <span class="badge bg-orange text-white text-uppercase">
-                                    {{ __('PENDING') }}
-                                </span>
-                            </td>
-                            <td class="align-middle text-center" style="width: 5%">
-                                <x-button.show class="btn-icon" route="{{ route('purchases.show', $purchase) }}" />
-                                {{-- <x-button.edit class="btn-icon" route="{{ route('purchases.edit', $purchase) }}" /> --}}
-                                <x-button.delete class="btn-icon" route="{{ route('purchases.delete', $purchase) }}"
-                                    onclick="return confirm('Are you sure you want to delete this purchase?')" />
-                            </td>
-                        @endif
+                        <td class="align-middle text-center" style="width: 5%">
+                            <x-button.show class="btn-icon" route="{{ route('ordersV2.show', $order) }}" />
+                            {{-- <x-button.print class="btn-icon" route="{{ route('order.downloadInvoice', $order) }}" /> --}}
+                            <x-button.delete class="btn-icon" route="{{ route('ordersV2.delete', $order) }}"
+                                onclick="return confirm('Are you sure you want to delete this order?')" />
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td class="align-middle text-center" colspan="7">
+                        <td class="align-middle text-center" colspan="8">
                             No results found
                         </td>
                     </tr>
@@ -182,12 +177,12 @@
 
     <div class="card-footer d-flex align-items-center">
         <p class="m-0 text-secondary">
-            Showing <span>{{ $purchases->firstItem() }}</span>
-            to <span>{{ $purchases->lastItem() }}</span> of <span>{{ $purchases->total() }}</span> entries
+            Showing <span>{{ $orders->firstItem() }}</span> to <span>{{ $orders->lastItem() }}</span> of
+            <span>{{ $orders->total() }}</span> entries
         </p>
 
         <ul class="pagination m-0 ms-auto">
-            {{ $purchases->links() }}
+            {{ $orders->links() }}
         </ul>
     </div>
 </div>

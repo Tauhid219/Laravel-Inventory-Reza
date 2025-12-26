@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
-class PurchaseForm extends Component
+class OrderV2Form extends Component
 {
     public $selectedCategory = null;
     public $selectedSubCategory = null;
@@ -21,7 +21,7 @@ class PurchaseForm extends Component
     private $product;
     public $manualTotal = null;
 
-    // Centralized role to category mapping
+    // Central role mapping
     protected $roleMapping = [
         'passive-admin'            => 'Passive',
         'printer-admin'            => 'Printer',
@@ -53,7 +53,7 @@ class PurchaseForm extends Component
         // Load categories based on the user's role
         $user = auth()->user();
 
-        // 1. Initialize the query builders
+        // 1. Initialize queries
         $categoryQuery = Category::query();
         $productQuery = Product::select('id', 'name', 'quantity', 'buying_price')
             ->with(['category', 'subCategory']);
@@ -61,7 +61,6 @@ class PurchaseForm extends Component
         // 2. Apply role-based filtering logic
         if (!$user->hasRole('super-admin|admin')) {
             $userCategoryName = null;
-
             foreach ($this->roleMapping as $role => $categoryName) {
                 if ($user->hasRole($role)) {
                     $userCategoryName = $categoryName;
@@ -70,70 +69,22 @@ class PurchaseForm extends Component
             }
 
             if ($userCategoryName) {
-                // Filter allowed categories for this user
+                // Filter categories
                 $categoryQuery->where('name', $userCategoryName);
 
-                // Filter allowed products for this user to prevent selecting other items
+                // Filter products to ensure only allowed products can be added
                 $productQuery->whereHas('category', function ($q) use ($userCategoryName) {
                     $q->where('name', $userCategoryName);
                 });
             } else {
-                // If no matching role is found, return empty results for safety
+                // If no matching role is found, return empty results
                 $categoryQuery->whereRaw('1 = 0');
                 $productQuery->whereRaw('1 = 0');
             }
         }
 
-        // 3. Fetch data
         $this->categories = $categoryQuery->get();
         $this->allProducts = $productQuery->get();
-
-        // if ($user->hasRole('super-admin|admin')) {
-        //     $this->categories = Category::all();
-        // } elseif ($user->hasRole('passive-admin')) {
-        //     $categoryId = Category::where('name', 'Passive')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('printer-admin')) {
-        //     $categoryId = Category::where('name', 'Printer')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('scanner-admin')) {
-        //     $categoryId = Category::where('name', 'Scanner')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('server-admin')) {
-        //     $categoryId = Category::where('name', 'Server')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('storage-admin')) {
-        //     $categoryId = Category::where('name', 'Storage')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('server-accessories-admin')) {
-        //     $categoryId = Category::where('name', 'Server Accessories')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('network-wired-admin')) {
-        //     $categoryId = Category::where('name', 'Network Wired')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('network-tools-admin')) {
-        //     $categoryId = Category::where('name', 'Network Tools')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('network-wireless-admin')) {
-        //     $categoryId = Category::where('name', 'Network Wireless')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('network-security-admin')) {
-        //     $categoryId = Category::where('name', 'Network Security')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('general-others-admin')) {
-        //     $categoryId = Category::where('name', 'General Others')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('office-accessories-admin')) {
-        //     $categoryId = Category::where('name', 'Office Accessories')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('office-stationeries-admin')) {
-        //     $categoryId = Category::where('name', 'Office Stationeries')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } else {
-        //     $this->categories = [];  // Empty array, no categories loaded
-        // }
-
-        // $this->allProducts = Product::select('id', 'name', 'quantity', 'buying_price')->with(['category', 'subCategory'])->get();
     }
 
     public function onCategoryUpdated($categoryId)
@@ -164,7 +115,7 @@ class PurchaseForm extends Component
             ? $this->manualTotal
             : $total * (1 + (is_numeric($this->taxes) ? $this->taxes : 0) / 100);
 
-        return view('livewire.purchase-form', [
+        return view('livewire.order-v2-form', [
             'subtotal' => $total,
             'categories' => $this->categories,
             'subCategories' => $this->subCategories,
@@ -222,7 +173,6 @@ class PurchaseForm extends Component
     public function saveProduct($index): void
     {
         $this->resetErrorBag();
-
         $product = $this->allProducts->find($this->invoiceProducts[$index]['product_id']);
 
         if ($product) {

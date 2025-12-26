@@ -77,7 +77,8 @@
                             <x-button.show class="btn-icon" route="{{ route('sub-categories.show', $subCategory) }}" />
                             <x-button.edit class="btn-icon" route="{{ route('sub-categories.edit', $subCategory) }}" />
                             <x-button.delete class="btn-icon"
-                                route="{{ route('sub-categories.destroy', $subCategory) }}" />
+                                route="{{ route('sub-categories.destroy', $subCategory) }}"
+                                onclick="return confirm('Are you sure you want to delete this subcategory?')" />
                         </td>
                     </tr>
                 @empty

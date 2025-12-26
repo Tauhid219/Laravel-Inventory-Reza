@@ -29,16 +29,16 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class
         ]);
 
-        $orders = Order::factory(50)->create();
-        $customers = Customer::factory(30)
+        $orders = Order::factory(5)->create();
+        $customers = Customer::factory(5)
             ->recycle($orders)
             ->create();
 
 
-        $purchases = Purchase::factory(60)->create();
-        $suppliers = Supplier::factory(20)->create();
+        $purchases = Purchase::factory(5)->create();
+        $suppliers = Supplier::factory(5)->create();
 
-        $users = User::factory(10)
+        $users = User::factory(5)
             ->recycle($suppliers)
             ->recycle($purchases)
             ->create();

@@ -24,7 +24,7 @@
                     @method('put')
 
                     <div class="row">
-                        <div class="col-lg-4">
+                        {{-- <div class="col-lg-4">
                             <div class="card">
                                 <div class="card-body">
                                     <h3 class="card-title">
@@ -50,9 +50,9 @@
                                     @enderror
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-lg-8">
+                        <div class="col-lg-12">
 
                             <div class="card">
                                 <div class="card-body">
@@ -182,7 +182,7 @@
                                         <div class="col-sm-6 col-md-6">
                                             <div class="mb-3">
                                                 <label class="form-label" for="buying_price">
-                                                    Buying price
+                                                    Price
                                                     <span class="text-danger">*</span>
                                                 </label>
 
@@ -199,7 +199,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-sm-6 col-md-6">
+                                        {{-- <div class="col-sm-6 col-md-6">
                                             <div class="mb-3">
                                                 <label for="selling_price" class="form-label">
                                                     Selling price
@@ -217,7 +217,7 @@
                                                     </div>
                                                 @enderror
                                             </div>
-                                        </div>
+                                        </div> --}}
 
                                         <div class="col-sm-6 col-md-6">
                                             <div class="mb-3">
@@ -259,7 +259,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-sm-6 col-md-6">
+                                        {{-- <div class="col-sm-6 col-md-6">
                                             <div class="mb-3">
                                                 <label for="tax" class="form-label">
                                                     {{ __('Tax') }}
@@ -300,7 +300,7 @@
                                                     </div>
                                                 @enderror
                                             </div>
-                                        </div>
+                                        </div> --}}
 
                                         <div class="col-md-12">
                                             <div class="mb-3">

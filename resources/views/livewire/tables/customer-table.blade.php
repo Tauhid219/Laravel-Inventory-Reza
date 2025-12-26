@@ -28,70 +28,73 @@
             <div class="ms-auto text-secondary">
                 Search:
                 <div class="ms-2 d-inline-block">
-                    <input type="text" wire:model.live="search" class="form-control form-control-sm" aria-label="Search invoice">
+                    <input type="text" wire:model.live="search" class="form-control form-control-sm"
+                        aria-label="Search invoice">
                 </div>
             </div>
         </div>
     </div>
 
-    <x-spinner.loading-spinner/>
+    <x-spinner.loading-spinner />
 
     <div class="table-responsive">
         <table wire:loading.remove class="table table-bordered card-table table-vcenter text-nowrap datatable">
             <thead class="thead-light">
-            <tr>
-                <th class="align-middle text-center w-1">
-                    {{ __('No.') }}
-                </th>
-                <th scope="col" class="align-middle text-center">
-                    <a wire:click.prevent="sortBy('name')" href="#" role="button">
-                        {{ __('Name') }}
-                        @include('inclues._sort-icon', ['field' => 'name'])
-                    </a>
-                </th>
-                <th scope="col" class="align-middle text-center">
-                    <a wire:click.prevent="sortBy('email')" href="#" role="button">
-                        {{ __('Email') }}
-                        @include('inclues._sort-icon', ['field' => 'email'])
-                    </a>
-                </th>
-                <th scope="col" class="align-middle text-center">
-                    {{ __('Action') }}
-                </th>
-            </tr>
+                <tr>
+                    <th class="align-middle text-center w-1">
+                        {{ __('No.') }}
+                    </th>
+                    <th scope="col" class="align-middle text-center">
+                        <a wire:click.prevent="sortBy('name')" href="#" role="button">
+                            {{ __('Name') }}
+                            @include('inclues._sort-icon', ['field' => 'name'])
+                        </a>
+                    </th>
+                    <th scope="col" class="align-middle text-center">
+                        <a wire:click.prevent="sortBy('email')" href="#" role="button">
+                            {{ __('Email') }}
+                            @include('inclues._sort-icon', ['field' => 'email'])
+                        </a>
+                    </th>
+                    <th scope="col" class="align-middle text-center">
+                        {{ __('Action') }}
+                    </th>
+                </tr>
             </thead>
             <tbody>
-            @forelse ($customers as $customer)
-                <tr>
-                    <td class="align-middle text-center">
-                        {{ ($customers->currentPage() - 1) * $customers->perPage() + $loop->iteration }}
-                    </td>
-                    <td class="align-middle">
-                        {{ $customer->name }}
-                    </td>
-                    <td class="align-middle">
-                        {{ $customer->email }}
-                    </td>
-                    <td class="align-middle text-center" style="width: 10%">
-                        <x-button.show class="btn-icon" route="{{ route('customers.show', $customer) }}"/>
-                        <x-button.edit class="btn-icon" route="{{ route('customers.edit', $customer) }}"/>
-                        <x-button.delete class="btn-icon" route="{{ route('customers.destroy', $customer) }}"/>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td class="align-middle text-center" colspan="8">
-                        No results found
-                    </td>
-                </tr>
-            @endforelse
+                @forelse ($customers as $customer)
+                    <tr>
+                        <td class="align-middle text-center">
+                            {{ ($customers->currentPage() - 1) * $customers->perPage() + $loop->iteration }}
+                        </td>
+                        <td class="align-middle">
+                            {{ $customer->name }}
+                        </td>
+                        <td class="align-middle">
+                            {{ $customer->email }}
+                        </td>
+                        <td class="align-middle text-center" style="width: 10%">
+                            <x-button.show class="btn-icon" route="{{ route('customers.show', $customer) }}" />
+                            <x-button.edit class="btn-icon" route="{{ route('customers.edit', $customer) }}" />
+                            <x-button.delete class="btn-icon" route="{{ route('customers.destroy', $customer) }}"
+                                onclick="return confirm('Are you sure you want to delete this customer?')" />
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td class="align-middle text-center" colspan="8">
+                            No results found
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 
     <div class="card-footer d-flex align-items-center">
         <p class="m-0 text-secondary">
-            Showing <span>{{ $customers->firstItem() }}</span> to <span>{{ $customers->lastItem() }}</span> of <span>{{ $customers->total() }}</span> entries
+            Showing <span>{{ $customers->firstItem() }}</span> to <span>{{ $customers->lastItem() }}</span> of
+            <span>{{ $customers->total() }}</span> entries
         </p>
 
         <ul class="pagination m-0 ms-auto">

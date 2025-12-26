@@ -97,7 +97,8 @@
                             <x-button.show class="btn-icon" route="{{ route('suppliers.show', $supplier) }}" />
                             <x-button.edit class="btn-icon" route="{{ route('suppliers.edit', $supplier) }}" />
                             @role('super-admin')
-                                <x-button.delete class="btn-icon" route="{{ route('suppliers.destroy', $supplier) }}" />
+                                <x-button.delete class="btn-icon" route="{{ route('suppliers.destroy', $supplier) }}"
+                                    onclick="return confirm('Are you sure you want to delete this supplier?')" />
                             @endrole
                         </td>
                     </tr>

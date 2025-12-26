@@ -21,6 +21,23 @@ class ProductTable extends Component
 
     public $categories;
 
+    // Define a mapping of roles to category names
+    protected $roleMapping = [
+        'passive-admin'            => 'Passive',
+        'printer-admin'            => 'Printer',
+        'scanner-admin'            => 'Scanner',
+        'server-admin'             => 'Server',
+        'storage-admin'            => 'Storage',
+        'server-accessories-admin' => 'Server Accessories',
+        'network-wired-admin'      => 'Network Wired',
+        'network-tools-admin'      => 'Network Tools',
+        'network-wireless-admin'   => 'Network Wireless',
+        'network-security-admin'   => 'Network Security',
+        'general-others-admin'     => 'General Others',
+        'office-accessories-admin' => 'Office Accessories',
+        'office-stationeries-admin'=> 'Office Stationeries',
+    ];
+
     public function sortBy($field): void
     {
         if ($this->sortField === $field) {
@@ -37,66 +54,38 @@ class ProductTable extends Component
     {
         $user = auth()->user();
 
-        $query = Product::query()->with(['category', 'unit', 'subCategory'])->search($this->search);
+        // 1. Start the query for products
+        $query = Product::query()
+            ->with(['category', 'unit', 'subCategory'])
+            ->search($this->search);
 
+        // 2. Apply role-based filtering
         if ($user->hasRole('super-admin|admin')) {
             $this->categories = Category::all();
-        } elseif ($user->hasRole('passive-admin')) {
-            $categoryId = Category::where('name', 'Passive')->first()->id;
-            $query->where('category_id', $categoryId);
-        } elseif ($user->hasRole('printer-admin')) {
-            $categoryId = Category::where('name', 'Printer')->first()->id;
-            $query->where('category_id', $categoryId);
-        } elseif ($user->hasRole('scanner-admin')) {
-            $categoryId = Category::where('name', 'Scanner')->first()->id;
-            $query->where('category_id', $categoryId);
-        } elseif ($user->hasRole('server-admin')) {
-            $categoryId = Category::where('name', 'Server')->first()->id;
-            $query->where('category_id', $categoryId);
-        } elseif ($user->hasRole('storage-admin')) {
-            $categoryId = Category::where('name', 'Storage')->first()->id;
-            $query->where('category_id', $categoryId);
-        } elseif ($user->hasRole('server-accessories-admin')) {
-            $categoryId = Category::where('name', 'Server Accessories')->first()->id;
-            $query->where('category_id', $categoryId);
-        } elseif ($user->hasRole('network-wired-admin')) {
-            $categoryId = Category::where('name', 'Network Wired')->first()->id;
-            $query->where('category_id', $categoryId);
-        } elseif ($user->hasRole('network-tools-admin')) {
-            $categoryId = Category::where('name', 'Network Tools')->first()->id;
-            $query->where('category_id', $categoryId);
-        } elseif ($user->hasRole('network-wireless-admin')) {
-            $categoryId = Category::where('name', 'Network Wireless')->first()->id;
-            $query->where('category_id', $categoryId);
-        } elseif ($user->hasRole('network-security-admin')) {
-            $categoryId = Category::where('name', 'Network Security')->first()->id;
-            $query->where('category_id', $categoryId);
-        } elseif ($user->hasRole('general-others-admin')) {
-            $categoryId = Category::where('name', 'General Others')->first()->id;
-            $query->where('category_id', $categoryId);
-        } elseif ($user->hasRole('office-accessories-admin')) {
-            $categoryId = Category::where('name', 'Office Accessories')->first()->id;
-            $query->where('category_id', $categoryId);
-        } elseif ($user->hasRole('office-stationeries-admin')) {
-            $categoryId = Category::where('name', 'Office Stationeries')->first()->id;
-            $query->where('category_id', $categoryId);
         } else {
-            $this->categories = [];  // Empty array, no categories loaded
+            $hasMatched = false;
+            foreach ($this->roleMapping as $role => $categoryName) {
+                if ($user->hasRole($role)) {
+                    $query->whereHas('category', function($q) use ($categoryName) {
+                        $q->where('name', $categoryName);
+                    });
+                    $hasMatched = true;
+                    break; // Exit the loop once a match is found
+                }
+            }
+
+            // If the user has no matching role, show empty results
+            if (!$hasMatched) {
+                $query->whereRaw('1 = 0');
+            }
         }
 
+        // 3. Pagination and Sorting
         $products = $query->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
             ->paginate($this->perPage);
 
         return view('livewire.tables.product-table', [
             'products' => $products,
         ]);
-
-        // return view('livewire.tables.product-table', [
-        //     'products' => Product::query()
-        //         ->with(['category', 'unit'])
-        //         ->search($this->search)
-        //         ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
-        //         ->paginate($this->perPage),
-        // ]);
     }
 }

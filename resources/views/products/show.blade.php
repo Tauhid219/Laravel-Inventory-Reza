@@ -20,7 +20,7 @@
             <div class="row row-cards">
 
                 <div class="row">
-                    <div class="col-lg-4">
+                    {{-- <div class="col-lg-4">
                         <div class="card">
                             <div class="card-body">
                                 <h3 class="card-title">
@@ -31,9 +31,9 @@
                                     alt="" id="image-preview" />
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
-                    <div class="col-lg-8">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
@@ -105,10 +105,10 @@
                                         </tr>
 
                                         <tr>
-                                            <td>Buying Price</td>
+                                            <td>Price</td>
                                             <td>{{ $product->buying_price }}</td>
                                         </tr>
-                                        <tr>
+                                        {{-- <tr>
                                             <td>Selling Price</td>
                                             <td>{{ $product->selling_price }}</td>
                                         </tr>
@@ -123,7 +123,7 @@
                                         <tr>
                                             <td>Tax Type</td>
                                             <td>{{ $product->tax_type->label() }}</td>
-                                        </tr>
+                                        </tr> --}}
                                         <tr>
                                             <td>{{ __('Notes') }}</td>
                                             <td>{{ $product->notes }}</td>

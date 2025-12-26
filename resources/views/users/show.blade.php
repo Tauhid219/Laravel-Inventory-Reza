@@ -27,11 +27,8 @@
                                     {{ __('Profile Image') }}
                                 </h3>
 
-                                <img id="image-preview"
-                                     class="img-account-profile mb-2"
-                                     src="{{ asset('assets/img/demo/user-placeholder.svg') }}"
-                                     alt=""
-                                >
+                                <img id="image-preview" class="img-account-profile mb-2"
+                                    src="{{ asset('assets/img/demo/user-placeholder.svg') }}" alt="">
                             </div>
                         </div>
                     </div>
@@ -57,6 +54,17 @@
                                         <tr>
                                             <td>Username</td>
                                             <td>{{ $user->username }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>User Role</td>
+                                            <td>
+                                                @if (!empty($user->getRoleNames()))
+                                                    @foreach ($user->getRoleNames() as $rolename)
+                                                        <label
+                                                            class="badge bg-primary text-white mx-1">{{ $rolename }}</label>
+                                                    @endforeach
+                                                @endif
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>

@@ -36,8 +36,10 @@ class PurchaseController extends Controller
 
     public function approvedPurchases()
     {
-        $purchases = Purchase::with(['supplier'])
-            ->where('status', PurchaseStatus::APPROVED)->get(); // 1 = approved
+        $purchases = Purchase::with(['supplier', 'details.product.category', 'details.product.subCategory'])
+            ->where('status', PurchaseStatus::APPROVED)
+            ->latest()
+            ->get(); // 1 = approved
 
         return view('purchases.approved-purchases', [
             'purchases' => $purchases,
@@ -46,8 +48,9 @@ class PurchaseController extends Controller
 
     public function pendingPurchases()
     {
-        $purchases = Purchase::with(['supplier'])
+        $purchases = Purchase::with(['supplier', 'details.product.category', 'details.product.subCategory'])
             ->where('status', PurchaseStatus::PENDING) // Assuming 0 = pending
+            ->latest()
             ->get();
 
         return view('purchases.pending-purchases', [

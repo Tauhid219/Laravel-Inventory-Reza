@@ -47,7 +47,8 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         @can('delete role')
-                                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                                            <button type="submit" class="btn btn-danger"
+                                                                onclick="return confirm('Are you sure you want to delete this role?')">Delete</button>
                                                         @endcan
                                                         @can('update role')
                                                             <a href="{{ route('addPermissionToRole', $role->id) }}"

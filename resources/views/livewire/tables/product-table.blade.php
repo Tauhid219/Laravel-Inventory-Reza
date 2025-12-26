@@ -149,7 +149,8 @@
                         <td class="align-middle text-center" style="width: 10%">
                             <x-button.show class="btn-icon" route="{{ route('products.show', $product) }}" />
                             <x-button.edit class="btn-icon" route="{{ route('products.edit', $product) }}" />
-                            <x-button.delete class="btn-icon" route="{{ route('products.destroy', $product) }}" />
+                            <x-button.delete class="btn-icon" route="{{ route('products.destroy', $product) }}"
+                                onclick="return confirm('Are you sure you want to delete this product?')" />
                         </td>
                     </tr>
                 @empty

@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Dashboards;
 use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Quotation;
 use App\Models\SubCategory;
+use App\Models\Supplier;
 
 class DashboardController extends Controller
 {
@@ -29,6 +31,8 @@ class DashboardController extends Controller
 
         $categories = Category::count();
         $subCategories = SubCategory::count();
+        $suppliers = Supplier::count();
+        $customers = Customer::count();
 
         $quotations = Quotation::count();
         $todayQuotations = Quotation::query()
@@ -44,6 +48,8 @@ class DashboardController extends Controller
             'todayPurchases' => $todayPurchases,
             'categories' => $categories,
             'subCategories' => $subCategories,
+            'suppliers' => $suppliers,
+            'customers' => $customers,
             'quotations' => $quotations,
             'todayQuotations' => $todayQuotations,
         ]);

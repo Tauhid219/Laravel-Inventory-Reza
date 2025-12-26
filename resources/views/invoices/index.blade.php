@@ -141,7 +141,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 class="modal-title text-center mx-auto" id="modalCenterTitle">Invoice of
-                        {{ $customer->name }}<br />Total Amount ${{ Cart::total() }}</h3>
+                        {{ $customer->name }}<br />Total Amount BDT{{ Cart::total() }}</h3>
                 </div>
 
                 <form action="{{ route('orders.store') }}" method="POST">

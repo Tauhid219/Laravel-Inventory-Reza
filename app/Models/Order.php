@@ -12,24 +12,26 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $guarded = [
-        'id',
-    ];
+    // protected $guarded = [
+    //     'id',
+    // ];
 
-    protected $fillable = [
-        'customer_id',
-        'order_date',
-        'order_status',
-        'total_products',
-        'sub_total',
-        'vat',
-        'total',
-        'invoice_no',
-        'payment_type',
-        'pay',
-        'due',
-        'note',
-    ];
+    // protected $fillable = [
+    //     'customer_id',
+    //     'order_date',
+    //     'order_status',
+    //     'total_products',
+    //     'sub_total',
+    //     'vat',
+    //     'total',
+    //     'invoice_no',
+    //     'payment_type',
+    //     'pay',
+    //     'due',
+    //     'note',
+    // ];
+
+    protected $guarded = [];
 
     protected $casts = [
         'order_date'    => 'date',

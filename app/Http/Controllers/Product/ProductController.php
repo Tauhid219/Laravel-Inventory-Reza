@@ -15,6 +15,22 @@ use Picqer\Barcode\BarcodeGeneratorHTML;
 
 class ProductController extends Controller
 {
+    private $roleMapping = [
+        'passive-admin' => 'Passive',
+        'printer-admin' => 'Printer',
+        'scanner-admin' => 'Scanner',
+        'server-admin' => 'Server',
+        'storage-admin' => 'Storage',
+        'server-accessories-admin' => 'Server Accessories',
+        'network-wired-admin' => 'Network Wired',
+        'network-tools-admin' => 'Network Tools',
+        'network-wireless-admin' => 'Network Wireless',
+        'network-security-admin' => 'Network Security',
+        'general-others-admin' => 'General Others',
+        'office-accessories-admin' => 'Office Accessories',
+        'office-stationeries-admin' => 'Office Stationeries',
+    ];
+
     public function __construct()
     {
         $this->middleware('permission:view product')->only(['index', 'show']);
@@ -31,56 +47,26 @@ class ProductController extends Controller
     public function create(Request $request)
     {
         $user = auth()->user();
+        $query = Category::query();
 
-        $categories = Category::query();
+        // Apply role-based filtering
+        if (!$user->hasRole('super-admin|admin')) {
+            $userCategoryName = null;
+            foreach ($this->roleMapping as $role => $categoryName) {
+                if ($user->hasRole($role)) {
+                    $userCategoryName = $categoryName;
+                    break;
+                }
+            }
 
-        if ($user->hasRole('super-admin|admin')) {
-            $categories = Category::all();
-        } elseif ($user->hasRole('passive-admin')) {
-            $categoryId = Category::where('name', 'Passive')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('printer-admin')) {
-            $categoryId = Category::where('name', 'Printer')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('scanner-admin')) {
-            $categoryId = Category::where('name', 'Scanner')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('server-admin')) {
-            $categoryId = Category::where('name', 'Server')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('storage-admin')) {
-            $categoryId = Category::where('name', 'Storage')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('server-accessories-admin')) {
-            $categoryId = Category::where('name', 'Server Accessories')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('network-wired-admin')) {
-            $categoryId = Category::where('name', 'Network Wired')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('network-tools-admin')) {
-            $categoryId = Category::where('name', 'Network Tools')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('network-wireless-admin')) {
-            $categoryId = Category::where('name', 'Network Wireless')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('network-security-admin')) {
-            $categoryId = Category::where('name', 'Network Security')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('general-others-admin')) {
-            $categoryId = Category::where('name', 'General Others')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('office-accessories-admin')) {
-            $categoryId = Category::where('name', 'Office Accessories')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('office-stationeries-admin')) {
-            $categoryId = Category::where('name', 'Office Stationeries')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } else {
-            $categories = []; // Empty array, no categories loaded
+            if ($userCategoryName) {
+                $query->where('name', $userCategoryName);
+            } else {
+                $query->whereRaw('1 = 0'); // No matching role, return no categories
+            }
         }
 
-        // $categories = $categories->get();
-
+        $categories = $query->get();
         $subCategories = SubCategory::whereIn('category_id', $categories->pluck('id'))->get();
 
         return view('products.create', [
@@ -178,58 +164,26 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $user = auth()->user();
+        $query = Category::query();
 
-        $categories = Category::query();
+        // Apply role-based filtering
+        if (!$user->hasRole('super-admin|admin')) {
+            $userCategoryName = null;
+            foreach ($this->roleMapping as $role => $categoryName) {
+                if ($user->hasRole($role)) {
+                    $userCategoryName = $categoryName;
+                    break;
+                }
+            }
 
-        if ($user->hasRole('super-admin|admin')) {
-            $categories = Category::all();
-        } elseif ($user->hasRole('passive-admin')) {
-            $categoryId = Category::where('name', 'Passive')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('printer-admin')) {
-            $categoryId = Category::where('name', 'Printer')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('scanner-admin')) {
-            $categoryId = Category::where('name', 'Scanner')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('server-admin')) {
-            $categoryId = Category::where('name', 'Server')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('storage-admin')) {
-            $categoryId = Category::where('name', 'Storage')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('server-accessories-admin')) {
-            $categoryId = Category::where('name', 'Server Accessories')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('network-wired-admin')) {
-            $categoryId = Category::where('name', 'Network Wired')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('network-tools-admin')) {
-            $categoryId = Category::where('name', 'Network Tools')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('network-wireless-admin')) {
-            $categoryId = Category::where('name', 'Network Wireless')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('network-security-admin')) {
-            $categoryId = Category::where('name', 'Network Security')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('general-others-admin')) {
-            $categoryId = Category::where('name', 'General Others')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('office-accessories-admin')) {
-            $categoryId = Category::where('name', 'Office Accessories')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('office-stationeries-admin')) {
-            $categoryId = Category::where('name', 'Office Stationeries')->first()->id;
-            $categories = Category::where('id', $categoryId)->get();
-        } else {
-            $categories = []; // Empty array, no categories loaded
+            if ($userCategoryName) {
+                $query->where('name', $userCategoryName);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
         }
 
-        // $categories = $categories->get();
-
-        // $subCategories = SubCategory::whereIn('category_id', $categories->pluck('id'))->get();
-
+        $categories = $query->get();
         $subCategories = SubCategory::where('category_id', $product->category_id)->get();
 
         return view('products.edit', [
@@ -238,13 +192,6 @@ class ProductController extends Controller
             'units' => Unit::all(),
             'product' => $product
         ]);
-
-        // return view('products.edit', [
-        //     'categories' => Category::all(),
-        //     'subCategories' => SubCategory::all(),
-        //     'units' => Unit::all(),
-        //     'product' => $product
-        // ]);
     }
 
     public function update(UpdateProductRequest $request, Product $product)

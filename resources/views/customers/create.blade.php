@@ -22,7 +22,7 @@
             <form action="{{ route('customers.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
-                    <div class="col-lg-4">
+                    {{-- <div class="col-lg-4">
                         <div class="card">
                             <div class="card-body">
                                 <h3 class="card-title">
@@ -42,9 +42,9 @@
                                 @enderror
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
-                    <div class="col-lg-8">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
                                 <h3 class="card-title">
@@ -62,7 +62,7 @@
                                         <x-input label="Phone Number" name="phone" :required="true"/>
                                     </div>
 
-                                    <div class="col-sm-6 col-md-6">
+                                    {{-- <div class="col-sm-6 col-md-6">
                                         <label for="bank_name" class="form-label">
                                             Bank Name
                                         </label>
@@ -90,7 +90,7 @@
 
                                     <div class="col-sm-6 col-md-6">
                                         <x-input label="Account number" name="account_number" />
-                                    </div>
+                                    </div> --}}
 
                                     <div class="mb-3">
                                         <label for="address" class="form-label required">
