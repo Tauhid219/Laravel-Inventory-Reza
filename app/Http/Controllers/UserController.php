@@ -32,13 +32,18 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $requestData = $request->all();
+
         if ($request->has('password')) {
             $requestData['password'] = bcrypt($request->password);
         }
 
         $user = User::create($requestData);
 
-        $user->assignRole($request->role);
+        // Assign Role to User
+        if ($request->has('roles')) {
+            $user->assignRole($request->roles);
+        }
+
         /**
          * Handle upload an image
          */
@@ -66,41 +71,36 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        // Assign Role to User
+        $roles = Role::all();
         return view('users.edit', [
-            'user' => $user
+            'user' => $user,
+            'roles' => $roles
         ]);
     }
 
     public function update(UpdateUserRequest $request, User $user)
     {
 
-        //        if ($validatedData['email'] != $user->email) {
-//            $validatedData['email_verified_at'] = null;
-//        }
+        // ১. সাধারণ ডাটা আপডেট (ফটো বাদে)
+        $user->update($request->except(['photo', 'roles']));
 
-        $user->update($request->except('photo'));
+        // ২. স্প্যাটি রোল আপডেট (সিঙ্ক করা)
+        if ($request->has('roles')) {
+            $user->syncRoles($request->roles);
+        }
 
-        /**
-         * Handle upload image with Storage.
-         */
+        // ৩. ফটো হ্যান্ডলিং এবং আপডেট
         if ($request->hasFile('photo')) {
-
-            // Delete Old Photo
-            if ($user->photo) {
+            if ($user->photo && file_exists(public_path('storage/profile/') . $user->photo)) {
                 unlink(public_path('storage/profile/') . $user->photo);
             }
 
-            // Prepare New Photo
             $file = $request->file('photo');
             $fileName = hexdec(uniqid()) . '.' . $file->getClientOriginalExtension();
-
-            // Store an image to Storage
             $file->storeAs('profile/', $fileName, 'public');
 
-            // Save DB
-            $user->update([
-                'photo' => $fileName
-            ]);
+            $user->update(['photo' => $fileName]);
         }
 
         return redirect()

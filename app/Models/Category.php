@@ -17,7 +17,8 @@ class Category extends Model
     protected $fillable = [
         'name',
         'slug',
-        'short_code'
+        'short_code',
+        'role_name',
     ];
 
     protected $casts = [

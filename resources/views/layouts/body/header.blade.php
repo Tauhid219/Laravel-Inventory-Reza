@@ -27,7 +27,21 @@
                     </span>
                     <div class="d-none d-xl-block ps-2">
                         <div>{{ Auth::user()->name }}</div>
-                        <div class="text-muted small">{{ Auth::user()->getRoleNames()->first() }}</div>
+                        <div class="text-muted small">
+                            @php
+                                $roles = Auth::user()->getRoleNames();
+                                $allRolesString = $roles->implode(', ');
+                            @endphp
+
+                            <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="{{ $allRolesString }}"
+                                style="cursor: pointer;">
+                                {{ $roles->take(2)->implode(', ') }}
+
+                                @if ($roles->count() > 2)
+                                    <span class="text-primary">(+{{ $roles->count() - 2 }} more)</span>
+                                @endif
+                            </span>
+                        </div>
                     </div>
                 </a>
 

@@ -67,15 +67,22 @@
                                             <x-input name="username" :value="old('username')" required="true" />
 
                                             <div class="form-group">
-                                                <label for="role">Role</label>
-                                                <select name="role" id="role" class="form-control" required>
-                                                    <option value="">Select Role</option>
+                                                <label for="roles" class="form-label">Roles</label>
+                                                <select name="roles[]" id="roles"
+                                                    class="form-control @error('roles') is-invalid @enderror" multiple
+                                                    required>
                                                     @foreach ($role as $r)
                                                         <option value="{{ $r->name }}"
-                                                            {{ old('role') == $r->name ? 'selected' : '' }}>
-                                                            {{ $r->name }}</option>
+                                                            {{ is_array(old('roles')) && in_array($r->name, old('roles')) ? 'selected' : '' }}>
+                                                            {{ $r->name }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
+                                                <small class="form-hint text-info">Hold CTRL to select multiple
+                                                    roles.</small>
+                                                @error('roles')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
 
                                         </div>

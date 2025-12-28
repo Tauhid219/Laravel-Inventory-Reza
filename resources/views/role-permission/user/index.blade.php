@@ -42,32 +42,19 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($user as $users)
+                                        @foreach ($user as $singleUser)
                                             <tr>
-                                                <td>{{ $users->id }}</td>
-                                                <td>{{ $users->name }}</td>
-                                                <td>{{ $users->email }}</td>
+                                                <td>{{ $singleUser->id }}</td>
+                                                <td>{{ $singleUser->name }}</td>
+                                                <td>{{ $singleUser->email }}</td>
                                                 <td>
-                                                    @if (!empty($users->getRoleNames()))
-                                                        @foreach ($users->getRoleNames() as $rolename)
-                                                            <label
-                                                                class="badge bg-primary text-white mx-1">{{ $rolename }}</label>
-                                                        @endforeach
-                                                    @endif
+                                                    @foreach ($singleUser->getRoleNames() as $rolename)
+                                                        <span class="badge bg-primary text-white">{{ $rolename }}</span>
+                                                    @endforeach
                                                 </td>
                                                 <td>
-                                                    <form action="{{ route('user.destroy', $users->id) }}" method="POST">
-                                                        @can('update user')
-                                                            <a href="{{ route('user.edit', $users->id) }}"
-                                                                class="btn btn-success">Edit</a>
-                                                        @endcan
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        @can('delete user')
-                                                            <button type="submit" class="btn btn-danger"
-                                                                onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
-                                                        @endcan
-                                                    </form>
+                                                    <a href="{{ route('user.edit', $singleUser->id) }}"
+                                                        class="btn btn-sm btn-success">Edit</a>
                                                 </td>
                                             </tr>
                                         @endforeach

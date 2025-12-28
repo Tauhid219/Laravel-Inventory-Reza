@@ -15,22 +15,6 @@ use Picqer\Barcode\BarcodeGeneratorHTML;
 
 class ProductController extends Controller
 {
-    private $roleMapping = [
-        'passive-admin' => 'Passive',
-        'printer-admin' => 'Printer',
-        'scanner-admin' => 'Scanner',
-        'server-admin' => 'Server',
-        'storage-admin' => 'Storage',
-        'server-accessories-admin' => 'Server Accessories',
-        'network-wired-admin' => 'Network Wired',
-        'network-tools-admin' => 'Network Tools',
-        'network-wireless-admin' => 'Network Wireless',
-        'network-security-admin' => 'Network Security',
-        'general-others-admin' => 'General Others',
-        'office-accessories-admin' => 'Office Accessories',
-        'office-stationeries-admin' => 'Office Stationeries',
-    ];
-
     public function __construct()
     {
         $this->middleware('permission:view product')->only(['index', 'show']);
@@ -49,24 +33,17 @@ class ProductController extends Controller
         $user = auth()->user();
         $query = Category::query();
 
-        // Apply role-based filtering
-        if (!$user->hasRole('super-admin|admin')) {
-            $userCategoryName = null;
-            foreach ($this->roleMapping as $role => $categoryName) {
-                if ($user->hasRole($role)) {
-                    $userCategoryName = $categoryName;
-                    break;
-                }
-            }
+        // Dynamic role-based filtering
+        if (!$user->hasRole(['super-admin', 'admin'])) {
+            $userRoles = $user->getRoleNames(); // User's current role names
 
-            if ($userCategoryName) {
-                $query->where('name', $userCategoryName);
-            } else {
-                $query->whereRaw('1 = 0'); // No matching role, return no categories
-            }
+            // Filter categories based on user's roles
+            $query->whereIn('role_name', $userRoles);
         }
 
         $categories = $query->get();
+
+        // Fetch sub-categories for the filtered categories
         $subCategories = SubCategory::whereIn('category_id', $categories->pluck('id'))->get();
 
         return view('products.create', [
@@ -166,24 +143,15 @@ class ProductController extends Controller
         $user = auth()->user();
         $query = Category::query();
 
-        // Apply role-based filtering
-        if (!$user->hasRole('super-admin|admin')) {
-            $userCategoryName = null;
-            foreach ($this->roleMapping as $role => $categoryName) {
-                if ($user->hasRole($role)) {
-                    $userCategoryName = $categoryName;
-                    break;
-                }
-            }
-
-            if ($userCategoryName) {
-                $query->where('name', $userCategoryName);
-            } else {
-                $query->whereRaw('1 = 0');
-            }
+        // Dynamic role-based filtering
+        if (!$user->hasRole(['super-admin', 'admin'])) {
+            $userRoles = $user->getRoleNames();
+            $query->whereIn('role_name', $userRoles);
         }
 
         $categories = $query->get();
+
+        // Fetch sub-categories for the product's category
         $subCategories = SubCategory::where('category_id', $product->category_id)->get();
 
         return view('products.edit', [

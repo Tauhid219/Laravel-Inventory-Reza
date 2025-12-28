@@ -21,23 +21,6 @@ class PurchaseForm extends Component
     private $product;
     public $manualTotal = null;
 
-    // Centralized role to category mapping
-    protected $roleMapping = [
-        'passive-admin'            => 'Passive',
-        'printer-admin'            => 'Printer',
-        'scanner-admin'            => 'Scanner',
-        'server-admin'             => 'Server',
-        'storage-admin'            => 'Storage',
-        'server-accessories-admin' => 'Server Accessories',
-        'network-wired-admin'      => 'Network Wired',
-        'network-tools-admin'      => 'Network Tools',
-        'network-wireless-admin'   => 'Network Wireless',
-        'network-security-admin'   => 'Network Security',
-        'general-others-admin'     => 'General Others',
-        'office-accessories-admin' => 'Office Accessories',
-        'office-stationeries-admin'=> 'Office Stationeries',
-    ];
-
     #[Validate('Required')]
     public int $taxes = 0;
 
@@ -48,92 +31,30 @@ class PurchaseForm extends Component
 
     public function mount(): void
     {
-        // $this->categories = Category::all();
-
-        // Load categories based on the user's role
         $user = auth()->user();
 
         // 1. Initialize the query builders
         $categoryQuery = Category::query();
-        $productQuery = Product::select('id', 'name', 'quantity', 'buying_price')
+        $productQuery = Product::select('id', 'name', 'quantity', 'buying_price', 'category_id', 'sub_category_id')
             ->with(['category', 'subCategory']);
 
-        // 2. Apply role-based filtering logic
-        if (!$user->hasRole('super-admin|admin')) {
-            $userCategoryName = null;
+        // 2. Apply dynamic role-based filtering logic
+        if (!$user->hasRole(['super-admin', 'admin'])) {
+            // Get all role names currently assigned to the user
+            $userRoles = $user->getRoleNames();
 
-            foreach ($this->roleMapping as $role => $categoryName) {
-                if ($user->hasRole($role)) {
-                    $userCategoryName = $categoryName;
-                    break;
-                }
-            }
+            // Filter allowed categories based on the role_name column in database
+            $categoryQuery->whereIn('role_name', $userRoles);
 
-            if ($userCategoryName) {
-                // Filter allowed categories for this user
-                $categoryQuery->where('name', $userCategoryName);
-
-                // Filter allowed products for this user to prevent selecting other items
-                $productQuery->whereHas('category', function ($q) use ($userCategoryName) {
-                    $q->where('name', $userCategoryName);
-                });
-            } else {
-                // If no matching role is found, return empty results for safety
-                $categoryQuery->whereRaw('1 = 0');
-                $productQuery->whereRaw('1 = 0');
-            }
+            // Filter allowed products based on the category's role_name
+            $productQuery->whereHas('category', function ($q) use ($userRoles) {
+                $q->whereIn('role_name', $userRoles);
+            });
         }
 
-        // 3. Fetch data
+        // 3. Fetch filtered data
         $this->categories = $categoryQuery->get();
         $this->allProducts = $productQuery->get();
-
-        // if ($user->hasRole('super-admin|admin')) {
-        //     $this->categories = Category::all();
-        // } elseif ($user->hasRole('passive-admin')) {
-        //     $categoryId = Category::where('name', 'Passive')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('printer-admin')) {
-        //     $categoryId = Category::where('name', 'Printer')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('scanner-admin')) {
-        //     $categoryId = Category::where('name', 'Scanner')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('server-admin')) {
-        //     $categoryId = Category::where('name', 'Server')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('storage-admin')) {
-        //     $categoryId = Category::where('name', 'Storage')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('server-accessories-admin')) {
-        //     $categoryId = Category::where('name', 'Server Accessories')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('network-wired-admin')) {
-        //     $categoryId = Category::where('name', 'Network Wired')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('network-tools-admin')) {
-        //     $categoryId = Category::where('name', 'Network Tools')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('network-wireless-admin')) {
-        //     $categoryId = Category::where('name', 'Network Wireless')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('network-security-admin')) {
-        //     $categoryId = Category::where('name', 'Network Security')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('general-others-admin')) {
-        //     $categoryId = Category::where('name', 'General Others')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('office-accessories-admin')) {
-        //     $categoryId = Category::where('name', 'Office Accessories')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } elseif ($user->hasRole('office-stationeries-admin')) {
-        //     $categoryId = Category::where('name', 'Office Stationeries')->first()->id;
-        //     $this->categories = Category::where('id', $categoryId)->get();
-        // } else {
-        //     $this->categories = [];  // Empty array, no categories loaded
-        // }
-
-        // $this->allProducts = Product::select('id', 'name', 'quantity', 'buying_price')->with(['category', 'subCategory'])->get();
     }
 
     public function onCategoryUpdated($categoryId)

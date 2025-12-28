@@ -31,7 +31,8 @@ class UpdateCategoryRequest extends FormRequest
                 'required',
                 'alpha_dash',
                 Rule::unique('categories')->ignore($this->category)
-            ]
+            ],
+            'role_name' => ['nullable', 'string']
         ];
     }
 }

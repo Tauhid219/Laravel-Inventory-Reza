@@ -3,7 +3,7 @@
 <div class="container mt-3">
     <a href="{{ url('role') }}" class="btn btn-warning mx-2">Role</a>
     <a href="{{ url('permission') }}" class="btn btn-warning mx-2">Permission</a>
-    <a href="{{ url('user') }}" class="btn btn-warning mx-2">User</a>
+    {{-- <a href="{{ url('user') }}" class="btn btn-warning mx-2">User</a> --}}
     {{-- <a href="{{ url('product') }}" class="btn btn-primary mx-2">Product</a> --}}
     <button type="button" class="dropdown-toggle btn btn-secondary float-end" data-bs-toggle="dropdown"
         aria-expanded="false">

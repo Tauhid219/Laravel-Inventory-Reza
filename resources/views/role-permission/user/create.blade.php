@@ -34,13 +34,18 @@
                                         <input type="text" name="password" class="form-control" />
                                     </div>
                                     <div class="mb-3">
-                                        <label for="">Role</label>
-                                        <select name="role[]" class="form-control">
-                                            <option value="">Select Role</option>
-                                            @foreach ($role as $roles)
-                                                <option value="{{ $roles->name }}">{{ $roles->name }}</option>
+                                        <label class="form-label">Assign Roles</label>
+                                        <select name="role[]" class="form-control @error('role') is-invalid @enderror"
+                                            multiple>
+                                            @foreach ($role as $r)
+                                                <option value="{{ $r->name }}">{{ $r->name }}</option>
                                             @endforeach
                                         </select>
+                                        @error('role')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                        <small class="form-hint text-info">Hold CTRL to select multiple
+                                            roles.</small>
                                     </div>
                                     <div class="mb-3">
                                         <button type="submit" class="btn btn-primary">Save</button>

@@ -22,15 +22,9 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => [
-                'required',
-                'unique:categories,name'
-            ],
-            'slug' => [
-                'required',
-                'unique:categories,slug',
-                'alpha_dash'
-            ]
+            'name' => ['required', 'unique:categories,name'],
+            'slug' => ['required', 'unique:categories,slug', 'alpha_dash'],
+            'role_name' => ['nullable', 'string']
         ];
     }
 }

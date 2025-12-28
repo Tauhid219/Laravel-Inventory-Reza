@@ -39,13 +39,13 @@
                                         @enderror
                                     </div>
                                     <div class="mb-3">
-                                        <label for="">Role</label>
-                                        <select name="role[]" class="form-control">
-                                            <option value="">Select Role</option>
+                                        <label class="form-label">Role</label>
+                                        <select name="role[]" class="form-control @error('role') is-invalid @enderror"
+                                            multiple>
                                             @foreach ($role as $roles)
-                                                @if ($roles->name != 'super-admin' || $user->hasRole('super-admin'))
-                                                    <option value="{{ $roles->id }}"
-                                                        {{ in_array($roles->id, $userRole) ? 'selected' : '' }}>
+                                                @if ($roles->name != 'super-admin' || auth()->user()->hasRole('super-admin'))
+                                                    <option value="{{ $roles->name }}"
+                                                        {{ $user->hasRole($roles->name) ? 'selected' : '' }}>
                                                         {{ $roles->name }}
                                                     </option>
                                                 @endif

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
+use Spatie\Permission\Models\Role;
 
 class CategoryController extends Controller
 {
@@ -27,7 +28,8 @@ class CategoryController extends Controller
 
     public function create()
     {
-        return view('categories.create');
+        $roles = Role::all(); // Get all roles
+        return view('categories.create', compact('roles'));
     }
 
     public function store(StoreCategoryRequest $request)
@@ -48,8 +50,10 @@ class CategoryController extends Controller
 
     public function edit(Category $category)
     {
+        $roles = Role::all();
         return view('categories.edit', [
-            'category' => $category
+            'category' => $category,
+            'roles' => $roles
         ]);
     }
 

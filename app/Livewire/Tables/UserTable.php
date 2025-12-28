@@ -21,7 +21,7 @@ class UserTable extends Component
     public function sortBy($field): void
     {
         if ($this->sortField === $field) {
-            $this->sortAsc = ! $this->sortAsc;
+            $this->sortAsc = !$this->sortAsc;
 
         } else {
             $this->sortAsc = true;
@@ -34,6 +34,7 @@ class UserTable extends Component
     {
         return view('livewire.tables.user-table', [
             'users' => User::query()
+                ->with('roles') // This will eager load the roles relationship
                 ->search($this->search)
                 ->orderBy($this->sortField, $this->sortAsc ? 'asc' : 'desc')
                 ->paginate($this->perPage),

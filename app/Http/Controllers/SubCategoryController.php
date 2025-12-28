@@ -62,12 +62,34 @@ class SubCategoryController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(SubCategory $subCategory)
     {
-        $categories = Category::all();
+        $user = auth()->user();
+        $query = Category::query();
+
+        // Dynamic role-based filtering for categories
+        if (!$user->hasRole(['super-admin', 'admin'])) {
+            // Get all role names assigned to the user
+            $userRoles = $user->getRoleNames();
+
+            // Filter categories where role_name matches user roles
+            $query->whereIn('role_name', $userRoles);
+        }
+
+        $categories = $query->get();
+
+        /**
+         * Security Check:
+         * If a non-admin user tries to edit a sub-category that doesn't belong
+         * to their assigned category roles, deny access.
+         */
+        if (!$user->hasRole(['super-admin', 'admin'])) {
+            $allowedCategoryIds = $categories->pluck('id')->toArray();
+            if (!in_array($subCategory->category_id, $allowedCategoryIds)) {
+                abort(403, 'Unauthorized action.');
+            }
+        }
+
         return view('sub_categories.edit', [
             'subCategory' => $subCategory,
             'categories' => $categories,

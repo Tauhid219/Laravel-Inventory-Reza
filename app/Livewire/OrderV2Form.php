@@ -21,22 +21,7 @@ class OrderV2Form extends Component
     private $product;
     public $manualTotal = null;
 
-    // Central role mapping
-    protected $roleMapping = [
-        'passive-admin'            => 'Passive',
-        'printer-admin'            => 'Printer',
-        'scanner-admin'            => 'Scanner',
-        'server-admin'             => 'Server',
-        'storage-admin'            => 'Storage',
-        'server-accessories-admin' => 'Server Accessories',
-        'network-wired-admin'      => 'Network Wired',
-        'network-tools-admin'      => 'Network Tools',
-        'network-wireless-admin'   => 'Network Wireless',
-        'network-security-admin'   => 'Network Security',
-        'general-others-admin'     => 'General Others',
-        'office-accessories-admin' => 'Office Accessories',
-        'office-stationeries-admin'=> 'Office Stationeries',
-    ];
+    // Static roleMapping removed to enable dynamic role management
 
     #[Validate('Required')]
     public int $taxes = 0;
@@ -45,42 +30,27 @@ class OrderV2Form extends Component
 
     #[Validate('required', message: 'Please select products')]
     public Collection $allProducts;
-
     public function mount(): void
     {
-        // $this->categories = Category::all();
-
-        // Load categories based on the user's role
         $user = auth()->user();
 
         // 1. Initialize queries
         $categoryQuery = Category::query();
-        $productQuery = Product::select('id', 'name', 'quantity', 'buying_price')
+        $productQuery = Product::select('id', 'name', 'quantity', 'buying_price', 'category_id', 'sub_category_id')
             ->with(['category', 'subCategory']);
 
-        // 2. Apply role-based filtering logic
-        if (!$user->hasRole('super-admin|admin')) {
-            $userCategoryName = null;
-            foreach ($this->roleMapping as $role => $categoryName) {
-                if ($user->hasRole($role)) {
-                    $userCategoryName = $categoryName;
-                    break;
-                }
-            }
+        // 2. Apply dynamic role-based filtering logic
+        if (!$user->hasRole(['super-admin', 'admin'])) {
+            // Get all role names assigned to the user
+            $userRoles = $user->getRoleNames();
 
-            if ($userCategoryName) {
-                // Filter categories
-                $categoryQuery->where('name', $userCategoryName);
+            // Filter categories based on role_name column
+            $categoryQuery->whereIn('role_name', $userRoles);
 
-                // Filter products to ensure only allowed products can be added
-                $productQuery->whereHas('category', function ($q) use ($userCategoryName) {
-                    $q->where('name', $userCategoryName);
-                });
-            } else {
-                // If no matching role is found, return empty results
-                $categoryQuery->whereRaw('1 = 0');
-                $productQuery->whereRaw('1 = 0');
-            }
+            // Filter products: Ensure only products from allowed categories are accessible
+            $productQuery->whereHas('category', function ($q) use ($userRoles) {
+                $q->whereIn('role_name', $userRoles);
+            });
         }
 
         $this->categories = $categoryQuery->get();
