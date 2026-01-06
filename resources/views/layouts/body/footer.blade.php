@@ -25,7 +25,7 @@
                         <script>
                             document.write(new Date().getFullYear())
                         </script>
-                        <a href="#" class="link-secondary">CSL Technologies</a>.
+                        <a href="#" class="link-secondary">Tauhid Reza</a>.
                         All rights reserved.
                     </li>
                 </ul>

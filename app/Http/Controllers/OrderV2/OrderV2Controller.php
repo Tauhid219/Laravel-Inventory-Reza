@@ -75,8 +75,17 @@ class OrderV2Controller extends Controller
     public function store(StoreOrderV2Request $request)
     {
         try {
-            DB::transaction(function () use ($request) {
+            // 1. Pre-validation: Check stock availability
+            foreach ($request->invoiceProducts as $item) {
+                $productModel = Product::find($item['product_id']);
+                if (!$productModel || $productModel->quantity < $item['quantity']) {
+                    return redirect()->back()
+                        ->withErrors(['error' => "Sorry, '{$productModel->name}' is out of stock. (Available: {$productModel->quantity})"])
+                        ->withInput();
+                }
+            }
 
+            DB::transaction(function () use ($request) {
                 $order = Order::create([
                     'customer_id' => $request->customer_id,
                     'order_date' => $request->date,
@@ -105,39 +114,45 @@ class OrderV2Controller extends Controller
             return redirect()
                 ->route('ordersV2.index')
                 ->with('success', 'Order has been created successfully!');
+
         } catch (\Exception $e) {
             return redirect()->back()
-                ->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])
+                ->withErrors(['error' => 'Error: ' . $e->getMessage()])
                 ->withInput();
         }
     }
 
     public function update(Request $request, Order $order)
     {
-        // TODO refactoring
+        try {
+            DB::transaction(function () use ($order) {
+                // Update stock for each product in the order
+                $orderDetails = $order->details;
 
-        // Reduce the stock
-        DB::transaction(function () use ($order) {
-            $products = OrderDetails::where('order_id', $order->id)->get();
+                foreach ($orderDetails as $item) {
+                    $productModel = Product::find($item->product_id);
 
-            foreach ($products as $product) {
-                $productModel = Product::find($product->product_id);
+                    if ($productModel->quantity < $item->quantity) {
+                        throw new \Exception("Insufficient stock for {$productModel->name}. Current stock: {$productModel->quantity}");
+                    }
 
-                if ($productModel->quantity < $product->quantity) {
-                    throw new \Exception('Insufficient stock for ' . $productModel->name);
+                    $productModel->decrement('quantity', $item->quantity);
                 }
 
-                $productModel->decrement('quantity', $product->quantity);
-            }
+                $order->update([
+                    'order_status' => OrderStatus::COMPLETE,
+                ]);
+            });
 
-            $order->update([
-                'order_status' => OrderStatus::COMPLETE,
-            ]);
-        });
+            return redirect()
+                ->route('ordersV2.completedOrders')
+                ->with('success', 'Order has been approved and stock updated!');
 
-        return redirect()
-            ->route('ordersV2.completedOrders')
-            ->with('success', 'Order has been completed!');
+        } catch (\Exception $e) {
+            // Log the error or handle it as needed
+            return redirect()->back()
+                ->withErrors(['error' => $e->getMessage()]);
+        }
     }
 
     public function destroy(Order $order)

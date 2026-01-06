@@ -30,6 +30,7 @@ class OrderV2Form extends Component
 
     #[Validate('required', message: 'Please select products')]
     public Collection $allProducts;
+
     public function mount(): void
     {
         $user = auth()->user();

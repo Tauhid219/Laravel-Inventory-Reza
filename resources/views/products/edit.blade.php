@@ -105,30 +105,6 @@
                                             </div>
                                         </div>
 
-                                        {{-- <div class="col-sm-6 col-md-6">
-                                            <div class="mb-3">
-                                                <label for="sub_category_id" class="form-label">
-                                                    {{ __('Subcategory') }}
-                                                </label>
-                                                <select name="sub_category_id" id="sub_category_id"
-                                                    class="form-select @error('sub_category_id') is-invalid @enderror">
-                                                    <option selected="" disabled="">
-                                                        Select a subcategory:
-                                                    </option>
-                                                    @foreach ($subCategories as $subCategory)
-                                                        <option value="{{ $subCategory->id }}"
-                                                            @if (old('sub_category_id', $product->sub_category_id) == $subCategory->id) selected="selected" @endif>
-                                                            {{ $subCategory->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                                @error('sub_category_id')
-                                                    <div class="invalid-feedback">
-                                                        {{ $message }}
-                                                    </div>
-                                                @enderror
-                                            </div>
-                                        </div> --}}
-
                                         <div class="col-sm-6 col-md-6">
                                             <div class="mb-3">
                                                 <label for="sub_category_id" class="form-label">

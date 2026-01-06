@@ -62,6 +62,9 @@ class SubCategoryController extends Controller
         ]);
     }
 
+    /**
+     * Show the form for editing the specified resource.
+     */
     public function edit(SubCategory $subCategory)
     {
         $user = auth()->user();

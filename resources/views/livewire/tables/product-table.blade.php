@@ -111,16 +111,16 @@
                 @forelse ($products as $product)
                     <tr>
                         <td class="align-middle text-center">
-                            {{ ($products->currentPage() - 1) * $products->perPage() + $loop->iteration }}
+                            {{ $products->firstItem() + $loop->index }}
                         </td>
                         <td class="align-middle text-center">
                             {{ $product->subCategory->name ?? 'N/A' }}
                         </td>
                         <td class="align-middle text-center">
-                            {{ $product->category->name }}
+                            {{ $product->category->name ?? 'N/A' }}
                         </td>
                         <td class="align-middle">
-                            {{ $product->name }}
+                            {{ $product->name ?? 'N/A' }}
                         </td>
                         {{-- <td class="align-middle text-center">
                             {{ $product->code }}
@@ -135,16 +135,18 @@
                             {{ $product->quantity_alert }}
                         </td>
 
-                        <script>
-                            function getBgColor(quantity, quantity_alert) {
-                                if (quantity_alert >= quantity) {
-                                    return '#f8d7da'; // Red
-                                } else if (quantity_alert === quantity - 1 || quantity_alert === quantity - 2) {
-                                    return '#fff70063'; // Yellow
+                        @push('scripts')
+                            <script>
+                                function getBgColor(quantity, quantity_alert) {
+                                    if (quantity_alert >= quantity) {
+                                        return '#f8d7da'; // Red
+                                    } else if (quantity_alert === quantity - 1 || quantity_alert === quantity - 2) {
+                                        return '#fff70063'; // Yellow
+                                    }
+                                    return 'transparent';
                                 }
-                                return 'transparent';
-                            }
-                        </script>
+                            </script>
+                        @endpush
 
                         <td class="align-middle text-center" style="width: 10%">
                             <x-button.show class="btn-icon" route="{{ route('products.show', $product) }}" />

@@ -64,17 +64,17 @@
                                             <td>
                                                 <a href="{{ route('categories.show', $product->category) }}"
                                                     class="badge bg-blue-lt">
-                                                    {{ $product->category->name }}
+                                                    {{ $product->category->name ?? 'N/A' }}
                                                 </a>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Sub Category</td>
                                             <td>
-                                                @if ($product->subcategory)
-                                                    <a href="{{ route('sub-categories.show', $product->subcategory) }}"
+                                                @if ($product->subCategory)
+                                                    <a href="{{ route('sub-categories.show', $product->subCategory) }}"
                                                         class="badge bg-blue-lt">
-                                                        {{ $product->subcategory->name }}
+                                                        {{ $product->subCategory->name ?? 'N/A' }}
                                                     </a>
                                                 @else
                                                     <span class="badge bg-red-lt">No Sub Category</span>
@@ -84,10 +84,13 @@
                                         <tr>
                                             <td>Unit</td>
                                             <td>
-                                                <a href="{{ route('categories.show', $product->unit) }}"
-                                                    class="badge bg-blue-lt">
-                                                    {{ $product->unit->short_code }}
-                                                </a>
+                                                @if ($product->unit)
+                                                    <a href="{{ route('units.show', $product->unit) }}"
+                                                        class="badge bg-blue-lt">
+                                                        {{ $product->unit->name }}
+                                                    @else
+                                                        <span class="badge bg-secondary-lt">N/A</span>
+                                                @endif
                                             </td>
                                         </tr>
 

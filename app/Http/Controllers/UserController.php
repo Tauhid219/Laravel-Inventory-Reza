@@ -82,15 +82,15 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
 
-        // ১. সাধারণ ডাটা আপডেট (ফটো বাদে)
+        // 1. Normal Data Update
         $user->update($request->except(['photo', 'roles']));
 
-        // ২. স্প্যাটি রোল আপডেট (সিঙ্ক করা)
+        // 2. Spatie Role Update
         if ($request->has('roles')) {
             $user->syncRoles($request->roles);
         }
 
-        // ৩. ফটো হ্যান্ডলিং এবং আপডেট
+        // 3. Photo Update
         if ($request->hasFile('photo')) {
             if ($user->photo && file_exists(public_path('storage/profile/') . $user->photo)) {
                 unlink(public_path('storage/profile/') . $user->photo);

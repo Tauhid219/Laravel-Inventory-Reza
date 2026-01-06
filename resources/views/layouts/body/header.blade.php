@@ -5,17 +5,18 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
-            {{-- <a href="{{ url('/') }}">
-                <img src="{{ asset('static/logo.svg') }}" width="110" height="32" alt="Tabler"
+            <a href="{{ url('/dashboard') }}">
+                <img src="{{ asset('static/logo-small.svg') }}" width="110" height="32" alt="Tabler"
                     class="navbar-brand-image">
-            </a> --}}
-            <a href="{{ url('/dashboard') }}" class="d-flex align-items-center">
+                <span class="ms-2">Reza Inventory</span>
+            </a>
+            {{-- <a href="{{ url('/dashboard') }}" class="d-flex align-items-center">
                 <img src="{{ asset('static/csl_logo 32x32.png') }}" width="32" height="32" alt="Project Logo"
                     class="navbar-brand-image">
 
                 <!-- প্রজেক্টের নাম -->
-                <span class="ms-2">CSL Inventory</span>
-            </a>
+                <span class="ms-2">Reza Inventory</span>
+            </a> --}}
         </h1>
 
         <div class="navbar-nav flex-row order-md-last">

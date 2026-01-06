@@ -31,25 +31,15 @@ class ProductController extends Controller
     public function create(Request $request)
     {
         $user = auth()->user();
-        $query = Category::query();
+        $query = Category::select(['id', 'name']); // Only select necessary fields
 
-        // Dynamic role-based filtering
         if (!$user->hasRole(['super-admin', 'admin'])) {
-            $userRoles = $user->getRoleNames(); // User's current role names
-
-            // Filter categories based on user's roles
-            $query->whereIn('role_name', $userRoles);
+            $query->whereIn('role_name', $user->getRoleNames());
         }
 
-        $categories = $query->get();
-
-        // Fetch sub-categories for the filtered categories
-        $subCategories = SubCategory::whereIn('category_id', $categories->pluck('id'))->get();
-
         return view('products.create', [
-            'categories' => $categories,
-            'subCategories' => $subCategories,
-            'units' => Unit::all()
+            'categories' => $query->get(),
+            'units' => Unit::select(['id', 'name'])->get() // Only select necessary fields
         ]);
     }
 
@@ -127,9 +117,11 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
+        // Eager load relations to prevent N+1 queries in the view
+        $product->load(['category', 'subCategory', 'unit']);
+
         // Generate a barcode
         $generator = new BarcodeGeneratorHTML();
-
         $barcode = $generator->getBarcode($product->code, $generator::TYPE_CODE_128);
 
         return view('products.show', [

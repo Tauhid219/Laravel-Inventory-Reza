@@ -30,10 +30,11 @@
         <div class="container container-tight py-4">
             <div class="text-center mb-4">
                 <a href="{{ url('/') }}" class="navbar-brand navbar-brand-autodark">
-                    {{-- <img src="{{ asset('static/logo.svg') }}" width="110" height="32" alt="Tabler" class="navbar-brand-image"> --}}
-                    <img src="{{ asset('static/csl_logo 32x32.png') }}" width="32" height="32" alt="Project Logo"
+                    <img src="{{ asset('static/logo-small.svg') }}" width="110" height="32" alt="Tabler"
                         class="navbar-brand-image">
-                    <span class="ms-2" style="font-size: 1.5rem; font-weight: bold;">CSL Inventory</span>
+                    {{-- <img src="{{ asset('static/csl_logo 32x32.png') }}" width="32" height="32" alt="Project Logo"
+                        class="navbar-brand-image"> --}}
+                    <span class="ms-2" style="font-size: 1.5rem; font-weight: bold;">Reza Inventory</span>
                 </a>
             </div>
 

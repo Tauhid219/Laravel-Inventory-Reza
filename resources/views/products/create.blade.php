@@ -160,9 +160,8 @@
                                                 </label>
 
                                                 @if ($units->count() === 1)
-                                                    <select name="category_id" id="category_id"
-                                                        class="form-select @error('category_id') is-invalid @enderror"
-                                                        readonly>
+                                                    <select name="unit_id" id="unit_id"
+                                                        class="form-select @error('unit_id') is-invalid @enderror" readonly>
                                                         @foreach ($units as $unit)
                                                             <option value="{{ $unit->id }}" selected>
                                                                 {{ $unit->name }}
@@ -178,8 +177,9 @@
 
                                                         @foreach ($units as $unit)
                                                             <option value="{{ $unit->id }}"
-                                                                @if (old('unit_id') == $unit->id) selected="selected" @endif>
-                                                                {{ $unit->name }}</option>
+                                                                @selected(old('unit_id') == $unit->id)>
+                                                                {{ $unit->name }}
+                                                            </option>
                                                         @endforeach
                                                     </select>
                                                 @endif
@@ -203,14 +203,13 @@
                                         </div> --}}
 
                                         <div class="col-sm-6 col-md-6">
-                                            <x-input disabled type="number" label="Quantity" name="quantity"
-                                                id="quantity" placeholder="0" value="{{ old('quantity') }}" />
+                                            <x-input disabled type="number" label="Quantity" name="quantity" id="quantity"
+                                                placeholder="0" value="{{ old('quantity') }}" />
                                         </div>
 
                                         <div class="col-sm-6 col-md-6">
                                             <x-input type="number" label="Quantity Alert" name="quantity_alert"
-                                                id="quantity_alert" placeholder="0"
-                                                value="{{ old('quantity_alert') }}" />
+                                                id="quantity_alert" placeholder="0" value="{{ old('quantity_alert') }}" />
                                         </div>
 
                                         {{-- <div class="col-sm-6 col-md-6">
@@ -281,10 +280,17 @@
     <script>
         document.getElementById('category_id').addEventListener('change', function() {
             let categoryId = this.value;
+            let subCategorySelect = document.getElementById('sub_category_id');
+
+            // Show loading indicator
+            subCategorySelect.innerHTML = '<option selected disabled>Loading...</option>';
+
             fetch(`/subcategories/${categoryId}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
                 .then(data => {
-                    let subCategorySelect = document.getElementById('sub_category_id');
                     subCategorySelect.innerHTML = '<option selected disabled>Select a subcategory:</option>';
                     data.subCategories.forEach(subCategory => {
                         let option = document.createElement('option');
@@ -292,6 +298,11 @@
                         option.text = subCategory.name;
                         subCategorySelect.appendChild(option);
                     });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    subCategorySelect.innerHTML =
+                        '<option selected disabled>Error loading subcategories</option>';
                 });
         });
     </script>

@@ -74,11 +74,31 @@
                         <td class="align-middle">
                             {{ $user->email }}
                         </td>
-                        <td class="align-middle">
+                        {{-- <td class="align-middle">
                             @if (!empty($user->getRoleNames()))
                                 @foreach ($user->getRoleNames() as $rolename)
                                     <label class="badge bg-primary text-white mx-1">{{ $rolename }}</label>
                                 @endforeach
+                            @endif
+                        </td> --}}
+                        <td class="align-middle">
+                            @php $roles = $user->getRoleNames(); @endphp
+
+                            @if ($roles->isNotEmpty())
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach ($roles->take(3) as $rolename)
+                                        {{-- Show only the first 3 roles --}}
+                                        <label class="badge bg-primary text-white">{{ $rolename }}</label>
+                                    @endforeach
+
+                                    @if ($roles->count() > 3)
+                                        {{-- Show count if there are more than 3 roles --}}
+                                        <span class="badge bg-secondary text-white"
+                                            title="{{ $roles->slice(3)->implode(', ') }}">
+                                            +{{ $roles->count() - 3 }} more
+                                        </span>
+                                    @endif
+                                </div>
                             @endif
                         </td>
                         <td class="align-middle text-center" style="width: 15%">

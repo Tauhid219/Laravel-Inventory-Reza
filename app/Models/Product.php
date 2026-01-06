@@ -77,16 +77,18 @@ class Product extends Model
 
     public function scopeSearch($query, $value): void
     {
-        // $query->where('name', 'like', "%{$value}%")
-        //     ->orWhere('code', 'like', "%{$value}%");
-
-        $query->where('name', 'like', "%{$value}%")
-            ->orWhere('code', 'like', "%{$value}%")
-            ->orWhereHas('category', function ($query) use ($value) {
-                $query->where('name', 'like', "%{$value}%");
-            })
-            ->orWhereHas('subCategory', function ($query) use ($value) {
-                $query->where('name', 'like', "%{$value}%");
+        // If there's a search value, filter the query
+        $query->when($value, function ($query) use ($value) {
+            $query->where(function ($q) use ($value) {
+                $q->where('name', 'like', "%{$value}%")
+                    ->orWhere('code', 'like', "%{$value}%")
+                    ->orWhereHas('category', function ($q) use ($value) {
+                        $q->where('name', 'like', "%{$value}%");
+                    })
+                    ->orWhereHas('subCategory', function ($q) use ($value) {
+                        $q->where('name', 'like', "%{$value}%");
+                    });
             });
+        });
     }
 }
