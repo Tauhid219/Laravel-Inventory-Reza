@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Tables;
 
-use App\Models\Category;
 use App\Models\Purchase;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -38,11 +37,14 @@ class PurchaseTable extends Component
         $user = auth()->user();
 
         // 1. Basic purchase query and relation loading
-        $query = Purchase::query()->with([
-            'supplier',
-            'details.product.category',
-            'details.product.subCategory'
-        ]);
+        $query = Purchase::query()
+            ->with([
+                'supplier:id,name',
+                'details:id,purchase_id,product_id',
+                'details.product:id,name,category_id,sub_category_id',
+                'details.product.category:id,name,role_name',
+                'details.product.subCategory:id,name',
+            ]);
 
         // 2. Dynamic role-based filtering
         if (!$user->hasRole(['super-admin', 'admin'])) {

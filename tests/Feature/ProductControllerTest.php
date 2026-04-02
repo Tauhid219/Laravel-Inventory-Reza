@@ -5,8 +5,8 @@ namespace Tests\Feature;
 use App\Enums\TaxType;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\SubCategory;
 use App\Models\Unit;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
@@ -30,7 +30,7 @@ class ProductControllerTest extends TestCase
 
     public function test_product_index(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser(['view product']);
         $this->actingAs($user);
         $response = $this->get(route('products.index'));
 
@@ -39,7 +39,7 @@ class ProductControllerTest extends TestCase
 
     public function test_product_create(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser(['create product']);
         $this->actingAs($user);
         $response = $this->get(route('products.create'));
 
@@ -49,7 +49,7 @@ class ProductControllerTest extends TestCase
     public function test_product_store(): void
     {
         // Acting as authenticated user
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser(['create product']);
         $this->actingAs($user);
 
         // Fake storage for image test
@@ -58,12 +58,18 @@ class ProductControllerTest extends TestCase
         // Create necessary foreign keys
         $category = Category::factory()->create();
         $unit = Unit::factory()->create();
+        $subCategory = SubCategory::create([
+            'name' => 'Test Sub Category',
+            'slug' => 'test-sub-category',
+            'category_id' => $category->id,
+        ]);
 
         // Prepare request payload
         $data = [
             'code' => 'PC123',
             'name' => 'Test Product',
             'category_id' => $category->id,
+            'sub_category_id' => $subCategory->id,
             'unit_id' => $unit->id,
             'buying_price' => 500,
             'selling_price' => 700,
@@ -96,13 +102,21 @@ class ProductControllerTest extends TestCase
     public function test_product_show(): void
     {
         // Arrange:
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser(['view product']);
         $this->actingAs($user);
+        $category = Category::factory()->create();
+        $subCategory = SubCategory::create([
+            'name' => 'Product Show Sub Category',
+            'slug' => 'product-show-sub-category',
+            'category_id' => $category->id,
+        ]);
 
         $product = Product::factory()
-            ->for(Category::factory())
+            ->for($category)
             ->for(Unit::factory())
-            ->create();
+            ->create([
+                'sub_category_id' => $subCategory->id,
+            ]);
 
         // Act: show
         $response = $this->get(route('products.show', $product->slug));
@@ -119,13 +133,21 @@ class ProductControllerTest extends TestCase
     public function test_product_edit(): void
     {
         // Arrange:
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser(['update product']);
         $this->actingAs($user);
+        $category = Category::factory()->create();
+        $subCategory = SubCategory::create([
+            'name' => 'Product Edit Sub Category',
+            'slug' => 'product-edit-sub-category',
+            'category_id' => $category->id,
+        ]);
 
         $product = Product::factory()
-            ->for(Category::factory())
+            ->for($category)
             ->for(Unit::factory())
-            ->create();
+            ->create([
+                'sub_category_id' => $subCategory->id,
+            ]);
 
         // Act: edit
         $response = $this->get(route('products.edit', $product->slug));
@@ -143,13 +165,21 @@ class ProductControllerTest extends TestCase
     public function test_product_update(): void
     {
         // Arrange: লগইন এবং প্রোডাক্ট বানানো
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser(['update product']);
         $this->actingAs($user);
 
+        $category = Category::factory()->create();
+        $subCategory = SubCategory::create([
+            'name' => 'Updated Product Sub Category',
+            'slug' => 'updated-product-sub-category',
+            'category_id' => $category->id,
+        ]);
         $product = Product::factory()
-            ->for(Category::factory())
+            ->for($category)
             ->for(Unit::factory())
-            ->create();
+            ->create([
+                'sub_category_id' => $subCategory->id,
+            ]);
 
         // Fake storage for image test
         Storage::fake('public');
@@ -159,6 +189,7 @@ class ProductControllerTest extends TestCase
             'code' => 'PC123',
             'name' => 'Updated Product',
             'category_id' => $product->category_id,
+            'sub_category_id' => $product->sub_category_id,
             'unit_id' => $product->unit_id,
             'buying_price' => 600,
             'selling_price' => 800,
@@ -194,7 +225,7 @@ class ProductControllerTest extends TestCase
     public function test_product_destroy(): void
     {
         // Arrange:
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser(['delete product']);
         $this->actingAs($user);
 
         $product = Product::factory()

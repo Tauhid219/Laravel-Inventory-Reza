@@ -1,135 +1,76 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <div class="page-body">
-        <div class="container-xl">
+    <x-adminlte.page-header :title="__('Create Order')" subtitle="Create an order with the updated workflow and itemized order builder.">
+        <x-slot:breadcrumbs>
+            @include('partials._breadcrumbs')
+        </x-slot:breadcrumbs>
+    </x-adminlte.page-header>
 
-            <x-alert />
+    <x-adminlte.page-body>
+        <x-alert />
 
-            <div class="row row-cards">
+        <form action="{{ route('ordersV2.store') }}" method="POST">
+            @csrf
 
-                <form action="{{ route('ordersV2.store') }}" method="POST">
-                    @csrf
-                    <div class="row">
+            <x-card>
+                <x-slot:header>
+                    <x-slot:title>
+                        {{ __('Order Details') }}
+                    </x-slot:title>
 
-                        <div class="col-lg-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <div>
-                                        <h3 class="card-title">
-                                            {{ __('Create Order') }}
-                                        </h3>
-                                    </div>
+                    <x-slot:actions>
+                        <x-action.close route="{{ route('ordersV2.index') }}" />
+                    </x-slot:actions>
+                </x-slot:header>
 
-                                    <div class="card-actions btn-actions">
-                                        <div class="dropdown">
-                                            <a href="#" class="btn-action dropdown-toggle" data-bs-toggle="dropdown"
-                                                aria-haspopup="true"
-                                                aria-expanded="false"><!-- Download SVG icon from http://tabler-icons.io/i/dots-vertical -->
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
-                                                    height="24" viewBox="0 0 24 24" stroke-width="2"
-                                                    stroke="currentColor" fill="none" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                    <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
-                                                    <path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
-                                                    <path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
-                                                </svg>
-                                            </a>
-                                            <div class="dropdown-menu dropdown-menu-end" style="">
-                                                {{-- - - --}}
-                                            </div>
-                                        </div>
+                <x-slot:content>
+                    <div class="row gx-3 mb-3">
+                        <div class="col-md-4">
+                            <label for="date" class="form-label required">
+                                {{ __('Order Date') }}
+                            </label>
 
-                                        {{-- - {{ URL::previous() }} - --}}
-                                        <a href="{{ route('ordersV2.index') }}" class="btn-action">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
-                                                height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                <path d="M18 6l-12 12"></path>
-                                                <path d="M6 6l12 12"></path>
-                                            </svg>
-                                        </a>
-                                    </div>
+                            <input name="date" id="date" type="date"
+                                class="form-control example-date-input @error('date') is-invalid @enderror"
+                                value="{{ old('date') ?? now()->format('Y-m-d') }}" required>
+
+                            @error('date')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
                                 </div>
-                                <div class="card-body">
+                            @enderror
+                        </div>
 
-                                    <div class="row gx-3 mb-3">
-                                        <div class="col-md-4">
-                                            <label for="date" class="form-label required">
-                                                {{ __('Order Date') }}
-                                            </label>
+                        <x-tom-select label="Customers" id="customer_id" name="customer_id"
+                            placeholder="Select Customer" :data="$customers" />
+                    </div>
 
-                                            <input name="date" id="date" type="date"
-                                                class="form-control example-date-input
+                    @livewire('order-v2-form')
 
-                                               @error('date') is-invalid @enderror"
-                                                value="{{ old('date') ?? now()->format('Y-m-d') }}" required>
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <label for="note" class="form-label">
+                                {{ __('Note (Optional)') }}
+                            </label>
+                            <textarea name="note" id="note" class="form-control @error('note') is-invalid @enderror" rows="3"
+                                placeholder="Enter any notes or comments here...">{{ old('note') }}</textarea>
 
-                                            @error('date')
-                                                <div class="invalid-feedback">
-                                                    {{ $message }}
-                                                </div>
-                                            @enderror
-                                        </div>
-
-
-                                        <x-tom-select label="Customers" id="customer_id" name="customer_id"
-                                            placeholder="Select Customer" :data="$customers" />
-
-                                        {{-- <div class="col-md-4">
-                                        <label for="reference" class="form-label required">
-                                            {{ __('Reference') }}
-                                        </label>
-
-                                        <input type="text" class="form-control"
-                                               id="reference"
-                                               name="reference"
-                                               value="PRS"
-                                               readonly
-                                        >
-
-                                        @error('reference')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                        @enderror
-                                    </div> --}}
-                                    </div>
-
-                                    @livewire('order-v2-form')
-
-                                    <!-- Note Input Field -->
-                                    <div class="row mt-4">
-                                        <div class="col-md-12">
-                                            <label for="note" class="form-label">
-                                                {{ __('Note (Optional)') }}
-                                            </label>
-                                            <textarea name="note" id="note" class="form-control @error('note') is-invalid @enderror" rows="3"
-                                                placeholder="Enter any notes or comments here...">{{ old('note') }}</textarea>
-
-                                            @error('note')
-                                                <div class="invalid-feedback">
-                                                    {{ $message }}
-                                                </div>
-                                            @enderror
-                                        </div>
-                                    </div>
+                            @error('note')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
                                 </div>
-
-                                <div class="card-footer text-end">
-                                    {{-- - onclick="return confirm('Are you sure you want to purchase?')" - --}}
-                                    {{-- - @disabled($errors->isNotEmpty()) - --}}
-                                    <button type="submit" class="btn btn-primary">
-                                        {{ __('Create Order') }}
-                                    </button>
-                                </div>
-                            </div>
+                            @enderror
                         </div>
                     </div>
-                </form>
-            </div>
-        </div>
-    </div>
+                </x-slot:content>
+
+                <x-slot:footer class="text-end">
+                    <button type="submit" class="btn btn-primary">
+                        {{ __('Create Order') }}
+                    </button>
+                </x-slot:footer>
+            </x-card>
+        </form>
+    </x-adminlte.page-body>
 @endsection

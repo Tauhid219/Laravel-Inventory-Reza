@@ -1,45 +1,46 @@
 @extends('layouts.auth')
 
-@section('content')
-<form class="card card-md" action="{{ route('register') }}" method="POST" autocomplete="off">
-    @csrf
+@section('title', __('Register'))
+@section('auth_heading', __('Create your inventory account.'))
+@section('auth_subtitle', __('Register a new account to access purchasing, stock, quotation, and sales workflows.'))
 
-    <div class="card-body">
-        <h2 class="card-title text-center mb-4">Create new account</h2>
+@section('content')
+<div class="card-body p-4 p-lg-5">
+    <h2 class="h3 text-center mb-2">{{ __('Create Account') }}</h2>
+    <p class="text-center text-muted mb-4">{{ __('Set up your credentials to start using the inventory system.') }}</p>
+
+    <form action="{{ route('register') }}" method="POST" autocomplete="off">
+        @csrf
 
         <x-input name="name" :value="old('name')" placeholder="Your name" required="true"/>
-
         <x-input name="email" :value="old('email')" placeholder="your@email.com" required="true"/>
-
         <x-input name="username" :value="old('username')" placeholder="Your username" required="true"/>
-
-        <x-input name="password" :value="old('password')" placeholder="Password" required="true"/>
-
-        <x-input name="password_confirmation" :value="old('password_confirmation')" placeholder="Password confirmation" required="true" label="Password Confirmation"/>
+        <x-input type="password" name="password" placeholder="Password" required="true"/>
+        <x-input type="password" name="password_confirmation" placeholder="Password confirmation" required="true" label="Password Confirmation"/>
 
         <div class="mb-3">
             <label class="form-check">
                 <input type="checkbox" name="terms-of-service" id="terms-of-service"
-                       class="form-check-input @error('terms-of-service') is-invalid @enderror"
-                >
+                       class="form-check-input @error('terms-of-service') is-invalid @enderror">
                 <span class="form-check-label">
-                    Agree the <a href="./terms-of-service.html" tabindex="-1">
-                        terms and policy</a>.
+                    {{ __('I agree to the platform terms and usage policy.') }}
                 </span>
             </label>
+            @error('terms-of-service')
+                <div class="invalid-feedback d-block">{{ $message }}</div>
+            @enderror
         </div>
 
         <div class="form-footer">
-            <x-button type="submit" class="w-100">
+            <button type="submit" class="btn btn-primary btn-block">
                 {{ __('Create new account') }}
-            </x-button>
+            </button>
         </div>
-    </div>
-</form>
+    </form>
 
-<div class="text-center text-secondary mt-3">
-    Already have account? <a href="{{ route('login') }}" tabindex="-1">
-        Sign in
-    </a>
+    <div class="text-center text-muted mt-4 inventory-auth-links">
+        {{ __('Already have an account?') }}
+        <a href="{{ route('login') }}" tabindex="-1">{{ __('Sign in') }}</a>
+    </div>
 </div>
 @endsection

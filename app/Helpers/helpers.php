@@ -17,8 +17,8 @@ if (!function_exists('format_currency')) {
         }
 
         $settings = settings();
-        $position = $settings->default_currency_position ?? '2';
-        $symbol = $settings->currency->symbol ?? ' $';
+        $position = $settings->default_currency_position ?? 'prefix';
+        $symbol = $settings->currency->symbol ?? '$';
         $decimal_separator = $settings->currency->decimal_separator ?? '.';
         $thousand_separator = $settings->currency->thousand_separator ?? ',';
 
@@ -29,6 +29,18 @@ if (!function_exists('format_currency')) {
         }
 
         return $formatted_value;
+    }
+}
+
+if (!function_exists('safe_currency')) {
+    function safe_currency($value, string $currency = 'BDT', ?string $locale = null, int $decimals = 2): string {
+        if (extension_loaded('intl')) {
+            return \Illuminate\Support\Number::currency((float) $value, $currency, $locale);
+        }
+
+        $amount = number_format((float) $value, $decimals, '.', ',');
+
+        return $currency . ' ' . $amount;
     }
 }
 

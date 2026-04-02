@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Purchase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -67,20 +68,38 @@ class SupplierTest extends TestCase
             ->assertViewIs('suppliers.show');
     }
 
-    public function test_user_can_delete_category()
+    public function test_super_admin_can_delete_supplier_without_related_purchases()
     {
-        //$this->withoutExceptionHandling();
-
-        $category = $this->createSupplier();
+        $supplier = $this->createSupplier();
 
         $this->assertDatabaseHas('suppliers', ['name' => 'Thomann']);
         $this->assertDatabaseCount('suppliers', 1);
 
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser();
         $this->actingAs($user);
 
-        $this->delete('/suppliers/'. $category->id);
+        $response = $this->delete('/suppliers/'. $supplier->id);
 
+        $response->assertRedirect(route('suppliers.index'));
         $this->assertDatabaseCount('suppliers', 0);
+    }
+
+    public function test_supplier_with_related_purchases_cannot_be_deleted()
+    {
+        $supplier = $this->createSupplier();
+        Purchase::factory()->create([
+            'supplier_id' => $supplier->id,
+        ]);
+
+        $user = $this->createAuthorizedUser();
+
+        $response = $this->actingAs($user)->delete('/suppliers/' . $supplier->id);
+
+        $response
+            ->assertRedirect(route('suppliers.index'))
+            ->assertSessionHas('error', 'This supplier has related purchases. Deletion is not allowed.');
+
+        $this->assertDatabaseCount('suppliers', 1);
+        $this->assertDatabaseHas('suppliers', ['id' => $supplier->id]);
     }
 }

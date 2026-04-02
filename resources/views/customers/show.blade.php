@@ -1,96 +1,52 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <div class="page-header d-print-none">
-        <div class="container-xl mb-3">
-            <div class="row g-2 align-items-center mb-3">
-                <div class="col">
-                    <h2 class="page-title">
-                        {{ $customer->name }}
-                    </h2>
-                </div>
-            </div>
-
+    <x-adminlte.page-header :title="$customer->name" subtitle="Review customer contact information and saved address details.">
+        <x-slot:breadcrumbs>
             @include('partials._breadcrumbs', ['model' => $customer])
-        </div>
-    </div>
+        </x-slot:breadcrumbs>
+    </x-adminlte.page-header>
 
-    <div class="page-body">
-        <div class="container-xl">
-            <div class="row row-cards">
+    <x-adminlte.page-body>
+        <x-card>
+            <x-slot:header>
+                <x-slot:title>
+                    {{ __('Customer Details') }}
+                </x-slot:title>
+            </x-slot:header>
 
-                <div class="row">
-                    {{-- <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h3 class="card-title">
-                                    {{ __('Profile Image') }}
-                                </h3>
-
-                                <img
-                                    class="img-account-profile mb-2"
-                                    src="{{ asset('assets/img/demo/user-placeholder.svg') }}"
-                                    id="image-preview"
-                                >
-                            </div>
-                        </div>
-                    </div> --}}
-
-                    <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    {{ __('Customer Details') }}
-                                </h3>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-bordered card-table table-vcenter text-nowrap datatable">
-                                    <tbody>
-                                    <tr>
-                                        <td>Name</td>
-                                        <td>{{ $customer->name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Email address</td>
-                                        <td>{{ $customer->email }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Phone number</td>
-                                        <td>{{ $customer->phone }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Address</td>
-                                        <td>{{ $customer->address }}</td>
-                                    </tr>
-                                    {{-- <tr>
-                                        <td>Account holder</td>
-                                        <td>{{ $customer->account_holder }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Account number</td>
-                                        <td>{{ $customer->account_number }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Bank name</td>
-                                        <td>{{ $customer->bank_name }}</td>
-                                    </tr> --}}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div class="card-footer text-end">
-                                <x-button.edit route="{{ route('customers.edit', $customer) }}">
-                                    {{ __('Edit') }}
-                                </x-button.edit>
-
-                                <x-button.back route="{{ route('customers.index') }}">
-                                    {{ __('Cancel') }}
-                                </x-button.back>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="table-responsive">
+                <table class="table table-bordered card-table table-vcenter text-nowrap datatable">
+                    <tbody>
+                        <tr>
+                            <td>{{ __('Name') }}</td>
+                            <td>{{ $customer->name }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ __('Email address') }}</td>
+                            <td>{{ $customer->email }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ __('Phone number') }}</td>
+                            <td>{{ $customer->phone }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ __('Address') }}</td>
+                            <td>{{ $customer->address }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </div>
-    </div>
+
+            <x-slot:footer class="text-end">
+                <x-button.edit route="{{ route('customers.edit', $customer) }}">
+                    {{ __('Edit') }}
+                </x-button.edit>
+
+                <x-button.back route="{{ route('customers.index') }}">
+                    {{ __('Cancel') }}
+                </x-button.back>
+            </x-slot:footer>
+        </x-card>
+    </x-adminlte.page-body>
 @endsection

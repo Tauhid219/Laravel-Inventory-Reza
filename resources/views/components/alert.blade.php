@@ -7,7 +7,9 @@
         <h3 class="mb-1">Success</h3>
         <p>{{ session('success') }}</p>
 
-        <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+        <button type="button" class="close" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
 @endif
 
@@ -16,7 +18,9 @@
         <h3 class="mb-1">Oops...</h3>
         <p>{{ session('error') }}</p>
 
-        <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+        <button type="button" class="close" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
 @endif
 
@@ -29,6 +33,8 @@
             @endforeach
         </ul>
 
-        <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+        <button type="button" class="close" data-dismiss="alert" aria-label="close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
 @endif

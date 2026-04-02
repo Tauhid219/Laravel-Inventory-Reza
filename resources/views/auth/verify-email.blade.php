@@ -1,47 +1,36 @@
 @extends('layouts.auth')
 
+@section('title', __('Verify Email'))
+@section('auth_heading', __('Verify your email before getting started.'))
+@section('auth_subtitle', __('Email verification helps protect your account and unlocks the authenticated experience.'))
+
 @section('content')
-<div class="text-center">
-    <div class="my-5">
-        <p class="fs-h3 text-secondary">
-            {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
-        </p>
-    </div>
-</div>
+<div class="card-body p-4 p-lg-5">
+    <h2 class="h3 text-center mb-2">{{ __('Verify Email') }}</h2>
+    <p class="text-center text-muted mb-4">
+        {{ __('Thanks for signing up! Please verify your email address using the link we just sent you.') }}
+    </p>
 
-
-<form action="{{ route('verification.send') }}" method="POST" autocomplete="off">
-    @csrf
-
-    <button type="submit" class="btn btn-primary w-100">
-        {{ __('Resend Verification Email') }}
-    </button>
-
-    <div class="mt-4">
+    <div class="mt-4 mb-4">
         @if (session('status') == 'verification-link-sent')
             <div class="alert alert-success" role="alert">
-                <div class="d-flex">
-                    <div>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
-                    </div>
-                    <div>
-                        <div class="text-secondary">
-                            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
-                        </div>
-                    </div>
-                </div>
+                {{ __('A new verification link has been sent to the email address you provided during registration.') }}
             </div>
         @endif
     </div>
-</form>
 
-<form action="{{ route('logout') }}" method="POST" autocomplete="off">
-    @csrf
-
-    <div class="form-footer">
+    <form action="{{ route('verification.send') }}" method="POST" autocomplete="off">
+        @csrf
         <button type="submit" class="btn btn-primary w-100">
+            {{ __('Resend Verification Email') }}
+        </button>
+    </form>
+
+    <form action="{{ route('logout') }}" method="POST" autocomplete="off" class="mt-3">
+        @csrf
+        <button type="submit" class="btn btn-default w-100">
             {{ __('Log Out') }}
         </button>
-    </div>
-</form>
+    </form>
+</div>
 @endsection

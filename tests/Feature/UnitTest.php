@@ -133,7 +133,8 @@ class UnitTest extends TestCase
 
         $response = $this->actingAs($user)->put('units/' . $unit->slug, [
             'name' => 'Meter',
-            'slug' => 'meter'
+            'slug' => 'meter',
+            'short_code' => 'mtr',
         ]);
 
         $this->assertDatabaseHas('units', [

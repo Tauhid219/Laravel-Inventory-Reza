@@ -1,48 +1,23 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <div class="page-header d-print-none">
-        <div class="container-xl mb-3">
-            <div class="row g-2 align-items-center mb-3">
-                <div class="col">
-                    <h2 class="page-title">
-                        {{ __('Edit Product') }}
-                    </h2>
-                </div>
-            </div>
-
+    <x-adminlte.page-header :title="__('Product Details')">
+        <x-slot:breadcrumbs>
             @include('partials._breadcrumbs', ['model' => $product])
-        </div>
-    </div>
+        </x-slot:breadcrumbs>
+    </x-adminlte.page-header>
 
-    <div class="page-body">
-        <div class="container-xl">
-            <div class="row row-cards">
+    <x-adminlte.page-body>
+        <x-card>
+            <x-slot:header>
+                <x-slot:title>
+                    {{ __('Product Details') }}
+                </x-slot:title>
+            </x-slot:header>
 
-                <div class="row">
-                    {{-- <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h3 class="card-title">
-                                    {{ __('Product Image') }}
-                                </h3>
-
-                                <img class="img-account-profile mb-2" src="{{ asset('assets/img/products/default.webp') }}"
-                                    alt="" id="image-preview" />
-                            </div>
-                        </div>
-                    </div> --}}
-
-                    <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    {{ __('Product Details') }}
-                                </h3>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-bordered card-table table-vcenter text-nowrap datatable">
-                                    <tbody>
+            <div class="table-responsive">
+                <table class="table table-bordered card-table table-vcenter text-nowrap datatable">
+                    <tbody>
                                         <tr>
                                             <td>Name</td>
                                             <td>{{ $product->name }}</td>
@@ -88,8 +63,9 @@
                                                     <a href="{{ route('units.show', $product->unit) }}"
                                                         class="badge bg-blue-lt">
                                                         {{ $product->unit->name }}
-                                                    @else
-                                                        <span class="badge bg-secondary-lt">N/A</span>
+                                                    </a>
+                                                @else
+                                                    <span class="badge bg-secondary-lt">N/A</span>
                                                 @endif
                                             </td>
                                         </tr>
@@ -131,23 +107,19 @@
                                             <td>{{ __('Notes') }}</td>
                                             <td>{{ $product->notes }}</td>
                                         </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div class="card-footer text-end">
-                                <x-button.edit route="{{ route('products.edit', $product) }}">
-                                    {{ __('Edit') }}
-                                </x-button.edit>
-
-                                <x-button.back route="{{ route('products.index') }}">
-                                    {{ __('Cancel') }}
-                                </x-button.back>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    </tbody>
+                </table>
             </div>
-        </div>
-    </div>
+
+            <x-slot:footer class="text-end">
+                <x-button.edit route="{{ route('products.edit', $product) }}">
+                    {{ __('Edit') }}
+                </x-button.edit>
+
+                <x-button.back route="{{ route('products.index') }}">
+                    {{ __('Cancel') }}
+                </x-button.back>
+            </x-slot:footer>
+        </x-card>
+    </x-adminlte.page-body>
 @endsection

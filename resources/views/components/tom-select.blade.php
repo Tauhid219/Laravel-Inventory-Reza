@@ -1,30 +1,50 @@
 @pushonce('page-styles')
-    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('dist/libs/tom-select/dist/css/tom-select.bootstrap4.css') }}">
 @endpushonce
 
 @props([
     'label' => '',
-    'name' => $name,
-    'id' => '' ?? $name,
+    'name',
+    'id' => null,
     'placeholder' => '',
     'data',
-    'value'
+    'value' => null,
 ])
 
+@php
+    $selectId = $id ?: $name;
+    $selectedValue = old($name, $value);
+    $placeholderText = $placeholder ?: __('Select an option...');
+    $tomSelectOptions = [
+        'create' => true,
+        'sortField' => [
+            'field' => 'text',
+            'direction' => 'asc',
+        ],
+        'plugins' => [
+            'clear_button' => [
+                'title' => 'Clear selection',
+            ],
+        ],
+    ];
+@endphp
+
 <div class="col-md-4">
-    <label for="{{ $id }}" class="form-label required" >
+    <label for="{{ $selectId }}" class="form-label required" >
         {{ $label }}
     </label>
 
-    <select id="{{ $id }}" name="{{ $name }}" placeholder="{{ $placeholder }}" autocomplete="off"
+    <select id="{{ $selectId }}" name="{{ $name }}" placeholder="{{ $placeholder }}" autocomplete="off"
             class="form-control form-select @error($name) is-invalid @enderror"
+            data-tom-select
+            data-tom-select-options='{{ json_encode($tomSelectOptions, JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_QUOT) }}'
     >
         <option value="">
-            Select a person...
+            {{ $placeholderText }}
         </option>
 
         @foreach($data as $option)
-            <option value="{{ $option->id }}" @selected(old($name, $value = '' ?? null) == $option->id)>
+            <option value="{{ $option->id }}" @selected((string) $selectedValue === (string) $option->id)>
                 {{ $option->name }}
             </option>
         @endforeach
@@ -36,20 +56,6 @@
     </div>
     @enderror
 </div>
-
-@pushonce('page-scripts')
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-
-    <script>
-        new TomSelect("#{{ $id }}",{
-            create: true,
-            sortField: {
-                field: "text",
-                direction: "asc"
-            }
-        });
-    </script>
-@endpushonce
 
 {{--- ---}}
 {{---

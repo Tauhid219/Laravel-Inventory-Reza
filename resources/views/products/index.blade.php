@@ -1,20 +1,18 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <div class="page-body">
-        {{-- @if ($products->isEmpty())
-        <x-empty
-            title="No products found"
-            message="Try adjusting your search or filter to find what you're looking for."
-            button_label="{{ __('Add your first Product') }}"
-            button_route="{{ route('products.create') }}"
-        />
-    @else --}}
-        <div class="container container-xl">
-            <x-alert />
+    <x-adminlte.page-header :title="__('Products')" subtitle="Manage catalog items, stock details, and product setup.">
+        <x-slot:actions>
+            <div class="btn-group">
+                <a href="{{ route('products.import.view') }}" class="btn btn-default">Import</a>
+                <a href="{{ route('products.create') }}" class="btn btn-primary">Add Product</a>
+            </div>
+        </x-slot:actions>
+    </x-adminlte.page-header>
 
-            @livewire('tables.product-table')
-        </div>
-        {{-- @endif --}}
-    </div>
+    <x-adminlte.page-body container-class="container container-xl">
+        <x-alert />
+
+        @livewire('tables.product-table')
+    </x-adminlte.page-body>
 @endsection

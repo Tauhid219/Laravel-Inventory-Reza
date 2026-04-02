@@ -1,13 +1,13 @@
 <div>
     <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex align-items-center justify-content-between gap-2">
             <div>
                 <h3 class="card-title">
                     Sub Category: {{ $subCategory->name }}
                 </h3>
             </div>
 
-            <div class="card-actions btn-actions">
+            <div class="card-tools d-flex align-items-center gap-2">
                 <x-action.close route="{{ url()->previous() }}" />
             </div>
         </div>

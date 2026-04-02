@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Product;
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Http\FormRequest;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
 
@@ -44,12 +45,25 @@ class StoreProductRequest extends FormRequest
     {
         $this->merge([
             'slug' => Str::slug($this->name, '-'),
-            'code' => IdGenerator::generate([
+            'code' => $this->code ?: $this->generateProductCode(),
+        ]);
+    }
+
+    private function generateProductCode(): string
+    {
+        if (DB::connection()->getDriverName() === 'mysql') {
+            return IdGenerator::generate([
                 'table' => 'products',
                 'field' => 'code',
                 'length' => 4,
                 'prefix' => 'PC'
-            ])
-        ]);
+            ]);
+        }
+
+        do {
+            $code = 'PC' . strtoupper(Str::random(6));
+        } while (DB::table('products')->where('code', $code)->exists());
+
+        return $code;
     }
 }

@@ -1,30 +1,21 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <div class="page-body">
-        <div class="container-xl">
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <h3 class="card-title">
-                            {{ __('Purchases: Pending') }}
-                        </h3>
-                    </div>
+    <x-adminlte.page-header :title="__('Pending Purchases')" subtitle="Review purchase records waiting for approval before stock is posted.">
+        <x-slot:actions>
+            <div class="btn-group">
+                <a href="{{ route('purchases.index') }}" class="btn btn-default">{{ __('All Purchases') }}</a>
+                <a href="{{ route('purchases.create') }}" class="btn btn-primary">{{ __('Add Purchase') }}</a>
+            </div>
+        </x-slot:actions>
+    </x-adminlte.page-header>
 
-                    <div class="card-actions">
-                        <a href="{{ route('purchases.create') }}" class="btn btn-icon btn-outline-success">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="24"
-                                height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M12 5l0 14" />
-                                <path d="M5 12l14 0" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-bordered card-table table-vcenter text-nowrap datatable">
+    <x-adminlte.page-body container-class="container container-xl">
+        <x-alert />
+
+        <x-card>
+            <div class="table-responsive">
+                <table class="table table-bordered card-table table-vcenter text-nowrap datatable">
                         <thead class="thead-light">
                             <tr>
                                 <th scope="col" class="align-middle text-center w-1">No.</th>
@@ -125,12 +116,8 @@
                                 </tr>
                             @endforeach
                         </tbody>
-                    </table>
-                </div>
-                <div class="card-footer">
-                    {{-- - - --}}
-                </div>
+                </table>
             </div>
-        </div>
-    </div>
+        </x-card>
+    </x-adminlte.page-body>
 @endsection

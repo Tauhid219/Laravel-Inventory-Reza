@@ -1,79 +1,31 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <div class="page-header d-print-none">
-        <div class="container-xl">
-            <div class="row g-2 align-items-center mb-3">
-                <div class="col">
-                    <h2 class="page-title">
-                        {{ __('Create Product') }}
-                    </h2>
-                </div>
-            </div>
-
+    <x-adminlte.page-header :title="__('Create Product')">
+        <x-slot:breadcrumbs>
             @include('partials._breadcrumbs')
-        </div>
-    </div>
+        </x-slot:breadcrumbs>
+    </x-adminlte.page-header>
 
-    <div class="page-body">
-        <div class="container-xl">
-            <x-alert />
+    <x-adminlte.page-body>
+        <x-alert />
 
-            <div class="row row-cards">
-                <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
+        <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
 
-                    <div class="row">
-                        {{-- <div class="col-lg-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h3 class="card-title">
-                                        {{ __('Product Image') }}
-                                    </h3>
+            <x-card>
+                <x-slot:header>
+                    <x-slot:title>
+                        {{ __('Product Create') }}
+                    </x-slot:title>
 
-                                    <img class="img-account-profile mb-2"
-                                        src="{{ asset('assets/img/products/default.webp') }}" id="image-preview" />
+                    <x-slot:actions>
+                        <x-action.close route="{{ route('products.index') }}" />
+                    </x-slot:actions>
+                </x-slot:header>
 
-                                    <div class="small font-italic text-muted mb-2">
-                                        JPG or PNG no larger than 2 MB
-                                    </div>
-
-                                    <input type="file" accept="image/*" id="image" name="product_image"
-                                        class="form-control @error('product_image') is-invalid @enderror"
-                                        onchange="previewImage();">
-
-                                    @error('product_image')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div> --}}
-
-                        <div class="col-lg-12">
-                            <div class="card">
-                                <div class="card-header">
-                                    <div>
-                                        <h3 class="card-title">
-                                            {{ __('Product Create') }}
-                                        </h3>
-                                    </div>
-
-                                    <div class="card-actions">
-                                        <a href="{{ route('products.index') }}" class="btn-action">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
-                                                height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                                <path d="M18 6l-12 12"></path>
-                                                <path d="M6 6l12 12"></path>
-                                            </svg>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row row-cards">
+                <x-slot:content>
+                    <div class="row row-cards">
                                         <div class="col-md-12">
 
                                             <x-input name="name" id="name" placeholder="Product name"
@@ -258,56 +210,23 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                </x-slot:content>
 
-                                <div class="card-footer text-end">
-                                    <x-button.save type="submit">
-                                        {{ __('Save') }}
-                                    </x-button.save>
+                <x-slot:footer class="text-end">
+                    <x-button.save type="submit">
+                        {{ __('Save') }}
+                    </x-button.save>
 
-                                    <x-button.back route="{{ route('products.index') }}">
-                                        {{ __('Cancel') }}
-                                    </x-button.back>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.getElementById('category_id').addEventListener('change', function() {
-            let categoryId = this.value;
-            let subCategorySelect = document.getElementById('sub_category_id');
-
-            // Show loading indicator
-            subCategorySelect.innerHTML = '<option selected disabled>Loading...</option>';
-
-            fetch(`/subcategories/${categoryId}`)
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(data => {
-                    subCategorySelect.innerHTML = '<option selected disabled>Select a subcategory:</option>';
-                    data.subCategories.forEach(subCategory => {
-                        let option = document.createElement('option');
-                        option.value = subCategory.id;
-                        option.text = subCategory.name;
-                        subCategorySelect.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    subCategorySelect.innerHTML =
-                        '<option selected disabled>Error loading subcategories</option>';
-                });
-        });
-    </script>
+                    <x-button.back route="{{ route('products.index') }}">
+                        {{ __('Cancel') }}
+                    </x-button.back>
+                </x-slot:footer>
+            </x-card>
+        </form>
+    </x-adminlte.page-body>
 @endsection
 
 @pushonce('page-scripts')
+    @include('products.partials.subcategory-script', ['selectedSubCategoryId' => old('sub_category_id')])
     <script src="{{ asset('assets/js/img-preview.js') }}"></script>
 @endpushonce

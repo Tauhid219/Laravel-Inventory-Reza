@@ -1,88 +1,76 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <div class="page-header d-print-none">
-        <div class="container-xl mb-3">
-            <div class="row g-2 align-items-center mb-3">
-                <div class="col">
-                    <h2 class="page-title">
-                        {{ $user->name }}
-                    </h2>
-                </div>
-            </div>
-
+    <x-adminlte.page-header :title="$user->name" subtitle="Review account details and assigned role access for this user.">
+        <x-slot:breadcrumbs>
             @include('partials._breadcrumbs', ['model' => $user])
-        </div>
-    </div>
+        </x-slot:breadcrumbs>
+    </x-adminlte.page-header>
 
-    <div class="page-body">
-        <div class="container-xl">
-            <div class="row row-cards">
+    <x-adminlte.page-body>
+        <div class="row row-cards">
+            <div class="col-lg-4">
+                <x-card>
+                    <x-slot:header>
+                        <x-slot:title>
+                            {{ __('Profile Image') }}
+                        </x-slot:title>
+                    </x-slot:header>
 
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h3 class="card-title">
-                                    {{ __('Profile Image') }}
-                                </h3>
+                    <div class="text-center">
+                        <img id="image-preview" class="img-account-profile mb-2"
+                            src="{{ $user->photo ? asset('storage/profile/' . $user->photo) : asset('assets/img/demo/user-placeholder.svg') }}"
+                            alt="">
+                    </div>
+                </x-card>
+            </div>
 
-                                <img id="image-preview" class="img-account-profile mb-2"
-                                    src="{{ asset('assets/img/demo/user-placeholder.svg') }}" alt="">
-                            </div>
-                        </div>
+            <div class="col-lg-8">
+                <x-card>
+                    <x-slot:header>
+                        <x-slot:title>
+                            {{ __('User Details') }}
+                        </x-slot:title>
+                    </x-slot:header>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered card-table table-vcenter text-nowrap">
+                            <tbody>
+                                <tr>
+                                    <td>{{ __('Name') }}</td>
+                                    <td>{{ $user->name }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Email address') }}</td>
+                                    <td>{{ $user->email }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Username') }}</td>
+                                    <td>{{ $user->username }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('User Role') }}</td>
+                                    <td>
+                                        @foreach ($user->getRoleNames() as $rolename)
+                                            <span class="badge bg-primary text-white mx-1">{{ $rolename }}</span>
+                                        @endforeach
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
-                    <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    {{ __('User Details') }}
-                                </h3>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-bordered card-table table-vcenter text-nowrap datatable">
-                                    <tbody>
-                                        <tr>
-                                            <td>Name</td>
-                                            <td>{{ $user->name }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Email address</td>
-                                            <td>{{ $user->email }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Username</td>
-                                            <td>{{ $user->username }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>User Role</td>
-                                            <td>
-                                                @if (!empty($user->getRoleNames()))
-                                                    @foreach ($user->getRoleNames() as $rolename)
-                                                        <label
-                                                            class="badge bg-primary text-white mx-1">{{ $rolename }}</label>
-                                                    @endforeach
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <x-slot:footer class="text-end">
+                        <x-button.edit route="{{ route('users.edit', $user) }}">
+                            {{ __('Edit') }}
+                        </x-button.edit>
 
-                            <div class="card-footer text-end">
-                                <x-button.edit route="{{ route('users.edit', $user) }}">
-                                    {{ __('Edit') }}
-                                </x-button.edit>
-
-                                <x-button.back route="{{ route('users.index') }}">
-                                    {{ __('Cancel') }}
-                                </x-button.back>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                        <x-button.back route="{{ route('users.index') }}">
+                            {{ __('Cancel') }}
+                        </x-button.back>
+                    </x-slot:footer>
+                </x-card>
             </div>
         </div>
-    </div>
+    </x-adminlte.page-body>
 @endsection

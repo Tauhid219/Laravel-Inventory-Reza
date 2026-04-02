@@ -1,36 +1,24 @@
 @extends('layouts.tabler')
 
 @section('content')
-<header class="page-header page-header-compact page-header-light border-bottom bg-white mb-4">
-    <div class="container-xl px-4">
-        <div class="page-header-content">
-            <div class="row align-items-center justify-content-between pt-3">
-                <div class="col-auto mb-3">
-                    <h1 class="page-header-title">
-                        <div class="page-header-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file">
-                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                                <polyline points="13 2 13 9 20 9"></polyline>
-                            </svg>
-                        </div>
-                        Daily Purchase Report - {{ today()->format('d-m-Y') }}
-                    </h1>
-                </div>
-            </div>
-        </div>
-    </div>
-</header>
+    <x-adminlte.page-header :title="__('Daily Purchase Report')" :subtitle="__('Purchases recorded on ') . today()->format('d-m-Y')">
+        <x-slot:actions>
+            <a href="{{ route('purchases.getPurchaseReport') }}" class="btn btn-default">{{ __('Export Range Report') }}</a>
+        </x-slot:actions>
+    </x-adminlte.page-header>
 
-<div class="container-xl px-4">
-    <div class="row">
-        <div class="col-xl-12">
-            <div class="card mb-4">
-                <div class="card-header">
-                    List of Purchases
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped align-middle">
+    <x-adminlte.page-body container-class="container container-xl">
+        <x-alert />
+
+        <x-card>
+            <x-slot:header>
+                <x-slot:title>
+                    {{ __('List of Purchases') }}
+                </x-slot:title>
+            </x-slot:header>
+
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
                             <thead class="thead-light">
                                 <tr>
                                     <th scope="col">No.</th>
@@ -51,10 +39,10 @@
                                     <td>{{ $purchase->purchase_date ? $purchase->purchase_date->format('d-m-Y') : 'N/A' }}</td>
                                     <td>{{ $purchase->total_amount }}</td>
                                     <td>
-                                        @if ($purchase->purchase_status == 1)
-                                            <span class="btn btn-success">Approved</span>
+                                        @if ($purchase->status === \App\Enums\PurchaseStatus::APPROVED)
+                                            <span class="btn btn-success">{{ __('Approved') }}</span>
                                         @else
-                                            <span class="btn btn-warning">Pending</span>
+                                            <span class="btn btn-warning">{{ __('Pending') }}</span>
                                         @endif
                                     </td>
                                     <td>
@@ -69,11 +57,8 @@
                                     </tr>
                                 @endforelse
                             </tbody>
-                        </table>
-                    </div>
-                </div>
+                </table>
             </div>
-        </div>
-    </div>
-</div>
+        </x-card>
+    </x-adminlte.page-body>
 @endsection

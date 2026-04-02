@@ -51,6 +51,15 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/theme/{theme}', function (string $theme) {
+        $allowedThemes = ['classic', 'dark-fixed', 'compact'];
+
+        abort_unless(in_array($theme, $allowedThemes, true), 404);
+
+        session(['adminlte_theme' => $theme]);
+
+        return redirect()->back();
+    })->name('theme.switch');
 
     // User Management
     Route::resource('/users', UserController::class)->middleware(['auth', 'role:super-admin']); //->except(['show']);

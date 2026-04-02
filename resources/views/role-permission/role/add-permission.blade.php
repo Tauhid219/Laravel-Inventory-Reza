@@ -1,59 +1,63 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <div class="page-body">
-        <div class="container container-xl">
-            @include('role-permission.nav-links')
+    <x-adminlte.page-header :title="__('Role Permissions')" :subtitle="__('Manage permission assignments for :role', ['role' => $role->name])">
+        <x-slot:actions>
+            <a href="{{ route('rl.index') }}" class="btn btn-default">
+                {{ __('Back to Roles') }}
+            </a>
+        </x-slot:actions>
+    </x-adminlte.page-header>
 
-            <div class="container mt-5">
-                <div class="row">
-                    <div class="col-md-12">
+    <x-adminlte.page-body>
+        @include('role-permission.nav-links')
 
-                        @if (session('status'))
-                            <div class="alert alert-success">
-                                {{ session('status') }}
-                            </div>
-                        @endif
+        @if (session('status'))
+            <div class="alert alert-success bg-white">{{ session('status') }}</div>
+        @endif
 
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="mb-0">Role: {{ $role->name }}
-                                    <a href="{{ url('role') }}" class="btn btn-danger ms-3">Back</a>
-                                </h4>
-                            </div>
-                            <div class="card-body">
-                                <form action="{{ route('givePermissionToRole', $role->id) }}" method="POST">
-                                    @csrf
-                                    @method('PUT')
-                                    <div class="mb-3">
-                                        @error('permission')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
-                                        <label for="">Permissions</label>
-                                        <div class="row">
-                                            @foreach ($permission as $permissions)
-                                                <div class="col-md-2">
-                                                    <label for="">
-                                                        <input type="checkbox" name="permission[]"
-                                                            value="{{ $permissions->name }}"
-                                                            {{ in_array($permissions->id, $rolepermission) ? 'checked' : '' }}
-                                                            {{ !auth()->user()->hasRole('super-admin') && in_array($permissions->name, $restrictedPermissions) ? 'hidden' : '' }}
-                                                            title="{{ !auth()->user()->hasRole('super-admin') && in_array($permissions->name, $restrictedPermissions) ? 'Only Super Admin can assign this permission' : '' }}">
-                                                        {{ $permissions->name }}
-                                                    </label>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <button type="submit" class="btn btn-primary">Update</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+        <x-alert />
+
+        <form action="{{ route('givePermissionToRole', $role->id) }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            <x-card>
+                <x-slot:header>
+                    <x-slot:title>
+                        {{ __('Permission Assignment') }}
+                    </x-slot:title>
+                </x-slot:header>
+
+                <x-slot:content>
+                    @error('permission')
+                        <div class="text-danger mb-3">{{ $message }}</div>
+                    @enderror
+
+                    <div class="row">
+                        @foreach ($permission as $permissions)
+                            @php
+                                $restricted = !auth()->user()->hasRole('super-admin') && in_array($permissions->name, $restrictedPermissions);
+                            @endphp
+
+                            @if (! $restricted)
+                                <div class="col-md-4 col-lg-3 mb-3">
+                                    <label class="d-flex align-items-center gap-2 border rounded px-3 py-2 mb-0">
+                                        <input type="checkbox" name="permission[]" value="{{ $permissions->name }}"
+                                            {{ in_array($permissions->id, $rolepermission) ? 'checked' : '' }}>
+                                        <span>{{ $permissions->name }}</span>
+                                    </label>
+                                </div>
+                            @endif
+                        @endforeach
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                </x-slot:content>
+
+                <x-slot:footer class="text-end">
+                    <x-button.save type="submit">{{ __('Update Permissions') }}</x-button.save>
+                    <x-button.back route="{{ route('rl.index') }}">{{ __('Cancel') }}</x-button.back>
+                </x-slot:footer>
+            </x-card>
+        </form>
+    </x-adminlte.page-body>
 @endsection

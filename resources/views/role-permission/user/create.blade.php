@@ -1,61 +1,100 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <div class="page-body">
-        <div class="container container-xl">
-            @include('role-permission.nav-links')
+    <x-adminlte.page-header :title="__('Create User')" subtitle="Create a new access-control user and assign one or more roles.">
+        <x-slot:actions>
+            <a href="{{ route('user.index') }}" class="btn btn-default">
+                {{ __('Back to Users') }}
+            </a>
+        </x-slot:actions>
+    </x-adminlte.page-header>
 
-            <div class="container mt-5">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="mb-0">Create User
-                                    <a href="{{ route('user.index') }}" class="btn btn-danger ms-3">Back</a>
-                                </h4>
+    <x-adminlte.page-body>
+        @include('role-permission.nav-links')
+
+        <x-alert />
+
+        <form action="{{ route('user.store') }}" method="POST">
+            @csrf
+
+            <x-card>
+                <x-slot:header>
+                    <x-slot:title>
+                        {{ __('User Details') }}
+                    </x-slot:title>
+                </x-slot:header>
+
+                <x-slot:content>
+                    <div class="row row-cards">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">{{ __('Name') }}</label>
+                                <input type="text" id="name" name="name" value="{{ old('name') }}"
+                                    class="form-control @error('name') is-invalid @enderror" />
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
-                            <div class="card-body">
-                                <form action="{{ route('user.store') }}" method="POST">
-                                    @csrf
-                                    <div class="mb-3">
-                                        <label for="">Name</label>
-                                        <input type="text" name="name" class="form-control" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="">Email</label>
-                                        <input type="text" name="email" class="form-control" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="">Username</label>
-                                        <input type="text" name="username" class="form-control" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="">Password</label>
-                                        <input type="text" name="password" class="form-control" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Assign Roles</label>
-                                        <select name="role[]" class="form-control @error('role') is-invalid @enderror"
-                                            multiple>
-                                            @foreach ($role as $r)
-                                                <option value="{{ $r->name }}">{{ $r->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('role')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
-                                        <small class="form-hint text-info">Hold CTRL to select multiple
-                                            roles.</small>
-                                    </div>
-                                    <div class="mb-3">
-                                        <button type="submit" class="btn btn-primary">Save</button>
-                                    </div>
-                                </form>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">{{ __('Email') }}</label>
+                                <input type="text" id="email" name="email" value="{{ old('email') }}"
+                                    class="form-control @error('email') is-invalid @enderror" />
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">{{ __('Username') }}</label>
+                                <input type="text" id="username" name="username" value="{{ old('username') }}"
+                                    class="form-control @error('username') is-invalid @enderror" />
+                                @error('username')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="password" class="form-label">{{ __('Password') }}</label>
+                                <input type="text" id="password" name="password"
+                                    class="form-control @error('password') is-invalid @enderror" />
+                                @error('password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="form-label">{{ __('Assign Roles') }}</label>
+                                <select name="role[]" class="form-control @error('role') is-invalid @enderror" multiple>
+                                    @foreach ($role as $r)
+                                        <option value="{{ $r->name }}"
+                                            {{ is_array(old('role')) && in_array($r->name, old('role')) ? 'selected' : '' }}>
+                                            {{ $r->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('role')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                                <small class="form-hint text-info">{{ __('Hold CTRL to select multiple roles.') }}</small>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                </x-slot:content>
+
+                <x-slot:footer class="text-end">
+                    <x-button.save type="submit">{{ __('Save') }}</x-button.save>
+                    <x-button.back route="{{ route('user.index') }}">{{ __('Cancel') }}</x-button.back>
+                </x-slot:footer>
+            </x-card>
+        </form>
+    </x-adminlte.page-body>
 @endsection

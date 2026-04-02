@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->string('role_name')->nullable();
             $table->string('slug')->unique();
             //$table->string('code')->unique();
             $table->timestamps();

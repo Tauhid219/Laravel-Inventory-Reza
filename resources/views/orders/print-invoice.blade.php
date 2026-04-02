@@ -3,7 +3,7 @@
 
 <head>
     <title>
-        {{ config('app.name') }}
+        {{ config('app.name') }} - Invoice {{ $order->invoice_no }}
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
@@ -17,6 +17,60 @@
         rel="stylesheet">
     <!-- Custom Stylesheet -->
     <link type="text/css" rel="stylesheet" href="{{ asset('assets/invoice/css/style.css') }}">
+    <style>
+        .invoice-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .invoice-meta-card {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 14px 16px;
+            background: #fff;
+        }
+
+        .invoice-meta-card .label {
+            display: block;
+            color: #6c757d;
+            font-size: 13px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+
+        .invoice-meta-card .value {
+            color: #212529;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .invoice-note {
+            margin-top: 24px;
+            padding: 16px 18px;
+            border-left: 4px solid #0d6efd;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .invoice-note h5 {
+            margin: 0 0 8px;
+            font-size: 15px;
+        }
+
+        .invoice-note p {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        @media print {
+            .invoice-meta-card {
+                break-inside: avoid;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -44,18 +98,6 @@
                         <div class="invoice-info">
                             <div class="row">
                                 <div class="col-sm-6 mb-50">
-                                    <div class="invoice-number">
-                                        <h4 class="inv-title-1">
-                                            Invoice date:
-                                        </h4>
-                                        <p class="invo-addr-1">
-                                            {{ $order->order_date }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-6 mb-50">
                                     <h4 class="inv-title-1">Customer</h4>
                                     <p class="inv-from-1">{{ $order->customer->name }}</p>
                                     <p class="inv-from-1">{{ $order->customer->phone }}</p>
@@ -69,6 +111,25 @@
                                     <p class="inv-from-1">info@csltechltd.com</p>
                                     <p class="inv-from-2">12B Ataturk Tower,
                                         22 Kemal Ataturk Avenue, Dhaka-1213</p>
+                                </div>
+                            </div>
+
+                            <div class="invoice-meta-grid">
+                                <div class="invoice-meta-card">
+                                    <span class="label">Invoice Date</span>
+                                    <span class="value">{{ optional($order->order_date)->format('d-m-Y') }}</span>
+                                </div>
+                                <div class="invoice-meta-card">
+                                    <span class="label">Payment Type</span>
+                                    <span class="value">{{ $order->payment_type }}</span>
+                                </div>
+                                <div class="invoice-meta-card">
+                                    <span class="label">Paid Amount</span>
+                                    <span class="value">{{ Number::currency($order->pay, 'BDT') }}</span>
+                                </div>
+                                <div class="invoice-meta-card">
+                                    <span class="label">Due Amount</span>
+                                    <span class="value">{{ Number::currency($order->due, 'BDT') }}</span>
                                 </div>
                             </div>
                         </div>
@@ -127,6 +188,26 @@
                                         </tr>
                                         <tr>
                                             <td colspan="3" class="text-end">
+                                                <strong>Paid</strong>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <strong>
+                                                    {{ Number::currency($order->pay, 'BDT') }}
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-end">
+                                                <strong>Due</strong>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <strong>
+                                                    {{ Number::currency($order->due, 'BDT') }}
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-end">
                                                 <strong>Total</strong>
                                             </td>
                                             <td class="align-middle text-center">
@@ -139,13 +220,13 @@
                                 </table>
                             </div>
                         </div>
-                        {{-- <div class="invoice-informeshon-footer">
-                                <ul>
-                                    <li><a href="#">www.website.com</a></li>
-                                    <li><a href="mailto:sales@hotelempire.com">info@example.com</a></li>
-                                    <li><a href="tel:+088-01737-133959">+62 123 123 123</a></li>
-                                </ul>
-                            </div> --}}
+
+                        @if ($order->note)
+                            <div class="invoice-note">
+                                <h5>Order Note</h5>
+                                <p>{{ $order->note }}</p>
+                            </div>
+                        @endif
                     </div>
                     <div class="invoice-btn-section clearfix d-print-none">
                         <a href="javascript:window.print()" class="btn btn-lg btn-print">

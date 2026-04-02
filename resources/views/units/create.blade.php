@@ -1,38 +1,38 @@
 @extends('layouts.tabler')
 
 @section('content')
-<div class="page-body">
-    <div class="container-xl">
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <h3 class="card-title">
+    <x-adminlte.page-header :title="__('Create Unit')" subtitle="Define a new measurement unit and its short code.">
+        <x-slot:breadcrumbs>
+            @include('partials._breadcrumbs')
+        </x-slot:breadcrumbs>
+    </x-adminlte.page-header>
+
+    <x-adminlte.page-body>
+        <x-alert />
+
+        <form action="{{ route('units.store') }}" method="POST">
+            @csrf
+
+            <x-card>
+                <x-slot:header>
+                    <x-slot:title>
                         {{ __('Unit Details') }}
-                    </h3>
-                </div>
+                    </x-slot:title>
 
-                <div class="card-actions">
-                    <x-action.close route="{{ route('units.index') }}" />
-                </div>
-            </div>
+                    <x-slot:actions>
+                        <x-action.close route="{{ route('units.index') }}" />
+                    </x-slot:actions>
+                </x-slot:header>
 
-            <form action="{{ route('units.store') }}" method="POST">
-                @csrf
-                <div class="card-body">
+                <x-slot:content>
                     <livewire:name />
 
                     <livewire:slug />
 
-                    <x-input
-                        label="{{ __('Short Code') }}"
-                        id="short_code"
-                        name="short_code"
-                        :value="old('short_code')"
-                        required
-                    />
-                </div>
+                    <x-input label="{{ __('Short Code') }}" id="short_code" name="short_code" :value="old('short_code')" required />
+                </x-slot:content>
 
-                <div class="card-footer text-end">
+                <x-slot:footer class="text-end">
                     <x-button.save type="submit">
                         {{ __('Save') }}
                     </x-button.save>
@@ -40,22 +40,21 @@
                     <x-button.back route="{{ route('units.index') }}">
                         {{ __('Cancel') }}
                     </x-button.back>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+                </x-slot:footer>
+            </x-card>
+        </form>
+    </x-adminlte.page-body>
 @endsection
 
 @pushonce('page-scripts')
-<script>
-    // Slug Generator
-    const title = document.querySelector("#name");
-    const slug = document.querySelector("#slug");
-    title.addEventListener("keyup", function() {
-        let preslug = title.value;
-        preslug = preslug.replace(/ /g,"-");
-        slug.value = preslug.toLowerCase();
-    });
-</script>
+    <script>
+        const title = document.querySelector('#name');
+        const slug = document.querySelector('#slug');
+
+        title?.addEventListener('keyup', function() {
+            let preslug = title.value;
+            preslug = preslug.replace(/ /g, '-');
+            slug.value = preslug.toLowerCase();
+        });
+    </script>
 @endpushonce

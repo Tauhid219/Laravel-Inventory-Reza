@@ -1,11 +1,18 @@
 @extends('layouts.auth')
 
+@section('title', __('Sign In'))
+@section('auth_heading', __('Welcome back to your inventory workspace.'))
+@section('auth_subtitle', __('Use your account to continue with sales, purchasing, stock management, and reporting.'))
+
 @section('content')
-<div class="card card-md">
-    <div class="card-body">
-        <h2 class="h2 text-center mb-4">
-            Login to your account
-        </h2>
+<div class="card-body p-4 p-lg-5">
+        <h2 class="h3 text-center mb-2">{{ __('Sign In') }}</h2>
+        <p class="text-center text-muted mb-4">{{ __('Enter your credentials to continue.') }}</p>
+
+        @if (session('status'))
+            <div class="alert alert-success">{{ session('status') }}</div>
+        @endif
+
         <form action="{{ route('login') }}" method="POST" autocomplete="off">
             @csrf
 
@@ -13,34 +20,25 @@
 
             <x-input type="password" name="password" placeholder="Your password" required="true"/>
 
-            <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-3">
                 <label for="remember" class="form-check">
                     <input type="checkbox" id="remember" name="remember" class="form-check-input"/>
-                    <span class="form-check-label">Remember me on this device</span>
+                    <span class="form-check-label">{{ __('Remember me on this device') }}</span>
                 </label>
+
+                <a href="{{ route('password.request') }}" class="small">{{ __('Forgot password?') }}</a>
             </div>
 
             <div class="form-footer">
-                <x-button type="submit" class="w-100">
+                <button type="submit" class="btn btn-primary btn-block">
                     {{ __('Sign in') }}
-                </x-button>
+                </button>
             </div>
         </form>
-    </div>
+
+        <div class="text-center text-muted mt-4 inventory-auth-links">
+            {{ __("Don't have an account yet?") }}
+            <a href="{{ route('register') }}">{{ __('Create one') }}</a>
+        </div>
 </div>
-
-{{-- <div class="text-center mt-3 text-gray-600">
-    <p>Don't have an account yet?
-        <a href="{{ route('register') }}" class="text-blue-500 hover:text-blue-700 focus:outline-none focus:underline" tabindex="-1">
-            Sign up
-        </a>
-    </p>
-
-    <p class="mt-2">
-        <a href="{{ route('password.request') }}" class="text-sm text-gray-500 hover:text-gray-700 focus:outline-none focus:underline">
-            I forgot my password
-        </a>
-    </p>
-</div> --}}
-
 @endsection

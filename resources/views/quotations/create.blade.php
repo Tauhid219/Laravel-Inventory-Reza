@@ -1,34 +1,15 @@
 @extends('layouts.tabler')
 
 @section('content')
-<div class="page-header d-print-none">
-    <div class="container-xl">
-        <div class="row g-2 align-items-center mb-3">
-            <div class="col">
-                <h2 class="page-title">
-                    {{ __('New Quotation') }}
-                </h2>
-            </div>
-        </div>
-
+<x-adminlte.page-header :title="__('New Quotation')">
+    <x-slot:breadcrumbs>
         @include('partials._breadcrumbs')
-    </div>
-</div>
+    </x-slot:breadcrumbs>
+</x-adminlte.page-header>
 
-@include('partials.session')
+@section('use_default_flash', '1')
 
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-
-<div class="page-body">
-    <div class="container-xl">
+<x-adminlte.page-body>
         <div class="row row-cards">
 
             <div class="row">
@@ -152,6 +133,5 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
+</x-adminlte.page-body>
 @endsection

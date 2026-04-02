@@ -1,12 +1,12 @@
 <div class="card">
-    <div class="card-header">
+    <div class="card-header d-flex align-items-center justify-content-between gap-2">
         <div>
             <h3 class="card-title">
                 {{ __('Purchases') }}
             </h3>
         </div>
 
-        <div class="card-actions">
+        <div class="card-tools d-flex align-items-center gap-2">
             <x-action.create route="{{ route('purchases.create') }}" />
         </div>
     </div>
@@ -139,7 +139,7 @@
                             {{ $purchase->date->format('d-m-Y') }}
                         </td>
                         <td class="align-middle text-center">
-                            {{ Number::currency($purchase->total_amount, 'BDT') }}
+                            {{ safe_currency($purchase->total_amount, 'BDT') }}
                         </td>
 
                         @if ($purchase->status === \App\Enums\PurchaseStatus::APPROVED)

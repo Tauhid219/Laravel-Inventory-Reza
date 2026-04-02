@@ -1,80 +1,80 @@
 @extends('layouts.tabler')
 
 @section('content')
-<div class="container-xl px-4 mt-4">
-    <x-alert/>
+    <x-adminlte.page-header :title="__('Settings')" subtitle="Manage password security and permanent account actions.">
+        <x-slot:actions>
+            <a href="{{ route('profile.edit') }}" class="btn btn-default">{{ __('Back to Profile') }}</a>
+        </x-slot:actions>
+    </x-adminlte.page-header>
 
-    <nav class="nav nav-borders">
-        <a class="nav-link ms-0" href="{{ route('profile.edit') }}">Profile</a>
-        <a class="nav-link active" href="{{ route('profile.settings') }}">Settings</a>
-    </nav>
+    <x-adminlte.page-body>
+        <x-alert />
 
-    <hr class="mt-0 mb-4" />
+        <div class="mb-4">
+            <div class="btn-group">
+                <a href="{{ route('profile.edit') }}" class="btn btn-default">{{ __('Profile') }}</a>
+                <a href="{{ route('profile.settings') }}" class="btn btn-primary">{{ __('Settings') }}</a>
+            </div>
+        </div>
 
-    @include('partials.session')
-
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <div>
-                        <h3 class="card-title">
+        <div class="row row-cards">
+            <div class="col-lg-8">
+                <x-card class="mb-4">
+                    <x-slot:header>
+                        <x-slot:title>
                             {{ __('Change Password') }}
-                        </h3>
-                    </div>
-                </div>
+                        </x-slot:title>
+                    </x-slot:header>
 
-                <x-form action="{{ route('password.update') }}" method="PUT">
-                    <div class="card-body">
-                        <x-input type="password" name="current_password" label="Current Password" required />
-                        <x-input type="password" name="password" label="New Password" required />
-                        <x-input type="password" name="password_confirmation" label="Confirm Password" required />
-                    </div>
+                    <x-form action="{{ route('password.update') }}" method="PUT">
+                        <div class="card-body">
+                            <x-input type="password" name="current_password" label="Current Password" required />
+                            <x-input type="password" name="password" label="New Password" required />
+                            <x-input type="password" name="password_confirmation" label="Confirm Password" required />
+                        </div>
 
-                    <div class="card-footer text-end">
-                        <x-button type="submit">{{ __('Save') }}</x-button>
-                    </div>
-                </x-form>
+                        <div class="card-footer text-end">
+                            <x-button.save type="submit">{{ __('Save') }}</x-button.save>
+                        </div>
+                    </x-form>
+                </x-card>
+            </div>
+
+            <div class="col-lg-4">
+                <x-card class="border-danger">
+                    <x-slot:header>
+                        <x-slot:title>
+                            {{ __('Delete Account') }}
+                        </x-slot:title>
+                    </x-slot:header>
+
+                    <x-slot:content>
+                        <p class="text-muted">
+                            {{ __('Deleting your account is permanent and cannot be undone. Please confirm your password before continuing.') }}
+                        </p>
+
+                        <form action="{{ route('profile.destroy') }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+
+                            <div class="mb-3">
+                                <label for="delete_password" class="form-label">{{ __('Current Password') }}</label>
+                                <input type="password" id="delete_password" name="password"
+                                    class="form-control @error('password', 'userDeletion') is-invalid @enderror"
+                                    required>
+                                @error('password', 'userDeletion')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <button type="submit" class="btn btn-danger"
+                                onclick="return confirm('Are you sure you want to delete your account?')">
+                                {{ __('Delete Account') }}
+                            </button>
+                        </form>
+                    </x-slot:content>
+                </x-card>
             </div>
         </div>
-
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    Two-Factor Authentication
-                </div>
-                <div class="card-body">
-                    <p>
-                        Add another level of security to your account by enabling two-factor authentication.
-                        We will send you a text message to verify your login attempts on unrecognized devices and browsers.
-                    </p>
-                    <form>
-                        <div class="form-check">
-                            <input class="form-check-input" id="twoFactorOn" type="radio" name="twoFactor" checked="" />
-                            <label class="form-check-label" for="twoFactorOn">On</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" id="twoFactorOff" type="radio" name="twoFactor" />
-                            <label class="form-check-label" for="twoFactorOff">Off</label>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-header">
-                    Delete Account
-                </div>
-                <div class="card-body">
-                    <p>
-                        Deleting your account is a permanent action and cannot be undone. If you are sure you want to delete your account, select the button below.
-                    </p>
-                    <button type="button" class="btn btn-danger-soft text-danger">
-                        I understand, delete my account
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    </x-adminlte.page-body>
 @endsection

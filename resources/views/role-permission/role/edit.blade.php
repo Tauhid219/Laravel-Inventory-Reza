@@ -1,37 +1,46 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <div class="page-body">
-        <div class="container container-xl">
-            @include('role-permission.nav-links')
+    <x-adminlte.page-header :title="__('Edit Role')" subtitle="Rename an existing role while keeping the current access model intact.">
+        <x-slot:actions>
+            <a href="{{ route('rl.index') }}" class="btn btn-default">
+                {{ __('Back to Roles') }}
+            </a>
+        </x-slot:actions>
+    </x-adminlte.page-header>
 
-            <div class="container mt-5">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="mb-0">Edit Role
-                                    <a href="{{ url('role') }}" class="btn btn-danger ms-3">Back</a>
-                                </h4>
-                            </div>
-                            <div class="card-body">
-                                <form action="{{ route('rl.update', $role->id) }}" method="POST">
-                                    @csrf
-                                    @method('PUT')
-                                    <div class="mb-3">
-                                        <label for="">Role Name</label>
-                                        <input type="text" name="name" value="{{ $role->name }}"
-                                            class="form-control" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <button type="submit" class="btn btn-primary">Update</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+    <x-adminlte.page-body>
+        @include('role-permission.nav-links')
+
+        <x-alert />
+
+        <form action="{{ route('rl.update', $role->id) }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            <x-card>
+                <x-slot:header>
+                    <x-slot:title>
+                        {{ __('Role Details') }}
+                    </x-slot:title>
+                </x-slot:header>
+
+                <x-slot:content>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">{{ __('Role Name') }}</label>
+                        <input type="text" id="name" name="name" value="{{ old('name', $role->name) }}"
+                            class="form-control @error('name') is-invalid @enderror" />
+                        @error('name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                </x-slot:content>
+
+                <x-slot:footer class="text-end">
+                    <x-button.save type="submit">{{ __('Update') }}</x-button.save>
+                    <x-button.back route="{{ route('rl.index') }}">{{ __('Cancel') }}</x-button.back>
+                </x-slot:footer>
+            </x-card>
+        </form>
+    </x-adminlte.page-body>
 @endsection

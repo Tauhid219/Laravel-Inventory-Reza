@@ -27,7 +27,7 @@ class CategoryTest extends TestCase
         $this->assertDatabaseCount('categories', 1)
             ->assertDatabaseHas('categories', ['name' => 'Speakers']);
 
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['view category']);
         $response = $this->actingAs($user)
             ->get('categories/');
 
@@ -37,7 +37,7 @@ class CategoryTest extends TestCase
 
     public function test_user_can_use_create_view()
     {
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['create category']);
         $response = $this->actingAs($user)->get('categories/create');
 
         $response->assertViewIs('categories.create');
@@ -45,7 +45,7 @@ class CategoryTest extends TestCase
 
     public function test_user_can_see_edit_view()
     {
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['update category']);
         $category = $this->createCategory();
 
         $response = $this->actingAs($user)->get('categories/'.$category->slug.'/edit');
@@ -57,7 +57,7 @@ class CategoryTest extends TestCase
 
     public function test_user_can_see_show_view()
     {
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['view category']);
         $category = $this->createCategory();
 
         $response = $this->actingAs($user)->get('categories/'.$category->slug);
@@ -76,7 +76,7 @@ class CategoryTest extends TestCase
         $this->assertDatabaseHas('categories', ['name' => 'Speakers']);
         $this->assertDatabaseCount('categories', 1);
 
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['delete category']);
         $this->actingAs($user);
 
         $this->delete('/categories/'. $category->slug);

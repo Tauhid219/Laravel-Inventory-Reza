@@ -7,7 +7,6 @@ use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\PurchaseDetails;
 use App\Models\Supplier;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -30,7 +29,7 @@ class PurchaseControllerTest extends TestCase
     public function test_purchase_index(): void
     {
         // Arrange: Create necessary data for the test
-        $user = User::factory()->create([]); // Create a user for authentication
+        $user = $this->createAuthorizedUser(['view purchase']); // Create a user for authentication
         $this->actingAs($user); // Authenticate the user
 
         $supplier = Supplier::factory()->create();
@@ -66,7 +65,7 @@ class PurchaseControllerTest extends TestCase
 
     public function test_purchase_approved_purchases(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser(['view purchase']);
         $this->actingAs($user);
 
         $supplier = Supplier::factory()->create();
@@ -92,7 +91,7 @@ class PurchaseControllerTest extends TestCase
 
     public function test_purchase_pending_purchases(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser(['view purchase']);
         $this->actingAs($user);
 
         $supplier = Supplier::factory()->create();
@@ -118,7 +117,7 @@ class PurchaseControllerTest extends TestCase
 
     public function test_purchase_show(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser(['view purchase']);
         $this->actingAs($user);
 
         $supplier = Supplier::factory()->create();
@@ -140,7 +139,7 @@ class PurchaseControllerTest extends TestCase
 
     public function test_purchase_create(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser(['create purchase']);
         $this->actingAs($user);
 
         $response = $this->get(route('purchases.create'));
@@ -154,7 +153,7 @@ class PurchaseControllerTest extends TestCase
     public function test_purchase_store()
     {
         // Arrange: Create necessary data for the test
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser(['create purchase']);
         $this->actingAs($user); // Authenticate the user
 
         // Create a supplier
@@ -210,7 +209,7 @@ class PurchaseControllerTest extends TestCase
 
         // Assert: Check if the purchase is created in the database
         $this->assertDatabaseHas('purchases', [
-            'purchase_no' => 'PRS-000001',
+            'purchase_no' => 'INV-12345',
             'status' => PurchaseStatus::PENDING->value,
             'total_amount' => 450,
         ]);
@@ -229,7 +228,7 @@ class PurchaseControllerTest extends TestCase
     public function test_purchase_edit(): void
     {
         // Create necessary data
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser(['update purchase']);
         $supplier = Supplier::factory()->create();
         $purchase = Purchase::factory()->create([
             'supplier_id' => $supplier->id,

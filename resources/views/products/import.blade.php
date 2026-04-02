@@ -1,9 +1,13 @@
 @extends('layouts.tabler')
 
 @section('content')
-<div class="page-body">
-    <div class="container-xl">
+<x-adminlte.page-header :title="__('Import Products')">
+    <x-slot:breadcrumbs>
+        @include('partials._breadcrumbs')
+    </x-slot:breadcrumbs>
+</x-adminlte.page-header>
 
+<x-adminlte.page-body>
         <form action="{{ route('products.import.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <x-card>
@@ -43,8 +47,7 @@
                 </x-slot:footer>
             </x-card>
         </form>
-    </div>
-</div>
+</x-adminlte.page-body>
 @endsection
 
 @pushonce('page-scripts')

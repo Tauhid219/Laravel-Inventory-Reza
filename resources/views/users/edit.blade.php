@@ -1,81 +1,74 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <div class="page-header d-print-none">
-        <div class="container-xl">
-            <div class="row g-2 align-items-center mb-3">
-                <div class="col">
-                    <h2 class="page-title">
-                        {{ __('Edit User') }}
-                    </h2>
-                </div>
+    <x-adminlte.page-header :title="__('Edit User')" subtitle="Update account details, profile image, assigned roles, and password.">
+        <x-slot:breadcrumbs>
+            @include('partials._breadcrumbs', ['model' => $user])
+        </x-slot:breadcrumbs>
+    </x-adminlte.page-header>
+
+    <x-adminlte.page-body>
+        <x-alert />
+
+        <div class="row row-cards">
+            <div class="col-lg-4">
+                <x-card>
+                    <x-slot:header>
+                        <x-slot:title>
+                            {{ __('Profile Image') }}
+                        </x-slot:title>
+                    </x-slot:header>
+
+                    <div class="text-center">
+                        <img class="img-account-profile mb-3"
+                            src="{{ $user->photo ? asset('storage/profile/' . $user->photo) : asset('assets/img/demo/user-placeholder.svg') }}"
+                            alt="" id="image-preview" />
+
+                        <div class="small text-muted mb-2">{{ __('JPG or PNG no larger than 1 MB') }}</div>
+
+                        <input class="form-control @error('photo') is-invalid @enderror"
+                            type="file" id="image" name="photo" form="user-profile-form" accept="image/*"
+                            onchange="previewImage();">
+
+                        @error('photo')
+                            <div class="invalid-feedback d-block">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                </x-card>
             </div>
 
-            @include('partials._breadcrumbs', ['model' => $user])
-        </div>
-    </div>
+            <div class="col-lg-8">
+                <div class="row row-cards">
+                    <div class="col-12">
+                        <form id="user-profile-form" action="{{ route('users.update', $user) }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            @method('put')
 
-    <div class="page-body">
-        <div class="container-xl">
-            <div class="row row-cards">
+                            <x-card>
+                                <x-slot:header>
+                                    <x-slot:title>
+                                        {{ __('User Details') }}
+                                    </x-slot:title>
 
-                <div class="col-lg-4">
-                    <div class="row row-cards">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h3 class="card-title">
-                                        {{ __('Profile Image') }}
-                                    </h3>
+                                    <x-slot:actions>
+                                        <x-action.close route="{{ route('users.index') }}" />
+                                    </x-slot:actions>
+                                </x-slot:header>
 
-                                    <img class="img-account-profile mb-2"
-                                        src="{{ $user->photo ? asset('storage/profile/' . $user->photo) : asset('assets/img/demo/user-placeholder.svg') }}"
-                                        alt="" id="image-preview" />
-
-                                    <div class="small font-italic text-muted mb-2">JPG or PNG no larger than 1 MB</div>
-
-                                    <input class="form-control form-control-solid mb-2 @error('photo') is-invalid @enderror"
-                                        type="file" id="image" name="photo" accept="image/*"
-                                        onchange="previewImage();">
-
-                                    @error('photo')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
+                                <x-slot:content>
+                                    <div class="row row-cards">
+                                        <div class="col-md-12">
+                                            <x-input name="name" :value="old('name', $user->name)" required="true" />
+                                            <x-input name="username" :value="old('username', $user->username)" required="true" />
+                                            <x-input name="email" :value="old('email', $user->email)" label="Email address" required="true" />
                                         </div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="col-lg-8">
-                    <div class="row row-cards">
-
-                        <div class="col-12">
-                            <form action="{{ route('users.update', $user) }}" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                @method('put')
-
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h3 class="card-title">
-                                            {{ __('User Details') }}
-                                        </h3>
-                                        <div class="row row-cards">
-                                            <div class="col-md-12">
-                                                <x-input name="name" :value="old('name', $user->name)" required="true" />
-
-                                                <x-input name="username" :value="old('username', $user->username)" required="true" />
-
-                                                <x-input name="email" :value="old('email', $user->email)" label="Email address"
-                                                    required="true" />
-                                            </div>
-
+                                        <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label class="form-label">{{ __('Assign Roles') }}</label>
-                                                <select name="roles[]"
-                                                    class="form-control @error('roles') is-invalid @enderror" multiple>
+                                                <select name="roles[]" class="form-control @error('roles') is-invalid @enderror" multiple>
                                                     @foreach ($roles as $role)
                                                         <option value="{{ $role->name }}"
                                                             {{ $user->hasRole($role->name) ? 'selected' : '' }}>
@@ -83,67 +76,71 @@
                                                         </option>
                                                     @endforeach
                                                 </select>
-                                                <small class="form-hint text-info">Hold CTRL to select multiple
-                                                    roles.</small>
+                                                <small class="form-hint text-info">
+                                                    {{ __('Hold CTRL to select multiple roles.') }}
+                                                </small>
                                                 @error('roles')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="card-footer text-end">
-                                        <x-button.save type="submit">
-                                            {{ __('Save') }}
-                                        </x-button.save>
+                                </x-slot:content>
 
-                                        <x-button.back route="{{ route('users.index') }}">
-                                            {{ __('Cancel') }}
-                                        </x-button.back>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                                <x-slot:footer class="text-end">
+                                    <x-button.save type="submit">
+                                        {{ __('Save') }}
+                                    </x-button.save>
 
-                        <div class="col-12">
-                            <form action="{{ route('users.updatePassword', $user) }}" method="POST">
-                                @csrf
-                                @method('put')
+                                    <x-button.back route="{{ route('users.index') }}">
+                                        {{ __('Cancel') }}
+                                    </x-button.back>
+                                </x-slot:footer>
+                            </x-card>
+                        </form>
+                    </div>
 
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h3 class="card-title">
-                                            {{ __('Change Password') }}
-                                        </h3>
+                    <div class="col-12">
+                        <form action="{{ route('users.updatePassword', $user) }}" method="POST">
+                            @csrf
+                            @method('put')
 
-                                        <div class="row row-cards">
-                                            <div class="col-sm-6 col-md-6">
-                                                <x-input type="password" name="password" />
-                                            </div>
+                            <x-card>
+                                <x-slot:header>
+                                    <x-slot:title>
+                                        {{ __('Change Password') }}
+                                    </x-slot:title>
+                                </x-slot:header>
 
-                                            <div class="col-sm-6 col-md-6">
-                                                <x-input type="password" name="password_confirmation"
-                                                    label="Password Confirmation" />
-                                            </div>
+                                <x-slot:content>
+                                    <div class="row row-cards">
+                                        <div class="col-sm-6">
+                                            <x-input type="password" name="password" />
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <x-input type="password" name="password_confirmation"
+                                                label="Password Confirmation" />
                                         </div>
                                     </div>
+                                </x-slot:content>
 
-                                    <div class="card-footer text-end">
-                                        <x-button.save type="submit">
-                                            {{ __('Update') }}
-                                        </x-button.save>
+                                <x-slot:footer class="text-end">
+                                    <x-button.save type="submit">
+                                        {{ __('Update') }}
+                                    </x-button.save>
 
-                                        <x-button.back route="{{ route('users.index') }}">
-                                            {{ __('Cancel') }}
-                                        </x-button.back>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                                    <x-button.back route="{{ route('users.index') }}">
+                                        {{ __('Cancel') }}
+                                    </x-button.back>
+                                </x-slot:footer>
+                            </x-card>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </x-adminlte.page-body>
 @endsection
 
 @pushonce('page-scripts')

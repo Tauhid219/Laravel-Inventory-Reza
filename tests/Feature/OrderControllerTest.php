@@ -13,7 +13,6 @@ use App\Models\Product;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Session;
 use Tests\TestCase;
 
 class OrderControllerTest extends TestCase
@@ -34,7 +33,7 @@ class OrderControllerTest extends TestCase
     public function test_order_create(): void
     {
         // Arrange
-        $user = \App\Models\User::factory()->create();
+        $user = $this->createAuthorizedUser(['create order']);
         $this->actingAs($user);
 
         $customer = Customer::factory()->create();
@@ -58,6 +57,9 @@ class OrderControllerTest extends TestCase
     public function test_order_store(): void
     {
         // Arrange: Prepare data for the order
+        $user = $this->createAuthorizedUser(['create order']);
+        $this->actingAs($user);
+
         $customer = Customer::factory()->create();
         $product = Product::factory()->create(); // Create a product
         $quantity = 2;
@@ -65,7 +67,7 @@ class OrderControllerTest extends TestCase
 
         // Add product to the cart (mocked version)
         Cart::shouldReceive('instance')
-            ->once()
+            ->twice()
             ->with('order')
             ->andReturnSelf();
 
@@ -80,6 +82,9 @@ class OrderControllerTest extends TestCase
                     'subtotal' => $quantity * $price
                 ]
             ]));
+
+        Cart::shouldReceive('destroy')
+            ->once();
 
         // Act: Send request to store the order
         $response = $this->post(route('orders.store'), [
@@ -112,9 +117,6 @@ class OrderControllerTest extends TestCase
             'unitcost' => $price,
             'total' => $quantity * $price,
         ]);
-
-        // Assert: Check if cart is cleared after order is created
-        $this->assertEmpty(Cart::instance('order')->content());
 
         // Assert: Check if the response redirects to the orders index with success message
         $response->assertRedirect(route('orders.index'));

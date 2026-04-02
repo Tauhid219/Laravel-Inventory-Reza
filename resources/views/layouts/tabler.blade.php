@@ -1,51 +1,67 @@
+{{-- Compatibility layout name retained so migrated views do not need a mass rename. --}}
+@php
+    $themeVariants = [
+        'classic' => [
+            'label' => 'Classic Dashboard',
+            'body' => 'hold-transition sidebar-mini layout-fixed',
+            'navbar' => 'navbar-white navbar-light',
+            'sidebar' => 'sidebar-dark-primary',
+            'logo' => 'brand-link navbar-white',
+            'accent' => 'primary',
+        ],
+        'dark-fixed' => [
+            'label' => 'Dark Fixed Dashboard',
+            'body' => 'hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed',
+            'navbar' => 'navbar-dark',
+            'sidebar' => 'sidebar-dark-primary',
+            'logo' => 'brand-link navbar-dark',
+            'accent' => 'warning',
+        ],
+        'compact' => [
+            'label' => 'Compact Dashboard',
+            'body' => 'hold-transition sidebar-mini sidebar-collapse',
+            'navbar' => 'navbar-white navbar-light',
+            'sidebar' => 'sidebar-dark-primary',
+            'logo' => 'brand-link navbar-white',
+            'accent' => 'info',
+        ],
+    ];
 
+    $activeTheme = session('adminlte_theme', 'classic');
+    $theme = $themeVariants[$activeTheme] ?? $themeVariants['classic'];
+    $appName = config('app.name', 'Reza Inventory');
+@endphp
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>{{ config('app.name') }}</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('static/logo-small.svg') }}" />
+@include('layouts.adminlte.head')
+<body class="{{ $theme['body'] }}">
+<div class="wrapper">
+    @include('layouts.adminlte.navbar', ['themeVariants' => $themeVariants, 'activeTheme' => $activeTheme, 'theme' => $theme])
+    @include('layouts.adminlte.sidebar', ['themeVariants' => $themeVariants, 'activeTheme' => $activeTheme, 'theme' => $theme])
 
-    <!-- CSS files -->
-    <link href="{{ asset('dist/css/tabler.min.css') }}" rel="stylesheet"/>
-    <style>
-        @import url('https://rsms.me/inter/inter.css');
-        :root {
-            --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
-        }
-        body {
-            font-feature-settings: "cv03", "cv04", "cv11";
-        }
-    </style>
-
-    <!-- Custom CSS for specific page.  -->
-    @stack('page-styles')
-    @livewireStyles
-</head>
-    <body>
-
-        <div class="page">
-
-            @include('layouts.body.header')
-
-            @include('layouts.body.navbar')
-
-            <div class="page-wrapper">
-                <div>
-                    @yield('content')
-                </div>
-
-                @include('layouts.body.footer')
+    <div class="content-wrapper">
+        @include('layouts.adminlte.breadcrumbs')
+        <section class="content pt-3">
+            <div class="container-fluid">
+                @include('layouts.adminlte.flash')
             </div>
-        </div>
+        </section>
+        @yield('content')
+    </div>
 
-        <!-- Tabler Core -->
-        <script src="{{ asset('dist/js/tabler.min.js') }}" defer></script>
-        {{--- Page Scripts ---}}
-        @stack('page-scripts')
+    @include('layouts.adminlte.footer')
+    @include('layouts.adminlte.control-sidebar')
+</div>
 
-        @livewireScripts
-    </body>
+<script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script>
+<script src="{{ asset('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('dist/libs/tom-select/dist/js/tom-select.complete.min.js') }}"></script>
+<script src="{{ asset('adminlte/dist/js/adminlte.min.js') }}"></script>
+<script src="{{ asset('adminlte/custom/inventory-adminlte.js') }}"></script>
+@stack('page-libraries')
+@stack('page-scripts')
+@stack('scripts')
+@livewireScripts
+<script src="{{ asset('vendor/livewire-powergrid/powergrid.js') }}"></script>
+</body>
 </html>
