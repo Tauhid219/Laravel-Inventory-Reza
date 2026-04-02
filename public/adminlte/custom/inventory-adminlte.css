@@ -246,6 +246,15 @@ body {
     margin-left: .5rem;
 }
 
+.brand-link.navbar-white .brand-text {
+    color: #1f2937;
+}
+
+.brand-link.navbar-white:hover .brand-text,
+.brand-link.navbar-white:focus .brand-text {
+    color: #111827;
+}
+
 .dark-mode .brand-link.navbar-dark {
     background: #1f2d3d;
 }
