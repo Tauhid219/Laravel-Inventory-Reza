@@ -1,7 +1,7 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <x-adminlte.page-header :title="__('Order Details')" subtitle="Review invoice information, ordered products, and completion status.">
+    <x-adminlte.page-header :title="__('Order Details')" subtitle="Review the updated order summary, item grouping, and completion status.">
         <x-slot:breadcrumbs>
             @include('partials._breadcrumbs', ['model' => $order])
         </x-slot:breadcrumbs>
@@ -49,9 +49,9 @@
                         <thead class="thead-light">
                             <tr>
                                 <th scope="col" class="align-middle text-center">No.</th>
-                                <th scope="col" class="align-middle text-center">Photo</th>
                                 <th scope="col" class="align-middle text-center">Product Name</th>
-                                <th scope="col" class="align-middle text-center">Product Code</th>
+                                <th scope="col" class="align-middle text-center">Category</th>
+                                <th scope="col" class="align-middle text-center">Sub Category</th>
                                 <th scope="col" class="align-middle text-center">Quantity</th>
                                 <th scope="col" class="align-middle text-center">Price</th>
                                 <th scope="col" class="align-middle text-center">Total</th>
@@ -62,13 +62,14 @@
                                 <tr>
                                     <td class="align-middle text-center">{{ $loop->iteration }}</td>
                                     <td class="align-middle text-center">
-                                        <div style="max-height: 80px; max-width: 80px;">
-                                            <img class="img-fluid"
-                                                src="{{ $item->product->product_image ? asset('storage/products/' . $item->product->product_image) : asset('assets/img/products/default.webp') }}">
-                                        </div>
+                                        <span class="badge bg-blue-lt">{{ $item->product->name }}</span>
                                     </td>
-                                    <td class="align-middle text-center">{{ $item->product->name }}</td>
-                                    <td class="align-middle text-center">{{ $item->product->code }}</td>
+                                    <td class="align-middle text-center">
+                                        <span class="badge bg-purple-lt">{{ $item->product->category->name ?? 'N/A' }}</span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <span class="badge bg-gray-lt">{{ $item->product->subCategory->name ?? 'N/A' }}</span>
+                                    </td>
                                     <td class="align-middle text-center">{{ $item->quantity }}</td>
                                     <td class="align-middle text-center">{{ number_format($item->unitcost, 2) }}</td>
                                     <td class="align-middle text-center">{{ number_format($item->total, 2) }}</td>
@@ -79,10 +80,6 @@
                                 <td class="text-center">{{ number_format($order->pay, 2) }}</td>
                             </tr>
                             <tr>
-                                <td colspan="6" class="text-end">{{ __('Due') }}</td>
-                                <td class="text-center">{{ number_format($order->due, 2) }}</td>
-                            </tr>
-                            <tr>
                                 <td colspan="6" class="text-end">{{ __('Total') }}</td>
                                 <td class="text-center">{{ number_format($order->total, 2) }}</td>
                             </tr>
@@ -90,15 +87,24 @@
                     </table>
                 </div>
 
-                <div class="row gx-3 mb-0">
-                    <div class="col-md-12">
-                        <label for="note" class="form-label">{{ __('Note') }}</label>
-                        <textarea class="form-control" rows="4" disabled>{{ $note }}</textarea>
+                @if ($order->note)
+                    <div class="row mt-5">
+                        <div class="col-md-12">
+                            <div class="hr-text text-start text-secondary mb-3">
+                                <span>{{ __('Order Note') }}</span>
+                            </div>
+                            <div class="card bg-light-lt border-0 shadow-none">
+                                <div class="card-body p-3 text-secondary"
+                                    style="white-space: pre-wrap; background-color: #f8f9fa; border-left: 4px solid #206bc4;">
+                                    {{ $order->note }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                @endif
             </x-slot:content>
 
-            @role('super-admin|admin')
+            @can('update order')
                 <x-slot:footer class="text-end">
                     @if ($order->order_status === \App\Enums\OrderStatus::PENDING)
                         <form action="{{ route('orders.update', $order) }}" method="POST">
@@ -112,7 +118,7 @@
                         </form>
                     @endif
                 </x-slot:footer>
-            @endrole
+            @endcan
         </x-card>
     </x-adminlte.page-body>
 @endsection

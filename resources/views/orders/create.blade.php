@@ -1,7 +1,7 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <x-adminlte.page-header :title="__('Create Order')" subtitle="Create a customer invoice and add products from the order cart.">
+    <x-adminlte.page-header :title="__('Create Order')" subtitle="Create an order with the canonical itemized order builder.">
         <x-slot:breadcrumbs>
             @include('partials._breadcrumbs')
         </x-slot:breadcrumbs>
@@ -10,7 +10,7 @@
     <x-adminlte.page-body>
         <x-alert />
 
-        <form action="{{ route('invoice.create') }}" method="POST">
+        <form action="{{ route('orders.store') }}" method="POST">
             @csrf
 
             <x-card>
@@ -46,14 +46,53 @@
                             placeholder="Select Customer" :data="$customers" />
                     </div>
 
-                    <livewire:order-form :cart-instance="'order'" />
+                    @livewire('order-form')
 
-                    <div class="row gx-3 mb-3">
+                    <div class="row mt-4 gx-3">
+                        <div class="col-md-4">
+                            <label for="payment_type" class="form-label required">
+                                {{ __('Payment Type') }}
+                            </label>
+
+                            <select name="payment_type" id="payment_type"
+                                class="form-select @error('payment_type') is-invalid @enderror" required
+                                onchange="document.getElementById('pay').disabled = this.value === 'due'; if(this.value === 'due') document.getElementById('pay').value = '';">
+                                <option value="cash" @selected(old('payment_type', 'cash') === 'cash')>{{ __('Cash') }}</option>
+                                <option value="cheque" @selected(old('payment_type') === 'cheque')>{{ __('Cheque') }}</option>
+                                <option value="due" @selected(old('payment_type') === 'due')>{{ __('Due') }}</option>
+                            </select>
+
+                            @error('payment_type')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="pay" class="form-label required">
+                                {{ __('Paid Amount') }}
+                            </label>
+
+                            <input name="pay" id="pay" type="number"
+                                class="form-control @error('pay') is-invalid @enderror"
+                                value="{{ old('pay') }}" min="0" step="0.01"
+                                placeholder="{{ __('Enter the amount received') }}" required>
+
+                            @error('pay')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
                         <div class="col-md-12">
                             <label for="note" class="form-label">
                                 {{ __('Note (Optional)') }}
                             </label>
-                            <textarea name="note" id="note" class="form-control" rows="4"
+                            <textarea name="note" id="note" class="form-control @error('note') is-invalid @enderror" rows="3"
                                 placeholder="Enter any notes or comments here...">{{ old('note') }}</textarea>
 
                             @error('note')
@@ -67,7 +106,7 @@
 
                 <x-slot:footer class="text-end">
                     <button type="submit" class="btn btn-primary">
-                        {{ __('Create Invoice') }}
+                        {{ __('Create Order') }}
                     </button>
                 </x-slot:footer>
             </x-card>

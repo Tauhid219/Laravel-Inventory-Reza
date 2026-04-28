@@ -10,6 +10,11 @@ use PhpOffice\PhpSpreadsheet\Writer\Xls;
 
 class ProductExportController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view product')->only(['create']);
+    }
+
     public function create()
     {
         $products = Product::all()->sortBy('product_name');

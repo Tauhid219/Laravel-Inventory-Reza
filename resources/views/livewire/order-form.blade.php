@@ -1,13 +1,9 @@
-<div>
-
-    @session('message')
-        <div class="p-4 bg-green-100">
-            {{ $value }}
+<div class="mb-3">
+    <div class="alert alert-info d-flex align-items-center" role="alert">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-info-circle me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 -9a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9v4" /><path d="M12 16h.01" /></svg>
+        <div>
+            <strong>{{ __('Quick Guide:') }}</strong> To add a product, click the <strong>"+"</strong> button and select the category first.
         </div>
-    @endsession
-
-    <div class="bg-green-100">
-        <p>*To add Product click "+" Button and Select the Category first</p>
     </div>
 
     <table class="table table-bordered" id="products_table">
@@ -24,10 +20,9 @@
             </tr>
         </thead>
 
-        <tbody>
-            @foreach ($invoiceProducts as $index => $invoiceProduct)
+        <tbody class="{{ empty($invoiceProducts) ? 'text-center' : '' }}">
+            @forelse ($invoiceProducts as $index => $invoiceProduct)
                 <tr>
-
                     {{-- - Category - --}}
                     <td class="align-middle text-center">
                         @if ($invoiceProduct['is_saved'])
@@ -109,11 +104,19 @@
 
                     {{-- - Unit Price - --}}
                     <td class="align-middle text-center">
-                        @if ($invoiceProduct['is_saved'])
+                        {{-- @if ($invoiceProduct['is_saved'])
                             {{ $unit_cost = number_format($invoiceProduct['product_price'], 2) }}
 
                             <input type="hidden" name="invoiceProducts[{{ $index }}][unitcost]"
                                 value="{{ $unit_cost }}">
+                        @endif --}}
+                        @if ($invoiceProduct['is_saved'])
+                            {{-- Display only --}}
+                            {{ number_format($invoiceProduct['product_price'], 2) }}
+
+                            {{-- Hidden input for DB (raw number) --}}
+                            <input type="hidden" name="invoiceProducts[{{ $index }}][unitcost]"
+                                value="{{ $invoiceProduct['product_price'] }}">
                         @endif
                     </td>
 
@@ -167,8 +170,17 @@
                         </button>
                     </td>
                 </tr>
-            @endforeach
-            <tr>
+            @empty
+                <tr>
+                    <td colspan="8" class="align-middle text-center py-4 text-secondary">
+                        <div class="d-flex flex-column align-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-package-export mb-2" width="48" height="48" viewBox="0 0 24 24" stroke-width="1" stroke="#adb5bd" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 10l-2 2m0 0l-2 -2m2 2l2 -2m0 0l2 2m0 0l-2 2m0 0l-2 -2m2 2l2 -2" /><path d="M12 2l0 12" /><path d="M12 22l0 -12" /><path d="M12 10l0 4" /><path d="M16 14l-4 4l-4 -4" /><path d="M12 18l0 4" /><path d="M8 18l4 4l4 -4" /><path d="M12 14l0 4" /></svg>
+                            <span>{{ __('No products added yet. Click the + button to start.') }}</span>
+                        </div>
+                    </td>
+                </tr>
+            @endforelse
+            <tr class="{{ empty($invoiceProducts) ? 'd-none' : '' }}">
                 <td colspan="7"></td>
                 <td class="text-center">
                     <button type="button" wire:click="addProduct" class="btn btn-icon btn-success">
@@ -207,17 +219,25 @@
                     @enderror
                 </td>
             </tr> --}}
-            <tr>
+            <tr class="{{ $total !== $subtotal && $manualTotal !== null ? 'table-warning' : '' }}">
                 <th colspan="7" class="align-middle text-end">
-                    Total
+                    Total 
+                    @if($total !== $subtotal && $manualTotal !== null)
+                        <span class="badge bg-warning text-dark ms-2" title="{{ __('The total has been manually adjusted') }}">
+                            <i class="fas fa-edit me-1"></i> {{ __('Manual Override') }}
+                        </span>
+                    @endif
                 </th>
                 <td class="text-center">
-                    {{ Number::currency($total, 'BDT') }}
-                    <input type="hidden" name="total_amount" value="{{ $total }}">
+                    <div class="input-group input-group-sm" style="max-width: 150px; margin: 0 auto;">
+                        <span class="input-group-text">BDT</span>
+                        <input type="number" wire:model.live="manualTotal" name="total_amount"
+                            class="form-control text-center {{ $total !== $subtotal && $manualTotal !== null ? 'border-warning' : '' }}" min="0" step="0.01"
+                            placeholder="{{ number_format($total, 2, '.', '') }}">
+                    </div>
                 </td>
             </tr>
 
         </tbody>
-
     </table>
 </div>

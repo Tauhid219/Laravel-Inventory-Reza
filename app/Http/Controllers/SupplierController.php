@@ -8,6 +8,14 @@ use App\Http\Requests\Supplier\UpdateSupplierRequest;
 
 class SupplierController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view supplier')->only(['index', 'show']);
+        $this->middleware('permission:create supplier')->only(['create', 'store']);
+        $this->middleware('permission:update supplier')->only(['edit', 'update']);
+        $this->middleware('permission:delete supplier')->only(['destroy']);
+    }
+
     public function index()
     {
         $suppliers = Supplier::all();

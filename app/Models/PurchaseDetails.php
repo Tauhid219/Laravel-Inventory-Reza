@@ -26,7 +26,23 @@ class PurchaseDetails extends Model
         'updated_at' => 'datetime'
     ];
 
-    protected $with = ['product'];
+    protected function unitcost(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $value / 100,
+            set: fn($value) => $value * 100,
+        );
+    }
+
+    protected function total(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $value / 100,
+            set: fn($value) => $value * 100,
+        );
+    }
+
+    // protected $with = ['product'];
 
     public function product(): BelongsTo
     {

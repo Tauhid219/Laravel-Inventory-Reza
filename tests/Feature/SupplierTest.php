@@ -28,7 +28,7 @@ class SupplierTest extends TestCase
         $this->assertDatabaseCount('suppliers', 1)
             ->assertDatabaseHas('suppliers', ['name' => 'Thomann']);
 
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['view supplier']);
         $response = $this->actingAs($user)
             ->get('suppliers/');
 
@@ -38,7 +38,7 @@ class SupplierTest extends TestCase
 
     public function test_user_can_use_create_view()
     {
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['create supplier']);
         $response = $this->actingAs($user)->get('suppliers/create');
 
         $response->assertViewIs('suppliers.create');
@@ -46,7 +46,7 @@ class SupplierTest extends TestCase
 
     public function test_user_can_see_edit_view()
     {
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['update supplier']);
         $supplier = $this->createSupplier();
 
         $response = $this->actingAs($user)->get('suppliers/'.$supplier->id.'/edit');
@@ -58,7 +58,7 @@ class SupplierTest extends TestCase
 
     public function test_user_can_see_show_view()
     {
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['view supplier']);
         $suppliers = $this->createSupplier();
 
         $response = $this->actingAs($user)->get('suppliers/'.$suppliers->id);
@@ -75,7 +75,7 @@ class SupplierTest extends TestCase
         $this->assertDatabaseHas('suppliers', ['name' => 'Thomann']);
         $this->assertDatabaseCount('suppliers', 1);
 
-        $user = $this->createAuthorizedUser();
+        $user = $this->createAuthorizedUser(['delete supplier']);
         $this->actingAs($user);
 
         $response = $this->delete('/suppliers/'. $supplier->id);
@@ -91,7 +91,7 @@ class SupplierTest extends TestCase
             'supplier_id' => $supplier->id,
         ]);
 
-        $user = $this->createAuthorizedUser();
+        $user = $this->createAuthorizedUser(['delete supplier']);
 
         $response = $this->actingAs($user)->delete('/suppliers/' . $supplier->id);
 

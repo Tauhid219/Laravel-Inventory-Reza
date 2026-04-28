@@ -7,7 +7,9 @@
         </div>
 
         <div class="card-tools d-flex align-items-center gap-2">
-            <x-action.create route="{{ route('customers.create') }}" />
+            @can('create customer')
+                <x-action.create route="{{ route('customers.create') }}" />
+            @endcan
         </div>
     </div>
 
@@ -74,10 +76,16 @@
                             {{ $customer->email }}
                         </td>
                         <td class="align-middle text-center" style="width: 10%">
-                            <x-button.show class="btn-icon" route="{{ route('customers.show', $customer) }}" />
-                            <x-button.edit class="btn-icon" route="{{ route('customers.edit', $customer) }}" />
-                            <x-button.delete class="btn-icon" route="{{ route('customers.destroy', $customer) }}"
-                                onclick="return confirm('Are you sure you want to delete this customer?')" />
+                            @can('view customer')
+                                <x-button.show class="btn-icon" route="{{ route('customers.show', $customer) }}" />
+                            @endcan
+                            @can('update customer')
+                                <x-button.edit class="btn-icon" route="{{ route('customers.edit', $customer) }}" />
+                            @endcan
+                            @can('delete customer')
+                                <x-button.delete class="btn-icon" route="{{ route('customers.destroy', $customer) }}"
+                                    onclick="return confirm('Are you sure you want to delete this customer?')" />
+                            @endcan
                         </td>
                     </tr>
                 @empty

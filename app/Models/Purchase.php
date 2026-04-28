@@ -33,6 +33,14 @@ class Purchase extends Model
         'status'     => PurchaseStatus::class
     ];
 
+    protected function totalAmount(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $value / 100,
+            set: fn($value) => $value * 100,
+        );
+    }
+
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class, 'supplier_id', 'id');

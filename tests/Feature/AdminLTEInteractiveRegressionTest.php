@@ -9,8 +9,8 @@ use App\Models\Order;
 use App\Models\OrderDetails;
 use App\Models\Product;
 use App\Models\Supplier;
-use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class AdminLTEInteractiveRegressionTest extends TestCase
@@ -56,7 +56,9 @@ class AdminLTEInteractiveRegressionTest extends TestCase
             ->assertOk()
             ->assertViewIs('orders.create')
             ->assertSee('name="customer_id"', false)
-            ->assertSee('data-tom-select', false);
+            ->assertSee('data-tom-select', false)
+            ->assertSee('name="payment_type"', false)
+            ->assertSee('name="pay"', false);
     }
 
     public function test_purchase_create_page_renders_supplier_tom_select_markup(): void
@@ -103,47 +105,9 @@ class AdminLTEInteractiveRegressionTest extends TestCase
             ->assertSee('data-bs-target="#modal-due"', false);
     }
 
-    public function test_invoice_preview_renders_payment_modal_and_note_payload(): void
+    public function test_legacy_orders_v2_route_name_is_retired(): void
     {
-        $user = $this->createUser();
-        $customer = Customer::factory()->create();
-
-        Cart::shouldReceive('instance')
-            ->once()
-            ->with('order')
-            ->andReturnSelf();
-
-        Cart::shouldReceive('content')
-            ->once()
-            ->andReturn(collect([
-                (object) [
-                    'name' => 'Demo Product',
-                    'price' => 100,
-                    'qty' => 2,
-                    'subtotal' => 200,
-                ],
-            ]));
-
-        Cart::shouldReceive('subtotal')
-            ->once()
-            ->andReturn('200.00');
-
-        Cart::shouldReceive('total')
-            ->twice()
-            ->andReturn('215.00');
-
-        $response = $this->actingAs($user)->post(route('invoice.create'), [
-            'customer_id' => $customer->id,
-            'note' => 'Keep this note on the invoice preview.',
-        ]);
-
-        $response
-            ->assertOk()
-            ->assertViewIs('invoices.index')
-            ->assertSee('data-bs-target="#modal"', false)
-            ->assertSee('name="payment_type"', false)
-            ->assertSee('name="note"', false)
-            ->assertSee('Keep this note on the invoice preview.');
+        $this->assertFalse(Route::has('ordersV2.index'));
     }
 
     protected function createDueOrder(): Order

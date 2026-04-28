@@ -152,7 +152,7 @@
                                 <x-button.show class="btn-icon" route="{{ route('purchases.show', $purchase) }}" />
 
                                 {{-- <x-button.edit class="btn-icon" route="{{ route('purchases.edit', $purchase) }}" /> --}}
-                                <x-button.delete class="btn-icon" route="{{ route('purchases.delete', $purchase) }}"
+                                <x-button.delete class="btn-icon" route="{{ route('purchases.destroy', $purchase) }}"
                                     onclick="return confirm('Are you sure you want to delete this purchase?')" />
                             </td>
                         @else
@@ -164,7 +164,7 @@
                             <td class="align-middle text-center" style="width: 5%">
                                 <x-button.show class="btn-icon" route="{{ route('purchases.show', $purchase) }}" />
                                 {{-- <x-button.edit class="btn-icon" route="{{ route('purchases.edit', $purchase) }}" /> --}}
-                                <x-button.delete class="btn-icon" route="{{ route('purchases.delete', $purchase) }}"
+                                <x-button.delete class="btn-icon" route="{{ route('purchases.destroy', $purchase) }}"
                                     onclick="return confirm('Are you sure you want to delete this purchase?')" />
                             </td>
                         @endif

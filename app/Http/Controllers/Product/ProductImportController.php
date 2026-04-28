@@ -10,6 +10,11 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ProductImportController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:create product')->only(['create', 'store']);
+    }
+
     public function create()
     {
         return view('products.import');

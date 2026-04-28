@@ -65,7 +65,7 @@
             </x-slot:content>
 
             <x-slot:footer class="text-end">
-                @role('super-admin|admin')
+                @can('update purchase')
                     @if ($purchase->status == \App\Enums\PurchaseStatus::PENDING)
                         <form action="{{ route('purchases.update', $purchase) }}" method="POST">
                             @csrf
@@ -80,7 +80,7 @@
                     @else
                         <a class="btn btn-default" href="{{ URL::previous() }}">{{ __('Back') }}</a>
                     @endif
-                @endrole
+                @endcan
             </x-slot:footer>
         </x-card>
 

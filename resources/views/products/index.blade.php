@@ -4,8 +4,10 @@
     <x-adminlte.page-header :title="__('Products')" subtitle="Manage catalog items, stock details, and product setup.">
         <x-slot:actions>
             <div class="btn-group">
-                <a href="{{ route('products.import.view') }}" class="btn btn-default">Import</a>
-                <a href="{{ route('products.create') }}" class="btn btn-primary">Add Product</a>
+                @can('create product')
+                    <a href="{{ route('products.import.view') }}" class="btn btn-default">Import</a>
+                    <a href="{{ route('products.create') }}" class="btn btn-primary">Add Product</a>
+                @endcan
             </div>
         </x-slot:actions>
     </x-adminlte.page-header>

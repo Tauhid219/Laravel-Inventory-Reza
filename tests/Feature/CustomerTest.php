@@ -27,7 +27,7 @@ class CustomerTest extends TestCase
         $this->assertDatabaseCount('customers', 1)
             ->assertDatabaseHas('customers', ['name' => 'Customer 1']);
 
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['view customer']);
         $response = $this->actingAs($user)
             ->get('customers/');
 
@@ -37,7 +37,7 @@ class CustomerTest extends TestCase
 
     public function test_user_can_use_create_view()
     {
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['create customer']);
         $response = $this->actingAs($user)->get('customers/create');
 
         $response->assertViewIs('customers.create');
@@ -52,7 +52,7 @@ class CustomerTest extends TestCase
         $this->assertDatabaseHas('customers', ['name' => 'Customer 1']);
         $this->assertDatabaseCount('customers', 1);
 
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['delete customer']);
         $this->actingAs($user);
 
         $this->delete('/customers/'. $customer->id);
@@ -63,7 +63,7 @@ class CustomerTest extends TestCase
 
     public function test_user_can_see_show_view()
     {
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['view customer']);
         $customer = $this->createCustomer();
 
         $response = $this->actingAs($user)->get('customers/'.$customer->id);
@@ -75,7 +75,7 @@ class CustomerTest extends TestCase
 
     public function test_user_can_see_edit_view()
     {
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['update customer']);
         $customer = $this->createCustomer();
 
         $response = $this->actingAs($user)->get('customers/'.$customer->id.'/edit');

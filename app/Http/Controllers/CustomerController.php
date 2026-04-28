@@ -8,6 +8,14 @@ use App\Http\Requests\Customer\UpdateCustomerRequest;
 
 class CustomerController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view customer')->only(['index', 'show']);
+        $this->middleware('permission:create customer')->only(['create', 'store']);
+        $this->middleware('permission:update customer')->only(['edit', 'update']);
+        $this->middleware('permission:delete customer')->only(['destroy']);
+    }
+
     public function index()
     {
         $customers = Customer::all();

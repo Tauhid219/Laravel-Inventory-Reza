@@ -44,10 +44,25 @@
                     <th class="align-middle text-center w-1">
                         {{ __('No.') }}
                     </th>
-                    <th scope="col" class="align-middle text-center">
+                    {{-- <th scope="col" class="align-middle text-center">
                         <a wire:click.prevent="sortBy('invoice_no')" href="#" role="button">
                             {{ __('Invoice No.') }}
                             @include('inclues._sort-icon', ['field' => 'invoice_no'])
+                        </a>
+                    </th> --}}
+                    <th scope="col" class="align-middle text-center">
+                        <a href="#" role="button">
+                            {{ __('Product') }}
+                        </a>
+                    </th>
+                    <th scope="col" class="align-middle text-center">
+                        <a href="#" role="button">
+                            {{ __('Category') }}
+                        </a>
+                    </th>
+                    <th scope="col" class="align-middle text-center">
+                        <a href="#" role="button">
+                            {{ __('Sub Category') }}
                         </a>
                     </th>
                     <th scope="col" class="align-middle text-center">
@@ -62,12 +77,12 @@
                             @include('inclues._sort-icon', ['field' => 'order_date'])
                         </a>
                     </th>
-                    <th scope="col" class="align-middle text-center">
+                    {{-- <th scope="col" class="align-middle text-center">
                         <a wire:click.prevent="sortBy('payment_type')" href="#" role="button">
                             {{ __('Paymet') }}
                             @include('inclues._sort-icon', ['field' => 'payment_type'])
                         </a>
-                    </th>
+                    </th> --}}
                     <th scope="col" class="align-middle text-center">
                         <a wire:click.prevent="sortBy('total')" href="#" role="button">
                             {{ __('Total') }}
@@ -91,8 +106,37 @@
                         <td class="align-middle text-center">
                             {{ $loop->iteration }}
                         </td>
-                        <td class="align-middle text-center">
+                        {{-- <td class="align-middle text-center">
                             {{ $order->invoice_no }}
+                        </td> --}}
+                        
+                        {{-- Product Names --}}
+                        <td class="align-middle text-center">
+                            @foreach ($order->details as $detail)
+                                <span class="badge bg-blue-lt">{{ $detail->product->name }}</span><br>
+                            @endforeach
+                        </td>
+
+                        {{-- Category Names --}}
+                        <td class="align-middle text-center">
+                            @php
+                                $categories = $order->details->map(fn($d) => $d->product->category->name)->unique();
+                            @endphp
+                            @foreach ($categories as $catName)
+                                <span class="badge bg-purple-lt">{{ $catName }}</span><br>
+                            @endforeach
+                        </td>
+
+                        {{-- Sub-Category Names --}}
+                        <td class="align-middle text-center">
+                            @php
+                                $subCategories = $order->details
+                                    ->map(fn($d) => $d->product->subCategory->name ?? 'N/A')
+                                    ->unique();
+                            @endphp
+                            @foreach ($subCategories as $subCatName)
+                                <span class="badge bg-gray-lt">{{ $subCatName }}</span><br>
+                            @endforeach
                         </td>
                         <td class="align-middle">
                             {{ $order->customer->name }}
@@ -100,9 +144,9 @@
                         <td class="align-middle text-center">
                             {{ $order->order_date->format('d-m-Y') }}
                         </td>
-                        <td class="align-middle text-center">
+                        {{-- <td class="align-middle text-center">
                             {{ $order->payment_type }}
-                        </td>
+                        </td> --}}
                         <td class="align-middle text-center">
                             {{ Number::currency($order->total, 'BDT') }}
                         </td>
@@ -115,8 +159,8 @@
                         </td>
                         <td class="align-middle text-center" style="width: 5%">
                             <x-button.show class="btn-icon" route="{{ route('orders.show', $order) }}" />
-                            <x-button.print class="btn-icon" route="{{ route('order.downloadInvoice', $order) }}" />
-                            <x-button.delete class="btn-icon" route="{{ route('orders.delete', $order) }}"
+                            {{-- <x-button.print class="btn-icon" route="{{ route('order.downloadInvoice', $order) }}" /> --}}
+                            <x-button.delete class="btn-icon" route="{{ route('orders.destroy', $order) }}"
                                 onclick="return confirm('Are you sure you want to delete this order?')" />
                         </td>
                     </tr>

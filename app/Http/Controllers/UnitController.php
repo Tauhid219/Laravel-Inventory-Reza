@@ -8,6 +8,14 @@ use App\Http\Requests\Unit\UpdateUnitRequest;
 
 class UnitController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view unit')->only(['index', 'show']);
+        $this->middleware('permission:create unit')->only(['create', 'store']);
+        $this->middleware('permission:update unit')->only(['edit', 'update']);
+        $this->middleware('permission:delete unit')->only(['destroy']);
+    }
+
     public function index()
     {
         $units = Unit::query()

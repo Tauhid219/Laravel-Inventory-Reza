@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers\Order;
 
+use App\Actions\Orders\CompleteOrder;
+use App\Actions\Orders\CreateOrder;
+use App\Actions\Orders\ValidateRequestedOrderProducts;
+use App\Data\Orders\CreateOrderData;
 use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Order\OrderStoreRequest;
+use App\Http\Requests\Order\StoreOrderRequest;
+use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Order;
-use App\Models\OrderDetails;
-use App\Models\Product;
-use Carbon\Carbon;
-use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:view order')->only(['index', 'show']);
+        $this->middleware('permission:view order')->only(['index', 'show', 'completedOrders', 'pendingOrders', 'downloadInvoice']);
         $this->middleware('permission:create order')->only(['create', 'store']);
         $this->middleware('permission:update order')->only(['update']);
         $this->middleware('permission:delete order')->only(['destroy']);
@@ -26,67 +26,12 @@ class OrderController extends Controller
 
     public function index()
     {
-        // $orders = Order::latest()->get();
-
-        // return view('orders.index', [
-        //     'orders' => $orders,
-        // ]);
-
-        // $orders = Order::with(['customer', 'details.product'])
-        //     ->latest()
-        //     ->paginate(20); // পেজিনেশন ✅
-
-        // return view('orders.index', compact('orders'));
-
         return view('orders.index');
-    }
-
-    public function create()
-    {
-        Cart::instance('order')
-            ->destroy();
-
-        return view('orders.create', [
-            'carts' => Cart::content(),
-            'customers' => Customer::all(['id', 'name']),
-            'products' => Product::select('id', 'name', 'quantity', 'buying_price')->with(['category', 'unit'])->get(),
-        ]);
-    }
-
-    public function store(OrderStoreRequest $request)
-    {
-        // $order = Order::create($request->all());
-
-        $order = Order::create(array_merge($request->all(), [
-            'note' => $request->note,
-        ]));
-
-        // Create Order Details
-        $contents = Cart::instance('order')->content();
-        $oDetails = [];
-
-        foreach ($contents as $content) {
-            $oDetails['order_id'] = $order['id'];
-            $oDetails['product_id'] = $content->id;
-            $oDetails['quantity'] = $content->qty;
-            $oDetails['unitcost'] = $content->price;
-            $oDetails['total'] = $content->subtotal;
-            $oDetails['created_at'] = Carbon::now();
-
-            OrderDetails::insert($oDetails);
-        }
-
-        // Delete Cart Sopping History
-        Cart::destroy();
-
-        return redirect()
-            ->route('orders.index')
-            ->with('success', 'Order has been created!');
     }
 
     public function show(Order $order)
     {
-        $order->loadMissing(['customer', 'details'])->get();
+        $order->loadMissing(['customer', 'details.product.category', 'details.product.subCategory']);
 
         return view('orders.show', [
             'order' => $order,
@@ -94,32 +39,73 @@ class OrderController extends Controller
         ]);
     }
 
-    public function update(Order $order, Request $request)
+    public function completedOrders()
     {
-        // TODO refactoring
+        $orders = Order::with('customer', 'details.product.category', 'details.product.subCategory')
+            ->where('order_status', OrderStatus::COMPLETE)
+            ->latest()
+            ->get();
 
-        // Reduce the stock
-        DB::transaction(function () use ($order) {
-            $products = OrderDetails::where('order_id', $order->id)->get();
+        return view('orders.complete-orders', [
+            'orders' => $orders
+        ]);
+    }
 
-            foreach ($products as $product) {
-                $productModel = Product::find($product->product_id);
+    public function pendingOrders()
+    {
+        $orders = Order::with('customer', 'details.product.category', 'details.product.subCategory')
+            ->where('order_status', OrderStatus::PENDING)
+            ->latest()
+            ->get();
 
-                if ($productModel->quantity < $product->quantity) {
-                    throw new \Exception('Insufficient stock for ' . $productModel->name);
-                }
+        return view('orders.pending-orders', [
+            'orders' => $orders
+        ]);
+    }
 
-                $productModel->decrement('quantity', $product->quantity);
-            }
+    public function create()
+    {
+        return view('orders.create', [
+            'categories' => Category::select(['id', 'name'])->get(),
+            'customers' => Customer::select(['id', 'name'])->get(),
+        ]);
+    }
 
-            $order->update([
-                'order_status' => OrderStatus::COMPLETE,
-            ]);
-        });
+    public function store(
+        StoreOrderRequest $request,
+        CreateOrder $createOrder,
+        ValidateRequestedOrderProducts $validateRequestedOrderProducts,
+    )
+    {
+        try {
+            $validateRequestedOrderProducts->handle($request->validated('invoiceProducts'));
 
-        return redirect()
-            ->route('orders.complete')
-            ->with('success', 'Order has been completed!');
+            $createOrder->handle(CreateOrderData::fromArray($request->validated()));
+
+            return redirect()
+                ->route('orders.index')
+                ->with('success', __('Order has been created successfully and is now pending approval.'));
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withErrors(['error' => __('Unable to create order: ') . $e->getMessage()])
+                ->withInput();
+        }
+    }
+
+    public function update(Request $request, Order $order, CompleteOrder $completeOrder)
+    {
+        try {
+            $completeOrder->handle($order);
+
+            return redirect()
+                ->route('orders.complete')
+                ->with('success', 'Order has been approved and stock updated!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withErrors(['error' => $e->getMessage()]);
+        }
     }
 
     public function destroy(Order $order)
@@ -131,11 +117,9 @@ class OrderController extends Controller
             ->with('success', 'Order has been deleted!');
     }
 
-    public function downloadInvoice($order)
+    public function downloadInvoice(Order $order)
     {
-        $order = Order::with(['customer', 'details'])
-            ->where('id', $order)
-            ->first();
+        $order->loadMissing(['customer', 'details.product']);
 
         return view('orders.print-invoice', [
             'order' => $order,

@@ -7,7 +7,9 @@
         </div>
 
         <div class="card-tools d-flex align-items-center gap-2">
-            <x-action.create route="{{ route('suppliers.create') }}" />
+            @can('create supplier')
+                <x-action.create route="{{ route('suppliers.create') }}" />
+            @endcan
         </div>
     </div>
 
@@ -94,12 +96,16 @@
                             </span>
                         </td>
                         <td class="align-middle text-center" style="width: 10%">
-                            <x-button.show class="btn-icon" route="{{ route('suppliers.show', $supplier) }}" />
-                            <x-button.edit class="btn-icon" route="{{ route('suppliers.edit', $supplier) }}" />
-                            @role('super-admin')
+                            @can('view supplier')
+                                <x-button.show class="btn-icon" route="{{ route('suppliers.show', $supplier) }}" />
+                            @endcan
+                            @can('update supplier')
+                                <x-button.edit class="btn-icon" route="{{ route('suppliers.edit', $supplier) }}" />
+                            @endcan
+                            @can('delete supplier')
                                 <x-button.delete class="btn-icon" route="{{ route('suppliers.destroy', $supplier) }}"
                                     onclick="return confirm('Are you sure you want to delete this supplier?')" />
-                            @endrole
+                            @endcan
                         </td>
                     </tr>
                 @empty

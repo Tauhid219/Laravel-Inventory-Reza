@@ -13,6 +13,14 @@ use Illuminate\Support\Facades\DB;
 
 class QuotationController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view quotation')->only(['index', 'show']);
+        $this->middleware('permission:create quotation')->only(['create', 'store']);
+        $this->middleware('permission:update quotation')->only(['edit', 'update']);
+        $this->middleware('permission:delete quotation')->only(['destroy']);
+    }
+
     public function index()
     {
         $quotations = Quotation::with(['customer'])->get();

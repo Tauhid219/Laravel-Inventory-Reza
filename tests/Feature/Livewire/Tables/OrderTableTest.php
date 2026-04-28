@@ -4,12 +4,13 @@ namespace Tests\Feature\Livewire\Tables;
 
 use App\Livewire\Tables\OrderTable;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class OrderTableTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function renders_successfully()
     {
         $user = $this->createUser();

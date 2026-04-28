@@ -3,17 +3,20 @@
 namespace Tests\Feature;
 
 use App\Enums\PurchaseStatus;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\PurchaseDetails;
 use App\Models\Supplier;
+use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class PurchaseControllerTest extends TestCase
 {
-    // use RefreshDatabase;
+    use RefreshDatabase;
     use WithFaker;
 
     /**
@@ -152,18 +155,13 @@ class PurchaseControllerTest extends TestCase
 
     public function test_purchase_store()
     {
-        // Arrange: Create necessary data for the test
         $user = $this->createAuthorizedUser(['create purchase']);
-        $this->actingAs($user); // Authenticate the user
+        $this->actingAs($user);
 
-        // Create a supplier
         $supplier = Supplier::factory()->create();
+        $category = Category::factory()->create();
+        $unit = Unit::factory()->create();
 
-        // Create Category and Unit data for products
-        $category = \App\Models\Category::factory()->create();
-        $unit = \App\Models\Unit::factory()->create();
-
-        // Create products (ensure categories and units are set)
         $product1 = Product::factory()->create([
             'category_id' => $category->id,
             'unit_id' => $unit->id,
@@ -173,56 +171,75 @@ class PurchaseControllerTest extends TestCase
             'unit_id' => $unit->id,
         ]);
 
-        // Prepare invoice products data
         $invoiceProducts = [
             [
                 'product_id' => $product1->id,
                 'quantity' => 2,
                 'unitcost' => 100,
-                'total' => 200,
             ],
             [
                 'product_id' => $product2->id,
                 'quantity' => 5,
                 'unitcost' => 50,
-                'total' => 250,
             ],
         ];
 
-        // Act: Send a POST request to store the purchase
         $response = $this->post(route('purchases.store'), [
             'supplier_id' => $supplier->id,
-            'date' => now()->toDateString(), // Send date as string
-            'purchase_no' => 'INV-12345',
+            'date' => now()->toDateString(),
+            'purchase_no' => 'FORGED-12345',
             'status' => PurchaseStatus::PENDING->value,
             'total_amount' => 450,
             'created_by' => $user->id,
             'updated_by' => $user->id,
-            'invoiceProducts' => $invoiceProducts, // Send the invoice products
+            'invoiceProducts' => $invoiceProducts,
         ]);
 
-        // Assert: Check if the response redirects to the purchases.index route
         $response->assertRedirect(route('purchases.index'));
-
-        // Assert: Check if the session contains a success message
         $response->assertSessionHas('success', 'Purchase has been created!');
 
-        // Assert: Check if the purchase is created in the database
         $this->assertDatabaseHas('purchases', [
-            'purchase_no' => 'INV-12345',
+            'supplier_id' => $supplier->id,
+            'total_amount' => 45000,
             'status' => PurchaseStatus::PENDING->value,
-            'total_amount' => 450,
         ]);
 
-        // Assert: Check if the purchase details are created in the database
-        foreach ($invoiceProducts as $product) {
-            $this->assertDatabaseHas('purchase_details', [
-                'product_id' => $product['product_id'], // Ensure product_id exists
-                'quantity' => $product['quantity'],
-                'unitcost' => $product['unitcost'],
-                'total' => $product['total'],
+        $this->assertDatabaseHas('purchase_details', [
+            'product_id' => $product1->id,
+            'quantity' => 2,
+            'unitcost' => 10000,
+        ]);
+
+        $this->assertDatabaseHas('purchase_details', [
+            'product_id' => $product2->id,
+            'quantity' => 5,
+            'unitcost' => 5000,
+        ]);
+    }
+
+    public function test_purchase_store_requires_at_least_one_line_and_does_not_partially_save(): void
+    {
+        $user = $this->createAuthorizedUser(['create purchase']);
+        $this->actingAs($user);
+
+        $supplier = Supplier::factory()->create();
+
+        $response = $this->from(route('purchases.create'))
+            ->post(route('purchases.store'), [
+                'supplier_id' => $supplier->id,
+                'date' => now()->toDateString(),
+                'total_amount' => 100,
+                'invoiceProducts' => [],
             ]);
-        }
+
+        $response
+            ->assertRedirect(route('purchases.create'))
+            ->assertSessionHasErrors([
+                'invoiceProducts' => 'At least one product row is required',
+            ]);
+
+        $this->assertDatabaseCount('purchases', 0);
+        $this->assertDatabaseCount('purchase_details', 0);
     }
 
     public function test_purchase_edit(): void
@@ -258,5 +275,119 @@ class PurchaseControllerTest extends TestCase
         // Assert that the related supplier and details are loaded (Eager Loading check)
         $this->assertTrue($purchase->load('supplier', 'details')->relationLoaded('supplier'));
         $this->assertTrue($purchase->load('supplier', 'details')->relationLoaded('details'));
+    }
+
+    public function test_purchase_store_persistence_and_server_side_totals(): void
+    {
+        $user = $this->createAuthorizedUser(['create purchase']);
+        $this->actingAs($user);
+
+        $supplier = Supplier::factory()->create();
+        $category = Category::factory()->create();
+        $unit = Unit::factory()->create();
+
+        $product1 = Product::factory()->create(['category_id' => $category->id, 'unit_id' => $unit->id]);
+        $product2 = Product::factory()->create(['category_id' => $category->id, 'unit_id' => $unit->id]);
+
+        $invoiceProducts = [
+            ['product_id' => $product1->id, 'quantity' => 2, 'unitcost' => 100, 'total' => 1], // Total should be 200
+            ['product_id' => $product2->id, 'quantity' => 5, 'unitcost' => 50, 'total' => 9999], // Total should be 250
+        ];
+
+        $response = $this->post(route('purchases.store'), [
+            'supplier_id' => $supplier->id,
+            'date' => now()->toDateString(),
+            'purchase_no' => 'FORGED-123',
+            'status' => PurchaseStatus::APPROVED->value,
+            'total_amount' => 450,
+            'created_by' => 999,
+            'invoiceProducts' => $invoiceProducts,
+        ]);
+
+        $response->assertRedirect(route('purchases.index'));
+
+        $purchase = Purchase::latest()->first();
+
+        // Verify server-side boundaries
+        $this->assertNotEquals('FORGED-123', $purchase->purchase_no);
+        $this->assertSame(PurchaseStatus::PENDING->value, $purchase->status->value);
+        $this->assertSame($user->id, $purchase->created_by);
+
+        // Verify line totals are server-calculated
+        $this->assertDatabaseHas('purchase_details', [
+            'purchase_id' => $purchase->id,
+            'product_id' => $product1->id,
+            'total' => 20000,
+        ]);
+        $this->assertDatabaseHas('purchase_details', [
+            'purchase_id' => $purchase->id,
+            'product_id' => $product2->id,
+            'total' => 25000,
+        ]);
+    }
+
+    public function test_purchase_approval_increases_stock_and_updates_status(): void
+    {
+        $user = $this->createAuthorizedUser(['update purchase']);
+        $this->actingAs($user);
+
+        $product = Product::factory()->create(['quantity' => 10]);
+        $purchase = Purchase::factory()->create(['status' => PurchaseStatus::PENDING]);
+
+        PurchaseDetails::create([
+            'purchase_id' => $purchase->id,
+            'product_id' => $product->id,
+            'quantity' => 5,
+            'unitcost' => 100,
+            'total' => 500,
+        ]);
+
+        $response = $this->put(route('purchases.update', $purchase));
+
+        $response->assertRedirect(route('purchases.index'));
+        $this->assertSame(PurchaseStatus::APPROVED->value, $purchase->fresh()->status->value);
+        $this->assertSame(15, $product->fresh()->quantity);
+    }
+
+    public function test_purchase_approval_is_idempotent_and_rejects_duplicate_approval(): void
+    {
+        $user = $this->createAuthorizedUser(['update purchase']);
+        $this->actingAs($user);
+
+        $purchase = Purchase::factory()->create(['status' => PurchaseStatus::APPROVED]);
+
+        $response = $this->put(route('purchases.update', $purchase));
+
+        $response->assertRedirect(route('purchases.index'));
+        $response->assertSessionHas('error', 'This purchase has already been approved.');
+    }
+
+    public function test_purchase_approval_handles_missing_product(): void
+    {
+        $user = $this->createAuthorizedUser(['update purchase']);
+        $this->actingAs($user);
+
+        $purchase = Purchase::factory()->create(['status' => PurchaseStatus::PENDING]);
+
+        $product = Product::factory()->create();
+
+        PurchaseDetails::create([
+            'purchase_id' => $purchase->id,
+            'product_id' => $product->id,
+            'quantity' => 1,
+            'unitcost' => 100,
+            'total' => 100,
+        ]);
+
+        DB::statement('PRAGMA defer_foreign_keys = ON');
+        DB::table('purchase_details')
+            ->where('purchase_id', $purchase->id)
+            ->update(['product_id' => $product->id + 999999]);
+
+        $response = $this->put(route('purchases.update', $purchase));
+
+        $response->assertRedirect(route('purchases.index'));
+        $response->assertSessionHas('error', 'A product in this purchase no longer exists.');
+        $this->assertSame(PurchaseStatus::PENDING->value, $purchase->fresh()->status->value);
     }
 }

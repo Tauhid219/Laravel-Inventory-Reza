@@ -11,7 +11,11 @@ class StoreQuotationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        if ($this->routeIs('quotations.update')) {
+            return $this->user()?->can('update quotation') ?? false;
+        }
+
+        return $this->user()?->can('create quotation') ?? false;
     }
 
     /**

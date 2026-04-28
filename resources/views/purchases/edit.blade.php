@@ -71,18 +71,20 @@
             </x-slot:content>
 
             <x-slot:footer class="text-end">
-                @if ($purchase->status === \App\Enums\PurchaseStatus::PENDING)
-                    <form action="{{ route('purchases.update', $purchase) }}" method="POST">
-                        @csrf
-                        @method('put')
-                        <input type="hidden" name="id" value="{{ $purchase->id }}">
+                @can('update purchase')
+                    @if ($purchase->status === \App\Enums\PurchaseStatus::PENDING)
+                        <form action="{{ route('purchases.update', $purchase) }}" method="POST">
+                            @csrf
+                            @method('put')
+                            <input type="hidden" name="id" value="{{ $purchase->id }}">
 
-                        <button type="submit" class="btn btn-success"
-                            onclick="return confirm('Are you sure you want to approve this purchase?')">
-                            {{ __('Approve Purchase') }}
-                        </button>
-                    </form>
-                @endif
+                            <button type="submit" class="btn btn-success"
+                                onclick="return confirm('Are you sure you want to approve this purchase?')">
+                                {{ __('Approve Purchase') }}
+                            </button>
+                        </form>
+                    @endif
+                @endcan
             </x-slot:footer>
         </x-card>
     </x-adminlte.page-body>

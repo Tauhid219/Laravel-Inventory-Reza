@@ -28,30 +28,55 @@ class RolePermissionSeeder extends Seeder
             'view role',
             'update role',
             'view permission',
+
             'create user',
             'view user',
             'update user',
             'delete user',
+
             'create product',
             'view product',
             'update product',
             'delete product',
+
             'create purchase',
             'view purchase',
             'update purchase',
             'delete purchase',
+
             'create order',
             'view order',
             'update order',
             'delete order',
+
             'create category',
             'view category',
             'update category',
             'delete category',
+
             'create subcategory',
             'view subcategory',
             'update subcategory',
-            'delete subcategory'
+            'delete subcategory',
+
+            'create customer',
+            'view customer',
+            'update customer',
+            'delete customer',
+
+            'create supplier',
+            'view supplier',
+            'update supplier',
+
+            'create unit',
+            'view unit',
+            'update unit',
+            'delete unit',
+
+            'create quotation',
+            'view quotation',
+            'update quotation',
+            'delete quotation',
         ])->get();
 
         // Assign only the specific permissions to the 'admin' role.

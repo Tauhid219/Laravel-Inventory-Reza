@@ -5,7 +5,6 @@ namespace App\Livewire;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\SubCategory;
-use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Validate;
@@ -13,82 +12,50 @@ use Livewire\Component;
 
 class OrderForm extends Component
 {
-    public $cart_instance;
-
     public $selectedCategory = null;
     public $selectedSubCategory = null;
 
-    public $categories;
+    public $categories = [];
     public $subCategories = [];
     public $products = [];
-
     private $product;
+    public $manualTotal = null;
+
+    // Static roleMapping removed to enable dynamic role management
 
     #[Validate('Required')]
-    // public int $taxes = 0;
+    public int $taxes = 0;
 
     public array $invoiceProducts = [];
 
     #[Validate('required', message: 'Please select products')]
     public Collection $allProducts;
 
-    public function mount($cartInstance): void
+    public function mount(): void
     {
-        $this->cart_instance = $cartInstance;
-
-        // $this->categories = Category::all();
-
-        // Load categories based on the user's role
         $user = auth()->user();
 
-        if ($user->hasRole('super-admin|admin')) {
-            $this->categories = Category::all();
-        } elseif ($user->hasRole('passive-admin')) {
-            $categoryId = Category::where('name', 'Passive')->first()->id;
-            $this->categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('printer-admin')) {
-            $categoryId = Category::where('name', 'Printer')->first()->id;
-            $this->categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('scanner-admin')) {
-            $categoryId = Category::where('name', 'Scanner')->first()->id;
-            $this->categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('server-admin')) {
-            $categoryId = Category::where('name', 'Server')->first()->id;
-            $this->categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('storage-admin')) {
-            $categoryId = Category::where('name', 'Storage')->first()->id;
-            $this->categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('server-accessories-admin')) {
-            $categoryId = Category::where('name', 'Server Accessories')->first()->id;
-            $this->categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('network-wired-admin')) {
-            $categoryId = Category::where('name', 'Network Wired')->first()->id;
-            $this->categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('network-tools-admin')) {
-            $categoryId = Category::where('name', 'Network Tools')->first()->id;
-            $this->categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('network-wireless-admin')) {
-            $categoryId = Category::where('name', 'Network Wireless')->first()->id;
-            $this->categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('network-security-admin')) {
-            $categoryId = Category::where('name', 'Network Security')->first()->id;
-            $this->categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('general-others-admin')) {
-            $categoryId = Category::where('name', 'General Others')->first()->id;
-            $this->categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('office-accessories-admin')) {
-            $categoryId = Category::where('name', 'Office Accessories')->first()->id;
-            $this->categories = Category::where('id', $categoryId)->get();
-        } elseif ($user->hasRole('office-stationeries-admin')) {
-            $categoryId = Category::where('name', 'Office Stationeries')->first()->id;
-            $this->categories = Category::where('id', $categoryId)->get();
-        } else {
-            $this->categories = [];  // Empty array, no categories loaded
+        // 1. Initialize queries
+        $categoryQuery = Category::query();
+        $productQuery = Product::select('id', 'name', 'quantity', 'buying_price', 'category_id', 'sub_category_id')
+            ->with(['category', 'subCategory']);
+
+        // 2. Apply dynamic role-based filtering logic
+        if (!$user->hasRole(['super-admin', 'admin'])) {
+            // Get all role names assigned to the user
+            $userRoles = $user->getRoleNames();
+
+            // Filter categories based on role_name column
+            $categoryQuery->whereIn('role_name', $userRoles);
+
+            // Filter products: Ensure only products from allowed categories are accessible
+            $productQuery->whereHas('category', function ($q) use ($userRoles) {
+                $q->whereIn('role_name', $userRoles);
+            });
         }
 
-        $this->allProducts = Product::select('id', 'name', 'quantity', 'buying_price')->get();  // Only load the necessary fields
-
-        //$cart_items = Cart::instance($this->cart_instance)->content();
+        $this->categories = $categoryQuery->get();
+        $this->allProducts = $productQuery->get();
     }
 
     public function onCategoryUpdated($categoryId)
@@ -114,18 +81,17 @@ class OrderForm extends Component
             }
         }
 
-        $cart_items = Cart::instance($this->cart_instance)->content();
+        // If manualTotal is set, use it; otherwise, calculate total
+        $finalTotal = $this->manualTotal !== null && $this->manualTotal !== ''
+            ? $this->manualTotal
+            : $total * (1 + (is_numeric($this->taxes) ? $this->taxes : 0) / 100);
 
-        // Pass categories and subcategories through the render view
         return view('livewire.order-form', [
             'subtotal' => $total,
             'categories' => $this->categories,
             'subCategories' => $this->subCategories,
             'products' => $this->products,
-            // 'total' => $total * (1 + (is_numeric($this->taxes) ? $this->taxes : 0) / 100),
-            'total' => $total,
-            'cart_items' => $cart_items,
-            // 'allProducts' => $this->allProducts,  // Make sure you have all the products
+            'total' => $finalTotal,
         ]);
     }
 
@@ -178,47 +144,15 @@ class OrderForm extends Component
     public function saveProduct($index): void
     {
         $this->resetErrorBag();
+        $product = $this->allProducts->find($this->invoiceProducts[$index]['product_id']);
 
-        $product = $this->allProducts
-            ->find($this->invoiceProducts[$index]['product_id']);
-
-        // Check if the product is found, then update invoice details
         if ($product) {
             $this->invoiceProducts[$index]['product_name'] = $product->name;
             $this->invoiceProducts[$index]['product_price'] = $product->buying_price;
-            $this->invoiceProducts[$index]['category_name'] = $product->category->name;  // Add category name
-            // $this->invoiceProducts[$index]['subcategory_name'] = $product->subCategory->name;  // Add subcategory name
-            $this->invoiceProducts[$index]['subcategory_name'] = $product->subCategory ? $product->subCategory->name : 'N/A';  // Check if subcategory exists
-            // $this->invoiceProducts[$index]['product_quantity'] = $product->quantity;  // Load the product's available quantity
+            $this->invoiceProducts[$index]['category_name'] = $product->category->name;
+            $this->invoiceProducts[$index]['subcategory_name'] = $product->subCategory ? $product->subCategory->name : 'N/A';
             $this->invoiceProducts[$index]['is_saved'] = true;
         }
-
-        //
-        $cart = Cart::instance($this->cart_instance);
-
-        $exists = $cart->search(function ($cartItem) use ($product) {
-            return $cartItem->id === $product['id'];
-        });
-
-        if ($exists->isNotEmpty()) {
-            session()->flash('message', 'Product exists in the cart!');
-
-            // not working correctly
-            //unset($this->invoiceProducts[$index]);
-
-            return;
-        }
-
-        $cart->add([
-            'id' => $product['id'],
-            'name' => $product['name'],
-            'price' => $product['buying_price'],
-            'qty' => $this->invoiceProducts[$index]['quantity'], //form field
-            'weight' => 1,
-            'options' => [
-                    'code' => $product['code'],
-                ],
-        ]);
     }
 
     public function removeProduct($index): void
@@ -226,8 +160,5 @@ class OrderForm extends Component
         unset($this->invoiceProducts[$index]);
 
         $this->invoiceProducts = array_values($this->invoiceProducts);
-
-        //
-        //Cart::instance($this->cart_instance)->remove($index);
     }
 }

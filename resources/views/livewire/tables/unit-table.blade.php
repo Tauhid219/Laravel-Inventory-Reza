@@ -7,7 +7,9 @@
         </div>
 
         <div class="card-tools d-flex align-items-center gap-2">
-            <x-action.create route="{{ route('units.create') }}" />
+            @can('create unit')
+                <x-action.create route="{{ route('units.create') }}" />
+            @endcan
         </div>
     </div>
 
@@ -83,10 +85,16 @@
                             {{ $unit->short_code }}
                         </td>
                         <td class="align-middle text-center" style="width: 10%">
-                            <x-button.show class="btn-icon" route="{{ route('units.show', $unit) }}" />
-                            <x-button.edit class="btn-icon" route="{{ route('units.edit', $unit) }}" />
-                            <x-button.delete class="btn-icon" route="{{ route('units.destroy', $unit) }}"
-                                onclick="return confirm('Are you sure you want to delete this unit?')" />
+                            @can('view unit')
+                                <x-button.show class="btn-icon" route="{{ route('units.show', $unit) }}" />
+                            @endcan
+                            @can('update unit')
+                                <x-button.edit class="btn-icon" route="{{ route('units.edit', $unit) }}" />
+                            @endcan
+                            @can('delete unit')
+                                <x-button.delete class="btn-icon" route="{{ route('units.destroy', $unit) }}"
+                                    onclick="return confirm('Are you sure you want to delete this unit?')" />
+                            @endcan
                         </td>
                     </tr>
                 @empty

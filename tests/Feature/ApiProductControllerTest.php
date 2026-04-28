@@ -12,52 +12,98 @@ class ApiProductControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    // public function test_product_api_url()
-    // {
-    //     $this->withoutExceptionHandling();
+    public function test_product_api_returns_products(): void
+    {
+        $category = Category::factory()->create();
+        $unit = Unit::factory()->create();
 
-    //     $this->createProduct();
+        Product::factory()->create([
+            'name' => 'Test Product',
+            'category_id' => $category->id,
+            'unit_id' => $unit->id,
+        ]);
 
-    //     $response = $this->get('api/products/');
+        $response = $this->getJson(route('api.product.index'));
 
-    //     $response->assertStatus(200);
-    //     $response->assertSee('Test Product');
-    //     $response->assertDontSee('Test Product 2');
-    // }
+        $response
+            ->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'name',
+                        'slug',
+                        'code',
+                        'quantity',
+                        'quantity_alert',
+                        'buying_price',
+                        'selling_price',
+                        'tax',
+                        'tax_type',
+                        'notes',
+                        'product_image',
+                        'category' => ['id', 'name', 'slug'],
+                        'sub_category',
+                        'unit' => ['id', 'name', 'slug'],
+                        'created_at',
+                        'updated_at',
+                    ],
+                ],
+                'links',
+                'meta',
+            ])
+            ->assertJsonPath('data.0.name', 'Test Product')
+            ->assertJsonPath('data.0.category.id', $category->id)
+            ->assertJsonPath('data.0.unit.id', $unit->id);
+    }
 
-    // public function test_product_url_with_query_string()
-    // {
-    //     $this->createProduct();
+    public function test_product_api_filters_by_category(): void
+    {
+        $unit = Unit::factory()->create();
+        $matchingCategory = Category::factory()->create();
+        $otherCategory = Category::factory()->create();
 
-    //     $response = $this->get('api/products?category_id=1');
+        Product::factory()->create([
+            'name' => 'Matching Product',
+            'category_id' => $matchingCategory->id,
+            'unit_id' => $unit->id,
+        ]);
 
-    //     $response->assertStatus(200);
-    //     $response->assertSee('Test Product');
-    //     $response->assertDontSee('Test Product 2');
-    // }
+        Product::factory()->create([
+            'name' => 'Other Product',
+            'category_id' => $otherCategory->id,
+            'unit_id' => $unit->id,
+        ]);
 
-    // public function createProduct()
-    // {
-    //     return Product::factory()->create([
-    //         'name' => 'Test Product',
-    //         'category_id' => $this->createCategory(),
-    //         'unit_id' => $this->createUnit()
-    //     ]);
-    // }
+        $response = $this->getJson(route('api.product.index', ['category_id' => $matchingCategory->id]));
 
-    // public function createCategory()
-    // {
-    //     return Category::factory()->create([
-    //         'name' => 'Speakers'
-    //     ]);
-    // }
+        $response
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.name', 'Matching Product')
+            ->assertJsonPath('data.0.category.id', $matchingCategory->id)
+            ->assertJsonMissing(['name' => 'Other Product']);
+    }
 
-    // public function createUnit()
-    // {
-    //     return Unit::factory()->create([
-    //         'name' => 'piece'
-    //     ]);
-    // }
+    public function test_product_api_paginates_products(): void
+    {
+        Product::factory()->count(3)->create();
 
+        $response = $this->getJson(route('api.product.index', ['per_page' => 2]));
 
+        $response
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('meta.per_page', 2)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function test_product_api_validates_category_filter(): void
+    {
+        $response = $this->getJson(route('api.product.index', ['category_id' => 999999]));
+
+        $response
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('category_id');
+    }
 }

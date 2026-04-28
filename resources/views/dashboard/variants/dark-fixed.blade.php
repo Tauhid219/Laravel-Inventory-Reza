@@ -25,7 +25,7 @@
         <div class="card card-secondary">
             <div class="card-header"><h3 class="card-title">Quick Actions</h3></div>
             <div class="card-body">
-                <a href="{{ route('ordersV2.create') }}" class="btn btn-primary btn-block mb-2">Create Order</a>
+                <a href="{{ route('orders.create') }}" class="btn btn-primary btn-block mb-2">Create Order</a>
                 <a href="{{ route('purchases.create') }}" class="btn btn-outline-light btn-block mb-2">Record Purchase</a>
                 <a href="{{ route('products.create') }}" class="btn btn-outline-info btn-block mb-2">Add Product</a>
                 <a href="{{ route('customers.create') }}" class="btn btn-outline-success btn-block">Add Customer</a>

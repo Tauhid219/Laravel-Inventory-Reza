@@ -1,7 +1,7 @@
 @extends('layouts.tabler')
 
 @section('content')
-    <x-adminlte.page-header :title="__('Orders')" subtitle="Manage invoices, order activity, and completion flow for customer sales.">
+    <x-adminlte.page-header :title="__('Orders')" subtitle="Manage the order workflow with product, category, and customer summaries.">
         <x-slot:actions>
             <div class="btn-group">
                 <a href="{{ route('orders.pending') }}" class="btn btn-default">{{ __('Pending') }}</a>
@@ -14,6 +14,12 @@
     <x-adminlte.page-body container-class="container container-xl">
         <x-alert />
 
-        <livewire:tables.order-table />
+        @if (empty($orders) || (isset($orders) && $orders->isEmpty()))
+            <x-empty title="{{ __('No orders found') }}"
+                message="{{ __('You haven\'t created any orders yet. Start by adding your first order to manage your sales.') }}"
+                button_label="{{ __('Add your first Order') }}" button_route="{{ route('orders.create') }}" />
+        @else
+            <livewire:tables.order-table />
+        @endif
     </x-adminlte.page-body>
 @endsection

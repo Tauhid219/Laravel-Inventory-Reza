@@ -7,7 +7,9 @@
         </div>
 
         <div class="card-tools d-flex align-items-center gap-2">
-            <x-action.create route="{{ route('quotations.create') }}" />
+            @can('create quotation')
+                <x-action.create route="{{ route('quotations.create') }}" />
+            @endcan
         </div>
     </div>
 
@@ -102,9 +104,15 @@
                         </span>
                     </td>
                     <td class="align-middle text-center">
-                        <x-button.show class="btn-icon" route="{{ route('quotations.show', $quotation) }}"/>
-                        <x-button.edit class="btn-icon" route="{{ route('quotations.edit', $quotation) }}"/>
-                        <x-button.delete class="btn-icon" route="{{ route('quotations.destroy', $quotation) }}"/>
+                        @can('view quotation')
+                            <x-button.show class="btn-icon" route="{{ route('quotations.show', $quotation) }}"/>
+                        @endcan
+                        @can('update quotation')
+                            <x-button.edit class="btn-icon" route="{{ route('quotations.edit', $quotation) }}"/>
+                        @endcan
+                        @can('delete quotation')
+                            <x-button.delete class="btn-icon" route="{{ route('quotations.destroy', $quotation) }}"/>
+                        @endcan
                     </td>
                 </tr>
             @empty

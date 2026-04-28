@@ -10,7 +10,7 @@
         <div class="small-box bg-success">
             <div class="inner"><h3>{{ $orders }}</h3><p>Total Orders</p></div>
             <div class="icon"><i class="fas fa-shopping-cart"></i></div>
-            <a href="{{ route('ordersV2.index') }}" class="small-box-footer">View orders <i class="fas fa-arrow-circle-right"></i></a>
+            <a href="{{ route('orders.index') }}" class="small-box-footer">View orders <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
     <div class="col-lg-3 col-6">
@@ -35,7 +35,7 @@
             <div class="card-header border-0">
                 <h3 class="card-title">Operations Snapshot</h3>
                 <div class="card-tools">
-                    <a href="{{ route('ordersV2.create') }}" class="btn btn-sm btn-primary">New Order</a>
+                    <a href="{{ route('orders.create') }}" class="btn btn-sm btn-primary">New Order</a>
                     <a href="{{ route('products.create') }}" class="btn btn-sm btn-outline-primary">Add Product</a>
                 </div>
             </div>

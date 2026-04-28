@@ -43,7 +43,7 @@
         @if ($activeTheme === 'compact')
             <x-slot:actions>
                 <div class="btn-group">
-                    <a href="{{ route('ordersV2.create') }}" class="btn btn-primary">New Order</a>
+                    <a href="{{ route('orders.create') }}" class="btn btn-primary">New Order</a>
                     <a href="{{ route('products.index') }}" class="btn btn-default">Browse Inventory</a>
                 </div>
             </x-slot:actions>

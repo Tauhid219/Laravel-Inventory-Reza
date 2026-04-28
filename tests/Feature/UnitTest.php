@@ -28,7 +28,7 @@ class UnitTest extends TestCase
         $this->assertDatabaseCount('units', 1)
             ->assertDatabaseHas('units', ['name' => 'piece']);
 
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['view unit']);
         $response = $this->actingAs($user)
             ->get('units/');
 
@@ -38,7 +38,7 @@ class UnitTest extends TestCase
 
     public function test_create_new_unit()
     {
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['create unit']);
         $this->actingAs($user)->get('units/create');
 
         Unit::create([
@@ -61,7 +61,7 @@ class UnitTest extends TestCase
         $this->assertDatabaseHas('units', ['name' => 'Piece']);
         $this->assertDatabaseCount('units', 1);
 
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['update unit']);
         $response = $this->actingAs($user)->get('units/piece/edit');
 
         $response->assertStatus(200)
@@ -71,7 +71,7 @@ class UnitTest extends TestCase
 
     public function test_user_can_store_unit()
     {
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['create unit']);
 
         $response = $this->actingAs($user)->post('units/', [
             'name' => 'Piece',
@@ -97,7 +97,7 @@ class UnitTest extends TestCase
         $this->assertDatabaseHas('units', ['name' => 'Piece']);
         $this->assertDatabaseCount('units', 1);
 
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['update unit']);
         $response = $this->actingAs($user)->get('units/piece/show');
 
         $response->assertStatus(404);
@@ -107,7 +107,7 @@ class UnitTest extends TestCase
     {
         //$this->withoutExceptionHandling();
 
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['update unit']);
         $unit = $this->createUnit();
 
         $response = $this->actingAs($user)->put('units/' . $unit->slug, [
@@ -124,7 +124,7 @@ class UnitTest extends TestCase
     {
         //$this->withoutExceptionHandling();
 
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['update unit']);
         $unit = $this->createUnit();
 
         $this->assertDatabaseHas('units', [
@@ -157,7 +157,7 @@ class UnitTest extends TestCase
         $this->assertDatabaseHas('units', ['name' => 'Piece']);
         $this->assertDatabaseCount('units', 1);
 
-        $user = $this->createUser();
+        $user = $this->createAuthorizedUser(['delete unit']);
         $this->actingAs($user);
 
         $this->delete('/units/'. $unit->slug);

@@ -43,15 +43,15 @@
                 </li>
 
                 <li class="nav-header">SALES</li>
-                <li class="nav-item {{ $menuOpen('orders-v2*', 'orders*', 'due*') }}">
-                    <a href="#" class="nav-link {{ $activeClass('orders-v2*', 'orders*', 'due*') }}">
+                <li class="nav-item {{ $menuOpen('orders*', 'due*') }}">
+                    <a href="#" class="nav-link {{ $activeClass('orders*', 'due*') }}">
                         <i class="nav-icon fas fa-shopping-cart"></i>
                         <p>Orders<i class="fas fa-angle-left right"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
-                        <li class="nav-item"><a href="{{ route('ordersV2.index') }}" class="nav-link {{ $activeClass('orders-v2') }}"><i class="far fa-circle nav-icon"></i><p>All Orders</p></a></li>
-                        <li class="nav-item"><a href="{{ route('ordersV2.pendingOrders') }}" class="nav-link {{ $activeClass('orders-v2/pending') }}"><i class="far fa-circle nav-icon"></i><p>Pending Orders</p></a></li>
-                        <li class="nav-item"><a href="{{ route('ordersV2.completedOrders') }}" class="nav-link {{ $activeClass('orders-v2/completed') }}"><i class="far fa-circle nav-icon"></i><p>Completed Orders</p></a></li>
+                        <li class="nav-item"><a href="{{ route('orders.index') }}" class="nav-link {{ $activeClass('orders') }}"><i class="far fa-circle nav-icon"></i><p>All Orders</p></a></li>
+                        <li class="nav-item"><a href="{{ route('orders.pending') }}" class="nav-link {{ $activeClass('orders/pending') }}"><i class="far fa-circle nav-icon"></i><p>Pending Orders</p></a></li>
+                        <li class="nav-item"><a href="{{ route('orders.complete') }}" class="nav-link {{ $activeClass('orders/complete') }}"><i class="far fa-circle nav-icon"></i><p>Completed Orders</p></a></li>
                         <li class="nav-item"><a href="{{ route('due.index') }}" class="nav-link {{ $activeClass('due/orders*') }}"><i class="far fa-circle nav-icon"></i><p>Due Orders</p></a></li>
                     </ul>
                 </li>
@@ -70,27 +70,41 @@
                 </li>
 
                 <li class="nav-header">INVENTORY</li>
-                <li class="nav-item">
-                    <a href="{{ route('products.index') }}" class="nav-link {{ $activeClass('products*') }}">
-                        <i class="nav-icon fas fa-boxes"></i>
-                        <p>Products</p>
-                    </a>
-                </li>
-                <li class="nav-item {{ $menuOpen('categories*', 'sub-categories*', 'units*') }}">
-                    <a href="#" class="nav-link {{ $activeClass('categories*', 'sub-categories*', 'units*') }}">
-                        <i class="nav-icon fas fa-layer-group"></i>
-                        <p>Inventory Setup<i class="fas fa-angle-left right"></i></p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item"><a href="{{ route('categories.index') }}" class="nav-link {{ $activeClass('categories*') }}"><i class="far fa-circle nav-icon"></i><p>Categories</p></a></li>
-                        <li class="nav-item"><a href="{{ route('sub-categories.index') }}" class="nav-link {{ $activeClass('sub-categories*') }}"><i class="far fa-circle nav-icon"></i><p>Sub Categories</p></a></li>
-                        <li class="nav-item"><a href="{{ route('units.index') }}" class="nav-link {{ $activeClass('units*') }}"><i class="far fa-circle nav-icon"></i><p>Units</p></a></li>
-                    </ul>
-                </li>
+                @can('view product')
+                    <li class="nav-item">
+                        <a href="{{ route('products.index') }}" class="nav-link {{ $activeClass('products*') }}">
+                            <i class="nav-icon fas fa-boxes"></i>
+                            <p>Products</p>
+                        </a>
+                    </li>
+                @endcan
+                @canany(['view category', 'view subcategory', 'view unit'])
+                    <li class="nav-item {{ $menuOpen('categories*', 'sub-categories*', 'units*') }}">
+                        <a href="#" class="nav-link {{ $activeClass('categories*', 'sub-categories*', 'units*') }}">
+                            <i class="nav-icon fas fa-layer-group"></i>
+                            <p>Inventory Setup<i class="fas fa-angle-left right"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @can('view category')
+                                <li class="nav-item"><a href="{{ route('categories.index') }}" class="nav-link {{ $activeClass('categories*') }}"><i class="far fa-circle nav-icon"></i><p>Categories</p></a></li>
+                            @endcan
+                            @can('view subcategory')
+                                <li class="nav-item"><a href="{{ route('sub-categories.index') }}" class="nav-link {{ $activeClass('sub-categories*') }}"><i class="far fa-circle nav-icon"></i><p>Sub Categories</p></a></li>
+                            @endcan
+                            @can('view unit')
+                                <li class="nav-item"><a href="{{ route('units.index') }}" class="nav-link {{ $activeClass('units*') }}"><i class="far fa-circle nav-icon"></i><p>Units</p></a></li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endcanany
 
                 <li class="nav-header">PARTIES</li>
-                <li class="nav-item"><a href="{{ route('customers.index') }}" class="nav-link {{ $activeClass('customers*') }}"><i class="nav-icon fas fa-user-friends"></i><p>Customers</p></a></li>
-                <li class="nav-item"><a href="{{ route('suppliers.index') }}" class="nav-link {{ $activeClass('suppliers*') }}"><i class="nav-icon fas fa-people-carry"></i><p>Suppliers</p></a></li>
+                @can('view customer')
+                    <li class="nav-item"><a href="{{ route('customers.index') }}" class="nav-link {{ $activeClass('customers*') }}"><i class="nav-icon fas fa-user-friends"></i><p>Customers</p></a></li>
+                @endcan
+                @can('view supplier')
+                    <li class="nav-item"><a href="{{ route('suppliers.index') }}" class="nav-link {{ $activeClass('suppliers*') }}"><i class="nav-icon fas fa-people-carry"></i><p>Suppliers</p></a></li>
+                @endcan
 
                 @role('super-admin|admin')
                     <li class="nav-header">ADMINISTRATION</li>

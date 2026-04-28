@@ -1,29 +1,25 @@
 <?php
 
-use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\SubCategoryController;
-use App\Http\Controllers\UserRolePermissionController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UnitController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\Order\OrderController;
-use App\Http\Controllers\Order\DueOrderController;
-use App\Http\Controllers\Product\ProductController;
-use App\Http\Controllers\Purchase\PurchaseController;
-use App\Http\Controllers\Order\OrderPendingController;
-use App\Http\Controllers\Order\OrderCompleteController;
-use App\Http\Controllers\Quotation\QuotationController;
 use App\Http\Controllers\Dashboards\DashboardController;
-use App\Http\Controllers\OrderV2\OrderV2CompleteController;
-use App\Http\Controllers\OrderV2\OrderV2Controller;
+use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\Order\DueOrderController;
+use App\Http\Controllers\Order\OrderController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Product\ProductExportController;
 use App\Http\Controllers\Product\ProductImportController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Purchase\PurchaseController;
+use App\Http\Controllers\Quotation\QuotationController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SubCategoryController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\UnitController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserRolePermissionController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,10 +32,6 @@ use App\Http\Controllers\Product\ProductImportController;
 |
 */
 
-Route::get('php/', function () {
-    return phpinfo();
-});
-
 Route::get('/welcome', function () {
     return view('welcome');
 });
@@ -47,6 +39,8 @@ Route::get('/welcome', function () {
 Route::get('/', function () {
     return view('auth.login');
 });
+
+Route::get('/health', HealthCheckController::class)->name('health');
 
 Route::middleware(['auth'])->group(function () {
 
@@ -74,34 +68,31 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/quotations', QuotationController::class);
     Route::resource('/customers', CustomerController::class);
     Route::resource('/suppliers', SupplierController::class);
-    Route::delete('suppliers/{supplier}', [SupplierController::class, 'destroy'])
-        ->name('suppliers.destroy')
-        ->middleware(['auth', 'role:super-admin']);
     Route::resource('/categories', CategoryController::class);
     Route::resource('/sub-categories', SubCategoryController::class);
     Route::resource('/units', UnitController::class);
 
     // Route Products
-    Route::get('/products/import', [ProductImportController::class, 'create'])->name('products.import.view');
-    // Route::post('/products/import', [ProductImportController::class, 'store'])->name('products.import.store');
-    Route::get('/products/export', [ProductExportController::class, 'create'])->name('products.export.store');
-    Route::resource('/products', ProductController::class);
-    Route::get('/subcategories/{category_id}', [ProductController::class, 'getSubCategories']);
+    Route::controller(ProductController::class)->group(function () {
+        Route::get('/products/import', [ProductImportController::class, 'create'])->name('products.import.view');
+        Route::post('/products/import', [ProductImportController::class, 'store'])->name('products.import.store');
+        Route::get('/products/export', [ProductExportController::class, 'create'])->name('products.export');
+        Route::resource('/products', ProductController::class);
+        Route::get('/subcategories/{category_id}', 'getSubCategories');
+    });
 
     // Route Orders
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/pending', OrderPendingController::class)->name('orders.pending');
-    Route::get('/orders/complete', OrderCompleteController::class)->name('orders.complete');
-
-    Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
-    Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
-    Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.delete');
-
-    Route::post('/invoice/create', [InvoiceController::class, 'create'])->name('invoice.create');
-
-    // SHOW ORDER
-    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::put('/orders/update/{order}', [OrderController::class, 'update'])->middleware(['auth', 'role:super-admin|admin'])->name('orders.update');
+    Route::controller(OrderController::class)->group(function () {
+        Route::get('/orders', 'index')->name('orders.index');
+        Route::get('/orders/pending', 'pendingOrders')->name('orders.pending');
+        Route::get('/orders/complete', 'completedOrders')->name('orders.complete');
+        Route::get('/orders/create', 'create')->name('orders.create');
+        Route::post('/orders', 'store')->name('orders.store');
+        Route::get('/orders/{order}', 'show')->name('orders.show');
+        Route::put('/orders/{order}', 'update')->middleware(['auth', 'role:super-admin|admin'])->name('orders.update');
+        Route::delete('/orders/{order}', 'destroy')->name('orders.destroy');
+        Route::get('/orders/details/{order}/download', 'downloadInvoice')->name('orders.downloadInvoice');
+    });
 
     // DUES
     Route::get('/due/orders/', [DueOrderController::class, 'index'])->name('due.index');
@@ -109,34 +100,22 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/due/order/edit/{order}', [DueOrderController::class, 'edit'])->name('due.edit');
     Route::put('/due/order/update/{order}', [DueOrderController::class, 'update'])->name('due.update');
 
-    // TODO: Remove from OrderController
-    Route::get('/orders/details/{order_id}/download', [OrderController::class, 'downloadInvoice'])->name('order.downloadInvoice');
-
-    // Route Orders V2
-    Route::get('/orders-v2', [OrderV2Controller::class, 'index'])->name('ordersV2.index');
-    Route::get('/orders-v2/completed', [OrderV2Controller::class, 'completedOrders'])->name('ordersV2.completedOrders');
-    Route::get('/orders-v2/pending', [OrderV2Controller::class, 'pendingOrders'])->name('ordersV2.pendingOrders');
-    Route::get('/orders-v2/create', [OrderV2Controller::class, 'create'])->name('ordersV2.create');
-    Route::post('/orders-v2/store', [OrderV2Controller::class, 'store'])->name('ordersV2.store');
-    Route::get('/orders-v2/{order}', [OrderV2Controller::class, 'show'])->name('ordersV2.show');
-    Route::put('/orders-v2/update/{order}', [OrderV2Controller::class, 'update'])->middleware(['auth', 'role:super-admin|admin'])->name('ordersV2.update');
-    Route::delete('/orders-v2/{order}', [OrderV2Controller::class, 'destroy'])->name('ordersV2.delete');
-
     // Route Purchases
-    Route::get('/purchases/approved', [PurchaseController::class, 'approvedPurchases'])->name('purchases.approvedPurchases');
-    Route::get('/purchases/pending', [PurchaseController::class, 'pendingPurchases'])->name('purchases.pendingPurchases');
-    Route::get('/purchases/report', [PurchaseController::class, 'dailyPurchaseReport'])->name('purchases.dailyPurchaseReport');
-    Route::get('/purchases/report/export', [PurchaseController::class, 'getPurchaseReport'])->name('purchases.getPurchaseReport');
-    Route::post('/purchases/report/export', [PurchaseController::class, 'exportPurchaseReport'])->name('purchases.exportPurchaseReport');
+    Route::controller(PurchaseController::class)->group(function () {
+        Route::get('/purchases/approved', 'approvedPurchases')->name('purchases.approvedPurchases');
+        Route::get('/purchases/pending', 'pendingPurchases')->name('purchases.pendingPurchases');
+        Route::get('/purchases/report', 'dailyPurchaseReport')->name('purchases.dailyPurchaseReport');
+        Route::get('/purchases/report/export', 'getPurchaseReport')->name('purchases.getPurchaseReport');
+        Route::post('/purchases/report/export', 'exportPurchaseReport')->name('purchases.exportPurchaseReport');
 
-    Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
-    Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
-    Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
-
-    Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
-    Route::get('/purchases/{purchase}/edit', [PurchaseController::class, 'edit'])->name('purchases.edit');
-    Route::put('/purchases/{purchase}/edit', [PurchaseController::class, 'update'])->middleware(['auth', 'role:super-admin|admin'])->name('purchases.update');
-    Route::delete('/purchases/{purchase}', [PurchaseController::class, 'destroy'])->name('purchases.delete');
+        Route::get('/purchases', 'index')->name('purchases.index');
+        Route::get('/purchases/create', 'create')->name('purchases.create');
+        Route::post('/purchases', 'store')->name('purchases.store');
+        Route::get('/purchases/{purchase}', 'show')->name('purchases.show');
+        Route::get('/purchases/{purchase}/edit', 'edit')->name('purchases.edit');
+        Route::put('/purchases/{purchase}/edit', 'update')->middleware(['auth', 'role:super-admin|admin'])->name('purchases.update');
+        Route::delete('/purchases/{purchase}', 'destroy')->name('purchases.destroy');
+    });
 
     // Route Role and Permission
     Route::middleware(['role:super-admin|admin'])->group(function () {
@@ -151,9 +130,4 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-require __DIR__ . '/auth.php';
-
-Route::get('test/', function () {
-    //    return view('test');
-    return view('orders.create');
-});
+require __DIR__.'/auth.php';
