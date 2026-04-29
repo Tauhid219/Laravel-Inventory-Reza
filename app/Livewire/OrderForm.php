@@ -41,7 +41,7 @@ class OrderForm extends Component
             ->with(['category', 'subCategory']);
 
         // 2. Apply dynamic role-based filtering logic
-        if (!$user->hasRole(['super-admin', 'admin'])) {
+        if (!$user->hasRole(['super-admin', 'admin', 'demo-admin'])) {
             // Get all role names assigned to the user
             $userRoles = $user->getRoleNames();
 

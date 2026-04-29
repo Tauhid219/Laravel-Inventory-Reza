@@ -19,6 +19,7 @@ class SubCategoryController extends Controller
         $this->middleware('permission:create subcategory')->only(['create', 'store']);
         $this->middleware('permission:update subcategory')->only(['edit', 'update']);
         $this->middleware('permission:delete subcategory')->only(['destroy']);
+        $this->middleware('deny.demo')->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
     public function index()
@@ -71,7 +72,7 @@ class SubCategoryController extends Controller
         $query = Category::query();
 
         // Dynamic role-based filtering for categories
-        if (!$user->hasRole(['super-admin', 'admin'])) {
+        if (!$user->hasRole(['super-admin', 'admin', 'demo-admin'])) {
             // Get all role names assigned to the user
             $userRoles = $user->getRoleNames();
 
@@ -86,7 +87,7 @@ class SubCategoryController extends Controller
          * If a non-admin user tries to edit a sub-category that doesn't belong
          * to their assigned category roles, deny access.
          */
-        if (!$user->hasRole(['super-admin', 'admin'])) {
+        if (!$user->hasRole(['super-admin', 'admin', 'demo-admin'])) {
             $allowedCategoryIds = $categories->pluck('id')->toArray();
             if (!in_array($subCategory->category_id, $allowedCategoryIds)) {
                 abort(403, 'Unauthorized action.');

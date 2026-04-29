@@ -1,3 +1,4 @@
+@php $isDemoMode = session('demo_mode', false); @endphp
 <div class="card">
     <div class="card-header d-flex align-items-center justify-content-between gap-2">
         <div>
@@ -7,7 +8,9 @@
         </div>
 
         <div class="card-tools d-flex align-items-center gap-2">
-            <x-action.create route="{{ route('purchases.create') }}" />
+            @unless ($isDemoMode)
+                <x-action.create route="{{ route('purchases.create') }}" />
+            @endunless
         </div>
     </div>
 
@@ -95,87 +98,82 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($purchases as $purchase)
-                    <tr>
-                        <td class="align-middle text-center">
-                            {{ $loop->iteration }}
-                        </td>
-                        {{-- <td class="align-middle text-center">
-                            {{ $purchase->purchase_no }}
-                        </td> --}}
-
-                        {{-- Product Names --}}
-                        <td class="align-middle text-center">
-                            @foreach ($purchase->details as $detail)
-                                <span class="badge bg-blue-lt">{{ $detail->product->name }}</span><br>
-                            @endforeach
-                        </td>
-
-                        {{-- Category Names --}}
-                        <td class="align-middle text-center">
-                            @php
-                                $categories = $purchase->details->map(fn($d) => $d->product->category->name)->unique();
-                            @endphp
-                            @foreach ($categories as $catName)
-                                <span class="badge bg-purple-lt">{{ $catName }}</span><br>
-                            @endforeach
-                        </td>
-
-                        {{-- Sub-Category Names --}}
-                        <td class="align-middle text-center">
-                            @php
-                                $subCategories = $purchase->details
-                                    ->map(fn($d) => $d->product->subCategory->name ?? 'N/A')
-                                    ->unique();
-                            @endphp
-                            @foreach ($subCategories as $subCatName)
-                                <span class="badge bg-gray-lt">{{ $subCatName }}</span><br>
-                            @endforeach
-                        </td>
-                        <td class="align-middle">
-                            {{ $purchase->supplier->name }}
-                        </td>
-                        <td class="align-middle text-center">
-                            {{ $purchase->date->format('d-m-Y') }}
-                        </td>
-                        <td class="align-middle text-center">
-                            {{ safe_currency($purchase->total_amount, 'BDT') }}
-                        </td>
-
-                        @if ($purchase->status === \App\Enums\PurchaseStatus::APPROVED)
-                            <td class="align-middle text-center">
-                                <span class="badge bg-green text-white text-uppercase">
-                                    {{ __('APPROVED') }}
-                                </span>
-                            </td>
-                            <td class="align-middle text-center">
-                                <x-button.show class="btn-icon" route="{{ route('purchases.show', $purchase) }}" />
-
-                                {{-- <x-button.edit class="btn-icon" route="{{ route('purchases.edit', $purchase) }}" /> --}}
-                                <x-button.delete class="btn-icon" route="{{ route('purchases.destroy', $purchase) }}"
-                                    onclick="return confirm('Are you sure you want to delete this purchase?')" />
-                            </td>
-                        @else
-                            <td class="align-middle text-center">
-                                <span class="badge bg-orange text-white text-uppercase">
-                                    {{ __('PENDING') }}
-                                </span>
-                            </td>
-                            <td class="align-middle text-center" style="width: 5%">
-                                <x-button.show class="btn-icon" route="{{ route('purchases.show', $purchase) }}" />
-                                {{-- <x-button.edit class="btn-icon" route="{{ route('purchases.edit', $purchase) }}" /> --}}
-                                <x-button.delete class="btn-icon" route="{{ route('purchases.destroy', $purchase) }}"
-                                    onclick="return confirm('Are you sure you want to delete this purchase?')" />
-                            </td>
-                        @endif
-                    </tr>
-                @empty
+                @if ($purchases->isEmpty())
                     <tr>
                         <td class="align-middle text-center" colspan="7">
                             No results found
                         </td>
                     </tr>
-                @endforelse
+                @else
+                    @foreach ($purchases as $purchase)
+                        <tr>
+                            <td class="align-middle text-center">
+                                {{ $loop->iteration }}
+                            </td>
+                            {{-- <td class="align-middle text-center">
+                                {{ $purchase->purchase_no }}
+                            </td> --}}
+
+                            {{-- Product Names --}}
+                            <td class="align-middle text-center">
+                                @foreach ($purchase->details as $detail)
+                                    <span class="badge bg-blue-lt">{{ $detail->product->name }}</span><br>
+                                @endforeach
+                            </td>
+
+                            {{-- Category Names --}}
+                            <td class="align-middle text-center">
+                                @php
+                                    $categories = $purchase->details->map(fn($d) => $d->product->category->name)->unique();
+                                @endphp
+                                @foreach ($categories as $catName)
+                                    <span class="badge bg-purple-lt">{{ $catName }}</span><br>
+                                @endforeach
+                            </td>
+
+                            {{-- Sub-Category Names --}}
+                            <td class="align-middle text-center">
+                                @php
+                                    $subCategories = $purchase->details
+                                        ->map(fn($d) => $d->product->subCategory->name ?? 'N/A')
+                                        ->unique();
+                                @endphp
+                                @foreach ($subCategories as $subCatName)
+                                    <span class="badge bg-gray-lt">{{ $subCatName }}</span><br>
+                                @endforeach
+                            </td>
+                            <td class="align-middle">
+                                {{ $purchase->supplier->name }}
+                            </td>
+                            <td class="align-middle text-center">
+                                {{ $purchase->date->format('d-m-Y') }}
+                            </td>
+                            <td class="align-middle text-center">
+                                {{ safe_currency($purchase->total_amount, 'BDT') }}
+                            </td>
+
+                            <td class="align-middle text-center">
+                                @if ($purchase->status === \App\Enums\PurchaseStatus::APPROVED)
+                                    <span class="badge bg-green text-white text-uppercase">
+                                        {{ $purchase->status->label() }}
+                                    </span>
+                                @else
+                                    <span class="badge bg-orange text-white text-uppercase">
+                                        {{ $purchase->status->label() }}
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="align-middle text-center" style="width: 5%">
+                                <x-button.show class="btn-icon" route="{{ route('purchases.show', $purchase) }}" />
+                                {{-- <x-button.edit class="btn-icon" route="{{ route('purchases.edit', $purchase) }}" /> --}}
+                                @if (! $isDemoMode)
+                                    <x-button.delete class="btn-icon" route="{{ route('purchases.destroy', $purchase) }}"
+                                        onclick="return confirm('Are you sure you want to delete this purchase?')" />
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                @endif
             </tbody>
         </table>
     </div>

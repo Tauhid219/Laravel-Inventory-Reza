@@ -20,7 +20,7 @@ class SelectCategory extends Component
         $query = Category::query();
 
         // 1. Dynamic role-based filtering for categories
-        if (!$user->hasRole(['super-admin', 'admin'])) {
+        if (!$user->hasRole(['super-admin', 'admin', 'demo-admin'])) {
             // Get all role names assigned to the user
             $userRoles = $user->getRoleNames();
 

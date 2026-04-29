@@ -1,11 +1,14 @@
 @extends('layouts.tabler')
 
 @section('content')
+    @php $isDemoMode = session('demo_mode', false); @endphp
     <x-adminlte.page-header :title="__('Completed Orders V2')" subtitle="Browse finalized updated-order records and printable invoice links.">
         <x-slot:actions>
             <div class="btn-group">
                 <a href="{{ route('orders.index') }}" class="btn btn-default">{{ __('All Orders') }}</a>
-                <a href="{{ route('orders.create') }}" class="btn btn-primary">{{ __('Add Order') }}</a>
+                @unless ($isDemoMode)
+                    <a href="{{ route('orders.create') }}" class="btn btn-primary">{{ __('Add Order') }}</a>
+                @endunless
             </div>
         </x-slot:actions>
     </x-adminlte.page-header>
@@ -107,7 +110,7 @@
                                                         d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
                                                 </svg>
                                             </a>
-                                            <a href="{{ route('order.downloadInvoice', $order) }}"
+                                            <a href="{{ route('orders.downloadInvoice', $order) }}"
                                                 class="btn btn-icon btn-outline-warning">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                     class="icon icon-tabler icon-tabler-printer" width="24"

@@ -1,12 +1,15 @@
 @extends('layouts.tabler')
 
 @section('content')
+    @php $isDemoMode = session('demo_mode', false); @endphp
     <x-adminlte.page-header :title="__('Quotations')" subtitle="Manage draft quotations and review customer proposals.">
-        <x-slot:actions>
-            <a href="{{ route('quotations.create') }}" class="btn btn-primary">
-                {{ __('Add Quotation') }}
-            </a>
-        </x-slot:actions>
+        @unless ($isDemoMode)
+            <x-slot:actions>
+                <a href="{{ route('quotations.create') }}" class="btn btn-primary">
+                    {{ __('Add Quotation') }}
+                </a>
+            </x-slot:actions>
+        @endunless
     </x-adminlte.page-header>
 
     <x-adminlte.page-body container-class="container container-xl">

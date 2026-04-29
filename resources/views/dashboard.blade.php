@@ -25,6 +25,7 @@
 
     $completionRate = $orders > 0 ? round(($completedOrders / $orders) * 100) : 0;
     $inventoryFamilies = $categories + $subCategories;
+    $isDemoMode = session('demo_mode', false);
 @endphp
 
 @extends('layouts.tabler')
@@ -40,7 +41,7 @@
             </ol>
         </x-slot:breadcrumbs>
 
-        @if ($activeTheme === 'compact')
+        @if ($activeTheme === 'compact' && ! $isDemoMode)
             <x-slot:actions>
                 <div class="btn-group">
                     <a href="{{ route('orders.create') }}" class="btn btn-primary">New Order</a>

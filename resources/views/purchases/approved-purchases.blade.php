@@ -1,11 +1,14 @@
 @extends('layouts.tabler')
 
 @section('content')
+    @php $isDemoMode = session('demo_mode', false); @endphp
     <x-adminlte.page-header :title="__('Approved Purchases')" subtitle="Browse completed purchase records that have already updated inventory.">
         <x-slot:actions>
             <div class="btn-group">
                 <a href="{{ route('purchases.index') }}" class="btn btn-default">{{ __('All Purchases') }}</a>
-                <a href="{{ route('purchases.create') }}" class="btn btn-primary">{{ __('Add Purchase') }}</a>
+                @unless ($isDemoMode)
+                    <a href="{{ route('purchases.create') }}" class="btn btn-primary">{{ __('Add Purchase') }}</a>
+                @endunless
             </div>
         </x-slot:actions>
     </x-adminlte.page-header>

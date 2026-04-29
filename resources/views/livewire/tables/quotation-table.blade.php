@@ -1,3 +1,4 @@
+@php $isDemoMode = session('demo_mode', false); @endphp
 <div class="card">
     <div class="card-header d-flex align-items-center justify-content-between gap-2">
         <div>
@@ -8,7 +9,9 @@
 
         <div class="card-tools d-flex align-items-center gap-2">
             @can('create quotation')
+                @unless ($isDemoMode)
                 <x-action.create route="{{ route('quotations.create') }}" />
+                @endunless
             @endcan
         </div>
     </div>
@@ -108,10 +111,14 @@
                             <x-button.show class="btn-icon" route="{{ route('quotations.show', $quotation) }}"/>
                         @endcan
                         @can('update quotation')
+                            @unless ($isDemoMode)
                             <x-button.edit class="btn-icon" route="{{ route('quotations.edit', $quotation) }}"/>
+                            @endunless
                         @endcan
                         @can('delete quotation')
+                            @unless ($isDemoMode)
                             <x-button.delete class="btn-icon" route="{{ route('quotations.destroy', $quotation) }}"/>
+                            @endunless
                         @endcan
                     </td>
                 </tr>

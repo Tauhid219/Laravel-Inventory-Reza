@@ -11,7 +11,16 @@ class UserRolePermissionController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:view user')->only(['index']);
+        $this->middleware(function ($request, $next) {
+            if (auth()->user()?->hasRole('demo-admin')) {
+                return $next($request);
+            }
+
+            abort_unless(auth()->user()?->can('view user'), 403);
+
+            return $next($request);
+        })->only(['index']);
+
         $this->middleware('permission:create user')->only(['create', 'store']);
         $this->middleware('permission:update user')->only(['edit', 'update', 'updatePassword']);
         $this->middleware('permission:delete user')->only(['destroy']);
@@ -19,7 +28,7 @@ class UserRolePermissionController extends Controller
 
     public function index()
     {
-        if (auth()->user()->hasRole('super-admin')) {
+        if (auth()->user()->hasRole(['super-admin', 'demo-admin'])) {
             $user = User::get();
         } else {
             $user = User::where(function ($query) {

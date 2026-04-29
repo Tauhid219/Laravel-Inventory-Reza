@@ -22,6 +22,7 @@ class ProductController extends Controller
         $this->middleware('permission:create product')->only(['create', 'store']);
         $this->middleware('permission:update product')->only(['edit', 'update']);
         $this->middleware('permission:delete product')->only(['destroy']);
+        $this->middleware('deny.demo')->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
     public function index()
@@ -34,7 +35,7 @@ class ProductController extends Controller
         $user = auth()->user();
         $query = Category::select(['id', 'name']); // Only select necessary fields
 
-        if (!$user->hasRole(['super-admin', 'admin'])) {
+        if (!$user->hasRole(['super-admin', 'admin', 'demo-admin'])) {
             $query->whereIn('role_name', $user->getRoleNames());
         }
 
@@ -89,7 +90,7 @@ class ProductController extends Controller
         $query = Category::query();
 
         // Dynamic role-based filtering
-        if (!$user->hasRole(['super-admin', 'admin'])) {
+        if (!$user->hasRole(['super-admin', 'admin', 'demo-admin'])) {
             $userRoles = $user->getRoleNames();
             $query->whereIn('role_name', $userRoles);
         }

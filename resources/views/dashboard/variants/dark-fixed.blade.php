@@ -1,3 +1,4 @@
+@php $isDemoMode = session('demo_mode', false); @endphp
 <div class="row">
     <div class="col-md-3"><div class="info-box bg-gradient-dark"><span class="info-box-icon"><i class="fas fa-box-open"></i></span><div class="info-box-content"><span class="info-box-text">Products</span><span class="info-box-number">{{ $products }}</span></div></div></div>
     <div class="col-md-3"><div class="info-box bg-gradient-info"><span class="info-box-icon"><i class="fas fa-user-friends"></i></span><div class="info-box-content"><span class="info-box-text">Customers</span><span class="info-box-number">{{ $customers }}</span></div></div></div>
@@ -25,10 +26,14 @@
         <div class="card card-secondary">
             <div class="card-header"><h3 class="card-title">Quick Actions</h3></div>
             <div class="card-body">
-                <a href="{{ route('orders.create') }}" class="btn btn-primary btn-block mb-2">Create Order</a>
-                <a href="{{ route('purchases.create') }}" class="btn btn-outline-light btn-block mb-2">Record Purchase</a>
-                <a href="{{ route('products.create') }}" class="btn btn-outline-info btn-block mb-2">Add Product</a>
-                <a href="{{ route('customers.create') }}" class="btn btn-outline-success btn-block">Add Customer</a>
+                @unless ($isDemoMode)
+                    <a href="{{ route('orders.create') }}" class="btn btn-primary btn-block mb-2">Create Order</a>
+                    <a href="{{ route('purchases.create') }}" class="btn btn-outline-light btn-block mb-2">Record Purchase</a>
+                    <a href="{{ route('products.create') }}" class="btn btn-outline-info btn-block mb-2">Add Product</a>
+                    <a href="{{ route('customers.create') }}" class="btn btn-outline-success btn-block">Add Customer</a>
+                @else
+                    <p class="text-muted mb-0">Quick-create actions are unavailable while browsing in demo mode.</p>
+                @endunless
             </div>
         </div>
     </div>

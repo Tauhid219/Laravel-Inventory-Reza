@@ -36,7 +36,7 @@ class SubCategoryTable extends Component
             ->search($this->search);
 
         // 2. Dynamic role-based filtering for sub-categories
-        if (!$user->hasRole(['super-admin', 'admin'])) {
+        if (!$user->hasRole(['super-admin', 'admin', 'demo-admin'])) {
             // Get all current role names assigned to the user
             $userRoles = $user->getRoleNames();
 

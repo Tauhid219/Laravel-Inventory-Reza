@@ -1,11 +1,14 @@
 @extends('layouts.tabler')
 
 @section('content')
+    @php $isDemoMode = session('demo_mode', false); @endphp
     <x-adminlte.page-header :title="__('Pending Orders V2')" subtitle="Review updated-order records that still need completion.">
         <x-slot:actions>
             <div class="btn-group">
                 <a href="{{ route('orders.index') }}" class="btn btn-default">{{ __('All Orders') }}</a>
-                <a href="{{ route('orders.create') }}" class="btn btn-primary">{{ __('Add Order') }}</a>
+                @unless ($isDemoMode)
+                    <a href="{{ route('orders.create') }}" class="btn btn-primary">{{ __('Add Order') }}</a>
+                @endunless
             </div>
         </x-slot:actions>
     </x-adminlte.page-header>

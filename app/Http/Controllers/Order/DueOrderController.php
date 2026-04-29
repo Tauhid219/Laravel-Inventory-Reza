@@ -13,6 +13,7 @@ class DueOrderController extends Controller
     {
         $this->middleware('permission:view order')->only(['index', 'show']);
         $this->middleware('permission:update order')->only(['edit', 'update']);
+        $this->middleware('deny.demo')->only(['edit', 'update']);
     }
 
     public function index()

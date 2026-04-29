@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
 class UserSeederForRolePermission extends Seeder
@@ -38,6 +39,21 @@ class UserSeederForRolePermission extends Seeder
 
             $role = Role::where('name', 'admin')->first();
             $user->assignRole($role);
+        }
+
+        $demoUser = User::updateOrCreate(
+            ['email' => 'demo-admin@reza-inventory.test'],
+            [
+                'name' => 'Demo Admin',
+                'username' => 'demo_admin',
+                'password' => Hash::make('demo12345'),
+            ]
+        );
+
+        $demoRole = Role::where('name', 'demo-admin')->first();
+
+        if ($demoRole) {
+            $demoUser->syncRoles([$demoRole]);
         }
     }
 }

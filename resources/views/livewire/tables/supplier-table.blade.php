@@ -1,3 +1,4 @@
+@php $isDemoMode = session('demo_mode', false); @endphp
 <div class="card">
     <div class="card-header d-flex align-items-center justify-content-between gap-2">
         <div>
@@ -8,7 +9,9 @@
 
         <div class="card-tools d-flex align-items-center gap-2">
             @can('create supplier')
+                @unless ($isDemoMode)
                 <x-action.create route="{{ route('suppliers.create') }}" />
+                @endunless
             @endcan
         </div>
     </div>
@@ -100,11 +103,15 @@
                                 <x-button.show class="btn-icon" route="{{ route('suppliers.show', $supplier) }}" />
                             @endcan
                             @can('update supplier')
+                                @unless ($isDemoMode)
                                 <x-button.edit class="btn-icon" route="{{ route('suppliers.edit', $supplier) }}" />
+                                @endunless
                             @endcan
                             @can('delete supplier')
+                                @unless ($isDemoMode)
                                 <x-button.delete class="btn-icon" route="{{ route('suppliers.destroy', $supplier) }}"
                                     onclick="return confirm('Are you sure you want to delete this supplier?')" />
+                                @endunless
                             @endcan
                         </td>
                     </tr>

@@ -11,6 +11,11 @@ use App\Http\Requests\ProfileUpdateRequest;
 
 class ProfileController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('deny.demo')->only(['edit', 'settings', 'update', 'destroy']);
+    }
+
     public function edit(Request $request)
     {
         return view('profile.edit', [

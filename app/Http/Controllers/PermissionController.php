@@ -9,9 +9,18 @@ class PermissionController extends Controller
 {
     public function __construct()
     {
+        $this->middleware(function ($request, $next) {
+            if (auth()->user()?->hasRole('demo-admin')) {
+                return $next($request);
+            }
+
+            abort_unless(auth()->user()?->can('view permission'), 403);
+
+            return $next($request);
+        })->only(['index', 'show']);
+
         $this->middleware('permission:create permission')->only(['create', 'store']);
         $this->middleware('permission:update permission')->only(['edit', 'update']);
-        $this->middleware('permission:view permission')->only(['index', 'show']);
         $this->middleware('permission:delete permission')->only(['destroy']);
     }
 

@@ -13,6 +13,7 @@ class ProductExportController extends Controller
     public function __construct()
     {
         $this->middleware('permission:view product')->only(['create']);
+        $this->middleware('deny.demo')->only(['create']);
     }
 
     public function create()

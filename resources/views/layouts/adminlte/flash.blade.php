@@ -12,7 +12,7 @@
 @if ($shouldRenderDefaultFlash)
     @foreach ($flashLevels as $key => $meta)
         @if (session()->has($key))
-            @php($renderedFlash = true)
+            @php $renderedFlash = true; @endphp
             <div class="alert {{ $meta['class'] }} alert-dismissible">
                 <h5 class="mb-1"><i class="{{ $meta['icon'] }} mr-2"></i>{{ $meta['title'] }}</h5>
                 <p class="mb-0">{{ session($key) }}</p>
@@ -24,7 +24,7 @@
     @endforeach
 
     @if ($errors->any())
-        @php($renderedFlash = true)
+        @php $renderedFlash = true; @endphp
         <div class="alert alert-danger alert-dismissible">
             <h5 class="mb-1"><i class="fas fa-ban mr-2"></i>There was a problem</h5>
             <ul class="mb-0 pl-3">

@@ -1,6 +1,7 @@
 @extends('layouts.tabler')
 
 @section('content')
+    @php $isDemoMode = session('demo_mode', false); @endphp
     <x-adminlte.page-header :title="__('Order Details')" subtitle="Review the updated order summary, item grouping, and completion status.">
         <x-slot:breadcrumbs>
             @include('partials._breadcrumbs', ['model' => $order])
@@ -105,6 +106,7 @@
             </x-slot:content>
 
             @can('update order')
+                @unless ($isDemoMode)
                 <x-slot:footer class="text-end">
                     @if ($order->order_status === \App\Enums\OrderStatus::PENDING)
                         <form action="{{ route('orders.update', $order) }}" method="POST">
@@ -118,6 +120,7 @@
                         </form>
                     @endif
                 </x-slot:footer>
+                @endunless
             @endcan
         </x-card>
     </x-adminlte.page-body>

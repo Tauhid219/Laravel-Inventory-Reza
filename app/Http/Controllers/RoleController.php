@@ -11,15 +11,24 @@ class RoleController extends Controller
 {
     public function __construct()
     {
+        $this->middleware(function ($request, $next) {
+            if (auth()->user()?->hasRole('demo-admin')) {
+                return $next($request);
+            }
+
+            abort_unless(auth()->user()?->can('view role'), 403);
+
+            return $next($request);
+        })->only(['index', 'show']);
+
         $this->middleware('permission:create role')->only(['create', 'store', 'edit', 'update']);
         $this->middleware('permission:update role')->only(['addPermissionToRole', 'givePermissionToRole']);
-        $this->middleware('permission:view role')->only(['index', 'show']);
         $this->middleware('permission:delete role')->only(['destroy']);
     }
 
     public function index()
     {
-        if (auth()->user()->hasRole('super-admin')) {
+        if (auth()->user()->hasRole(['super-admin', 'demo-admin'])) {
             $roles = Role::get();
         } else {
             $roles = Role::where('name', '!=', 'super-admin')->get();

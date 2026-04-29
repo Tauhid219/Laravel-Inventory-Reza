@@ -38,7 +38,7 @@ class ProductTable extends Component
         $user = auth()->user();
         $query = Product::query()->with(['category', 'subCategory'])->search($this->search);
 
-        if (!$user->hasRole(['super-admin', 'admin'])) {
+        if (!$user->hasRole(['super-admin', 'admin', 'demo-admin'])) {
             $userRoles = $user->getRoleNames(); // Get all role names of the user
 
             $query->whereHas('category', function ($q) use ($userRoles) {

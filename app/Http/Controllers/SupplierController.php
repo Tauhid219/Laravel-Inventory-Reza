@@ -14,6 +14,7 @@ class SupplierController extends Controller
         $this->middleware('permission:create supplier')->only(['create', 'store']);
         $this->middleware('permission:update supplier')->only(['edit', 'update']);
         $this->middleware('permission:delete supplier')->only(['destroy']);
+        $this->middleware('deny.demo')->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
     public function index()

@@ -24,6 +24,7 @@ class PurchaseController extends Controller
         $this->middleware('permission:create purchase')->only(['create', 'store']);
         $this->middleware('permission:update purchase')->only(['edit', 'update']);
         $this->middleware('permission:delete purchase')->only(['destroy']);
+        $this->middleware('deny.demo')->only(['create', 'store', 'edit', 'update', 'destroy', 'getPurchaseReport', 'exportPurchaseReport']);
     }
 
     public function index()

@@ -23,6 +23,11 @@ class RoleSeeder extends Seeder
             Role::create(['name' => 'admin']);
         }
 
+        // Demo Admin Role
+        if (!Role::where('name', 'demo-admin')->exists()) {
+            Role::create(['name' => 'demo-admin']);
+        }
+
         // Passive Admin Role
         if (!Role::where('name', 'passive-admin')->exists()) {
             Role::create(['name' => 'passive-admin']);

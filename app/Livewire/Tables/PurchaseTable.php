@@ -47,7 +47,7 @@ class PurchaseTable extends Component
             ]);
 
         // 2. Dynamic role-based filtering
-        if (!$user->hasRole(['super-admin', 'admin'])) {
+        if (!$user->hasRole(['super-admin', 'admin', 'demo-admin'])) {
             // Get all current role names assigned to the user
             $userRoles = $user->getRoleNames();
 

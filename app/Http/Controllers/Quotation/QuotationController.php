@@ -19,6 +19,7 @@ class QuotationController extends Controller
         $this->middleware('permission:create quotation')->only(['create', 'store']);
         $this->middleware('permission:update quotation')->only(['edit', 'update']);
         $this->middleware('permission:delete quotation')->only(['destroy']);
+        $this->middleware('deny.demo')->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
     public function index()

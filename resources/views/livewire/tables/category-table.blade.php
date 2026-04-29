@@ -1,3 +1,4 @@
+@php $isDemoMode = session('demo_mode', false); @endphp
 <div class="card">
     <div class="card-header d-flex align-items-center justify-content-between gap-2">
         <div>
@@ -6,7 +7,9 @@
             </h3>
         </div>
         <div class="card-tools d-flex align-items-center gap-2">
-            <x-action.create route="{{ route('categories.create') }}" />
+            @unless ($isDemoMode)
+                <x-action.create route="{{ route('categories.create') }}" />
+            @endunless
         </div>
     </div>
     <div class="card-body border-bottom py-3">
@@ -73,9 +76,11 @@
                         </td>
                         <td class="align-middle text-center" style="width: 10%">
                             <x-button.show class="btn-icon" route="{{ route('categories.show', $category) }}" />
-                            <x-button.edit class="btn-icon" route="{{ route('categories.edit', $category) }}" />
-                            <x-button.delete class="btn-icon" route="{{ route('categories.destroy', $category) }}"
-                                onclick="return confirm('Are you sure you want to delete this category?')" />
+                            @unless ($isDemoMode)
+                                <x-button.edit class="btn-icon" route="{{ route('categories.edit', $category) }}" />
+                                <x-button.delete class="btn-icon" route="{{ route('categories.destroy', $category) }}"
+                                    onclick="return confirm('Are you sure you want to delete this category?')" />
+                            @endunless
                         </td>
                     </tr>
                 @empty

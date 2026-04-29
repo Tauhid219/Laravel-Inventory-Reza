@@ -1,4 +1,5 @@
 <nav class="main-header navbar navbar-expand {{ $theme['navbar'] }}">
+    @php $isDemoMode = session('demo_mode', false); @endphp
     <ul class="navbar-nav">
         <li class="nav-item">
             <a class="nav-link" data-widget="pushmenu" href="#" role="button">
@@ -11,6 +12,13 @@
         <li class="nav-item d-none d-md-inline-block">
             <span class="nav-link text-muted">{{ $themeVariants[$activeTheme]['label'] }}</span>
         </li>
+        @if ($isDemoMode)
+            <li class="nav-item d-none d-md-inline-block">
+                <span class="nav-link">
+                    <span class="badge badge-info text-uppercase">{{ __('Demo Mode') }}</span>
+                </span>
+            </li>
+        @endif
     </ul>
 
     <ul class="navbar-nav ml-auto align-items-center">
@@ -56,7 +64,9 @@
                     </p>
                 </li>
                 <li class="user-footer">
-                    <a href="{{ route('profile.edit') }}" class="btn btn-default btn-flat">Profile</a>
+                    @unless ($isDemoMode)
+                        <a href="{{ route('profile.edit') }}" class="btn btn-default btn-flat">Profile</a>
+                    @endunless
                     <form action="{{ route('logout') }}" method="POST" class="d-inline float-right">
                         @csrf
                         <button type="submit" class="btn btn-default btn-flat">Logout</button>

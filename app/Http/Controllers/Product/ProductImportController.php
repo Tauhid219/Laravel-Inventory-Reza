@@ -13,6 +13,7 @@ class ProductImportController extends Controller
     public function __construct()
     {
         $this->middleware('permission:create product')->only(['create', 'store']);
+        $this->middleware('deny.demo')->only(['create', 'store']);
     }
 
     public function create()

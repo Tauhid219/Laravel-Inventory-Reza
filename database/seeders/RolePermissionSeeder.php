@@ -81,5 +81,26 @@ class RolePermissionSeeder extends Seeder
 
         // Assign only the specific permissions to the 'admin' role.
         $adminRole->syncPermissions($adminPermissions);
+
+        // Get the 'demo-admin' role from the roles table.
+        $demoAdminRole = Role::where('name', 'demo-admin')->first();
+
+        // Restrict demo access to read-only business visibility.
+        $demoAdminPermissions = Permission::whereIn('name', [
+            'view role',
+            'view permission',
+            'view user',
+            'view product',
+            'view purchase',
+            'view order',
+            'view category',
+            'view subcategory',
+            'view customer',
+            'view supplier',
+            'view unit',
+            'view quotation',
+        ])->get();
+
+        $demoAdminRole?->syncPermissions($demoAdminPermissions);
     }
 }

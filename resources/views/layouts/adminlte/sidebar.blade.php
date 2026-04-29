@@ -2,6 +2,7 @@
     $isActive = fn (...$patterns) => request()->is(...$patterns);
     $menuOpen = fn (...$patterns) => $isActive(...$patterns) ? 'menu-open' : '';
     $activeClass = fn (...$patterns) => $isActive(...$patterns) ? 'active' : '';
+    $isDemoMode = session('demo_mode', false);
 @endphp
 <aside class="main-sidebar elevation-4 {{ $theme['sidebar'] }}">
     <a href="{{ route('dashboard') }}" class="{{ $theme['logo'] }}">
@@ -15,7 +16,11 @@
                 <img src="{{ Avatar::create(Auth::user()->name)->toBase64() }}" class="img-circle elevation-2" alt="{{ Auth::user()->name }}">
             </div>
             <div class="info">
-                <a href="{{ route('profile.edit') }}" class="d-block">{{ Auth::user()->name }}</a>
+                @if ($isDemoMode)
+                    <span class="d-block">{{ Auth::user()->name }}</span>
+                @else
+                    <a href="{{ route('profile.edit') }}" class="d-block">{{ Auth::user()->name }}</a>
+                @endif
                 <span class="sidebar-role-label">{{ Auth::user()->getRoleNames()->implode(', ') ?: 'User' }}</span>
             </div>
         </div>
@@ -106,17 +111,22 @@
                     <li class="nav-item"><a href="{{ route('suppliers.index') }}" class="nav-link {{ $activeClass('suppliers*') }}"><i class="nav-icon fas fa-people-carry"></i><p>Suppliers</p></a></li>
                 @endcan
 
-                @role('super-admin|admin')
+                @role('super-admin|admin|demo-admin')
                     <li class="nav-header">ADMINISTRATION</li>
                     @role('super-admin')
                         <li class="nav-item"><a href="{{ route('users.index') }}" class="nav-link {{ $activeClass('users*') }}"><i class="nav-icon fas fa-users-cog"></i><p>Users</p></a></li>
                     @endrole
+                    @can('view user')
+                        <li class="nav-item"><a href="{{ route('user.index') }}" class="nav-link {{ $activeClass('user*') }}"><i class="nav-icon fas fa-users"></i><p>User Roles</p></a></li>
+                    @endcan
                     <li class="nav-item"><a href="{{ route('welcome-page') }}" class="nav-link {{ $activeClass('welcome-page', 'role*', 'permission*', 'user') }}"><i class="nav-icon fas fa-user-shield"></i><p>Roles & Permissions</p></a></li>
                 @endrole
 
-                <li class="nav-header">ACCOUNT</li>
-                <li class="nav-item"><a href="{{ route('profile.edit') }}" class="nav-link {{ $activeClass('profile') }}"><i class="nav-icon fas fa-id-badge"></i><p>Profile</p></a></li>
-                <li class="nav-item"><a href="{{ route('profile.settings') }}" class="nav-link {{ $activeClass('profile/settings') }}"><i class="nav-icon fas fa-cogs"></i><p>Settings</p></a></li>
+                @unless ($isDemoMode)
+                    <li class="nav-header">ACCOUNT</li>
+                    <li class="nav-item"><a href="{{ route('profile.edit') }}" class="nav-link {{ $activeClass('profile') }}"><i class="nav-icon fas fa-id-badge"></i><p>Profile</p></a></li>
+                    <li class="nav-item"><a href="{{ route('profile.settings') }}" class="nav-link {{ $activeClass('profile/settings') }}"><i class="nav-icon fas fa-cogs"></i><p>Settings</p></a></li>
+                @endunless
             </ul>
         </nav>
     </div>

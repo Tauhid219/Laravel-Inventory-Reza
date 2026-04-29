@@ -14,6 +14,7 @@ class CustomerController extends Controller
         $this->middleware('permission:create customer')->only(['create', 'store']);
         $this->middleware('permission:update customer')->only(['edit', 'update']);
         $this->middleware('permission:delete customer')->only(['destroy']);
+        $this->middleware('deny.demo')->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
     public function index()

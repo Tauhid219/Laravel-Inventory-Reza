@@ -22,6 +22,7 @@ class OrderController extends Controller
         $this->middleware('permission:create order')->only(['create', 'store']);
         $this->middleware('permission:update order')->only(['update']);
         $this->middleware('permission:delete order')->only(['destroy']);
+        $this->middleware('deny.demo')->only(['create', 'store', 'update', 'destroy']);
     }
 
     public function index()

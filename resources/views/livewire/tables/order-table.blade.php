@@ -1,3 +1,4 @@
+@php $isDemoMode = session('demo_mode', false); @endphp
 <div class="card">
     <div class="card-header d-flex align-items-center justify-content-between gap-2">
         <div>
@@ -7,7 +8,9 @@
         </div>
 
         <div class="card-tools d-flex align-items-center gap-2">
-            <x-action.create route="{{ route('orders.create') }}" />
+            @unless ($isDemoMode)
+                <x-action.create route="{{ route('orders.create') }}" />
+            @endunless
         </div>
     </div>
 
@@ -160,8 +163,10 @@
                         <td class="align-middle text-center" style="width: 5%">
                             <x-button.show class="btn-icon" route="{{ route('orders.show', $order) }}" />
                             {{-- <x-button.print class="btn-icon" route="{{ route('order.downloadInvoice', $order) }}" /> --}}
-                            <x-button.delete class="btn-icon" route="{{ route('orders.destroy', $order) }}"
-                                onclick="return confirm('Are you sure you want to delete this order?')" />
+                            @unless ($isDemoMode)
+                                <x-button.delete class="btn-icon" route="{{ route('orders.destroy', $order) }}"
+                                    onclick="return confirm('Are you sure you want to delete this order?')" />
+                            @endunless
                         </td>
                     </tr>
                 @empty

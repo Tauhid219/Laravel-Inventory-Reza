@@ -118,7 +118,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Route Role and Permission
-    Route::middleware(['role:super-admin|admin'])->group(function () {
+    Route::middleware(['role:super-admin|admin|demo-admin'])->group(function () {
         Route::resource('/permission', PermissionController::class)->names('pr');
         Route::resource('/role', RoleController::class)->names('rl');
         Route::get('/role/{id}/add-permissions', [RoleController::class, 'addPermissionToRole'])->name('addPermissionToRole');

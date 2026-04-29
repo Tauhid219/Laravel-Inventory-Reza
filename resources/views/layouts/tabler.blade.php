@@ -30,6 +30,7 @@
     $activeTheme = session('adminlte_theme', 'classic');
     $theme = $themeVariants[$activeTheme] ?? $themeVariants['classic'];
     $appName = config('app.name', 'Reza Inventory');
+    $isDemoMode = session('demo_mode', false);
 @endphp
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -44,6 +45,17 @@
         <section class="content pt-3">
             <div class="container-fluid">
                 @include('layouts.adminlte.flash')
+                @if ($isDemoMode)
+                    <div class="alert alert-info border-0 shadow-sm">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+                            <div>
+                                <strong>{{ __('Demo Mode') }}</strong>
+                                <span class="ml-2">{{ __('You can explore the admin panel, but data changes and administrative actions are disabled.') }}</span>
+                            </div>
+                            <span class="badge badge-light text-uppercase">{{ __('Read only') }}</span>
+                        </div>
+                    </div>
+                @endif
             </div>
         </section>
         @yield('content')

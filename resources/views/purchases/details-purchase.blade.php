@@ -1,6 +1,7 @@
 @extends('layouts.tabler')
 
 @section('content')
+    @php $isDemoMode = session('demo_mode', false); @endphp
     <x-adminlte.page-header :title="__('Purchase Details')" subtitle="Review supplier information, approval state, and purchased product lines.">
         <x-slot:breadcrumbs>
             @include('partials._breadcrumbs', ['model' => $purchase])
@@ -66,6 +67,7 @@
 
             <x-slot:footer class="text-end">
                 @can('update purchase')
+                    @unless ($isDemoMode)
                     @if ($purchase->status == \App\Enums\PurchaseStatus::PENDING)
                         <form action="{{ route('purchases.update', $purchase) }}" method="POST">
                             @csrf
@@ -80,6 +82,9 @@
                     @else
                         <a class="btn btn-default" href="{{ URL::previous() }}">{{ __('Back') }}</a>
                     @endif
+                    @else
+                        <a class="btn btn-default" href="{{ URL::previous() }}">{{ __('Back') }}</a>
+                    @endunless
                 @endcan
             </x-slot:footer>
         </x-card>

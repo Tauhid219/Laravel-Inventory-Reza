@@ -14,6 +14,7 @@ class UnitController extends Controller
         $this->middleware('permission:create unit')->only(['create', 'store']);
         $this->middleware('permission:update unit')->only(['edit', 'update']);
         $this->middleware('permission:delete unit')->only(['destroy']);
+        $this->middleware('deny.demo')->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
     public function index()

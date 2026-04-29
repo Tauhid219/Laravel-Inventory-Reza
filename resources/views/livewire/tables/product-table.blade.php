@@ -1,3 +1,4 @@
+@php $isDemoMode = session('demo_mode', false); @endphp
 <div class="card">
     <div class="card-header d-flex align-items-center justify-content-between gap-2">
         <div>
@@ -14,16 +15,20 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-end" style="">
                     @can('create product')
+                        @unless ($isDemoMode)
                         <a href="{{ route('products.create') }}" class="dropdown-item">
                             <x-icon.plus />
                             {{ __('Create Product') }}
                         </a>
+                        @endunless
                     @endcan
                     @can('view product')
+                        @unless ($isDemoMode)
                         <a href="{{ route('products.export') }}" class="dropdown-item">
                             <x-icon.plus />
                             {{ __('Export Products') }}
                         </a>
+                        @endunless
                     @endcan
                 </div>
             </div>
@@ -153,11 +158,15 @@
                                 <x-button.show class="btn-icon" route="{{ route('products.show', $product) }}" />
                             @endcan
                             @can('update product')
+                                @unless ($isDemoMode)
                                 <x-button.edit class="btn-icon" route="{{ route('products.edit', $product) }}" />
+                                @endunless
                             @endcan
                             @can('delete product')
+                                @unless ($isDemoMode)
                                 <x-button.delete class="btn-icon" route="{{ route('products.destroy', $product) }}"
                                     onclick="return confirm('Are you sure you want to delete this product?')" />
+                                @endunless
                             @endcan
                         </td>
                     </tr>

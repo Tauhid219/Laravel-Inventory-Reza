@@ -1,3 +1,4 @@
+@php $isDemoMode = session('demo_mode', false); @endphp
 <div class="row">
     <div class="col-lg-3 col-6">
         <div class="small-box bg-primary">
@@ -34,10 +35,12 @@
         <div class="card">
             <div class="card-header border-0">
                 <h3 class="card-title">Operations Snapshot</h3>
-                <div class="card-tools">
-                    <a href="{{ route('orders.create') }}" class="btn btn-sm btn-primary">New Order</a>
-                    <a href="{{ route('products.create') }}" class="btn btn-sm btn-outline-primary">Add Product</a>
-                </div>
+                @unless ($isDemoMode)
+                    <div class="card-tools">
+                        <a href="{{ route('orders.create') }}" class="btn btn-sm btn-primary">New Order</a>
+                        <a href="{{ route('products.create') }}" class="btn btn-sm btn-outline-primary">Add Product</a>
+                    </div>
+                @endunless
             </div>
             <div class="card-body">
                 <div class="row">
